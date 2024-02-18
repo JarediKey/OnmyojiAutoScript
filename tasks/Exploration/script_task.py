@@ -186,7 +186,10 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, ExplorationAssets):
     def do_battle(self):
         while 1:
             self.screenshot()
-            # 战后奖励
+            # 每场战斗奖励
+            if self.appear(self.I_REWARD, threshold=0.6):
+                self.click(self.I_REWARD)
+            # 探索完成后地上的奖励
             if self.appear(self.I_BATTLE_REWARD) and not self.appear(self.I_GET_REWARD):
                 self.click(self.I_BATTLE_REWARD)
             # boss 战
