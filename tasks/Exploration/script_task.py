@@ -188,7 +188,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, ExplorationAssets):
             self.screenshot()
             # 每场战斗奖励
             if self.appear(self.I_REWARD, threshold=0.6):
-                self.click(self.I_REWARD)
+                self.run_general_battle(self.config.exploration.general_battle_config)
             # 探索完成后地上的奖励
             if self.appear(self.I_BATTLE_REWARD) and not self.appear(self.I_GET_REWARD):
                 self.click(self.I_BATTLE_REWARD)
