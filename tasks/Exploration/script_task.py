@@ -76,6 +76,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, ExplorationAssets):
                 self.battle_process()
             if self.appear(self.I_EXPLORATION_TITLE):
                 self.open_expect_level()
+            logger.info(f'Exploration completion count: {count} / {explorationConfig.exploration_config.attack_number}')
 
         if self.wait_until_appear(self.I_RED_CLOSE, wait_time=2):
             self.appear_then_click(self.I_RED_CLOSE)
