@@ -186,21 +186,21 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, ExplorationAssets):
     def do_battle(self):
         while 1:
             self.screenshot()
-            # 每场战斗奖励
-            if self.appear(self.I_REWARD, threshold=0.6):
+            # 判断是否在战斗中
+            if self.appear(self.I_REWARD, threshold=0.6) or self.appear(self.I_BATTLE_START):
                 self.run_general_battle(self.config.exploration.general_battle_config)
             # 探索完成后地上的奖励
             if self.appear(self.I_BATTLE_REWARD) and not self.appear(self.I_GET_REWARD):
                 self.click(self.I_BATTLE_REWARD)
             # boss 战
             if self.appear_then_click(self.I_BOSS_BATTLE_BUTTON):
-                if self.wait_until_appear(self.I_BATTLE_START, wait_time=5):
+                if self.wait_until_appear(self.I_BATTLE_START, wait_time=6):
                     self.run_general_battle(self.config.exploration.general_battle_config)
                 else:
                     continue
             # 小怪 战
             if self.appear_then_click(self.I_NORMAL_BATTLE_BUTTON):
-                if self.wait_until_appear(self.I_BATTLE_START, wait_time=5):
+                if self.wait_until_appear(self.I_BATTLE_START, wait_time=6):
                     self.run_general_battle(self.config.exploration.general_battle_config)
                 else:
                     continue
