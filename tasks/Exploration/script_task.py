@@ -81,6 +81,17 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, ExplorationAssets):
         if self.wait_until_appear(self.I_RED_CLOSE, wait_time=2):
             self.appear_then_click(self.I_RED_CLOSE)
         self.ui_goto(page_main)
+        # Close Buff
+        self.open_buff()
+        if con.buff_gold_50_click:
+            self.gold_50(False)
+        if con.buff_gold_100_click:
+            self.gold_100(False)
+        if con.buff_exp_50_click:
+            self.exp_50(False)
+        if con.buff_exp_100_click:
+            self.exp_100(False)
+        self.close_buff()
         self.set_next_run(task='Exploration', success=True, finish=True)
 
     # 查找指定的章节：
