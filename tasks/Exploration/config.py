@@ -63,9 +63,7 @@ class ChooseRarity(str, Enum):
 class ExplorationConfig(BaseModel):
     buff_gold_50_click: bool = Field(default=False)
     buff_gold_100_click: bool = Field(default=False)
-
-    attack_number: AttackNumber = Field(title='探索次数', default=AttackNumber.SEVEN,
-                                        description='默认探索7次')
+    attack_number: int = Field(title='探索完成次数', default=7, ge=1, description='默认探索7次')
 
     current_exploration_times: str = Field(default='0', description='探索次数')
 

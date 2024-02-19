@@ -62,22 +62,21 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, ExplorationAssets):
                             f' Enter {explorationConfig.exploration_config.exploration_level} failed!')
             raise RequestHumanTakeover
 
-        # 只探索7次
-        if explorationConfig.exploration_config.attack_number == AttackNumber.SEVEN:
-            count = 0
-            while count < 7:
-                if self.wait_until_appear(self.I_E_EXPLORATION_CLICK, wait_time=1):
-                    self.click(self.I_E_EXPLORATION_CLICK)
-                    count += 1
-                    # 进入战斗环节
-                    self.battle_process()
-                if self.appear(self.I_EXPLORATION_TITLE):
-                    self.open_expect_level()
+        # 按探索次数开始进行
+        count = 0
+        while count < explorationConfig.exploration_config.attack_number:
+            if self.wait_until_appear(self.I_E_EXPLORATION_CLICK, wait_time=1):
+                self.click(self.I_E_EXPLORATION_CLICK)
+                count += 1
+                # 进入战斗环节
+                self.battle_process()
+            if self.appear(self.I_EXPLORATION_TITLE):
+                self.open_expect_level()
 
-            if self.wait_until_appear(self.I_RED_CLOSE, wait_time=2):
-                self.appear_then_click(self.I_RED_CLOSE)
-            self.ui_goto(page_main)
-            self.set_next_run(task='Exploration', success=True, finish=False)
+        if self.wait_until_appear(self.I_RED_CLOSE, wait_time=2):
+            self.appear_then_click(self.I_RED_CLOSE)
+        self.ui_goto(page_main)
+        self.set_next_run(task='Exploration', success=True, finish=True)
 
     # 查找指定的章节：
     def open_expect_level(self):
