@@ -270,7 +270,7 @@ class ScriptTask(GameUi, ReplaceShikigami, KekkaiUtilizeAssets):
 
             if self.appear(self.I_U_ENTER_REALM):
                 break
-            if self.appear_then_click(self.I_UTILIZE_ADD, interval=2):
+            if self.appear_then_click(self.I_UTILIZE_ADD, interval=4):
                 continue
         logger.info('Enter utilize')
         return True
@@ -287,7 +287,7 @@ class ScriptTask(GameUi, ReplaceShikigami, KekkaiUtilizeAssets):
         else:
             check_image = self.I_UTILIZE_ZONES_GROUP
 
-        timer_click = Timer(1)
+        timer_click = Timer(3)
         timer_click.start()
         while 1:
             self.screenshot()
@@ -297,7 +297,7 @@ class ScriptTask(GameUi, ReplaceShikigami, KekkaiUtilizeAssets):
                 timer_click.reset()
                 x, y = check_image.coord()
                 self.device.click(x=x, y=y, control_name=check_image.name)
-        time.sleep(0.5)
+        time.sleep(2)
 
     @cached_property
     def order_targets(self) -> ImageGrid:
