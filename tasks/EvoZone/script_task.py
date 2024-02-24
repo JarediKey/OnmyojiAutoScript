@@ -161,14 +161,22 @@ class ScriptTask(GeneralBattle, GeneralInvite, GeneralBuff, GeneralRoom, GameUi,
                 continue
 
             if self.current_count >= self.limit_count:
+                logger.info('EvoZone count limit out, and to check if in room')
+                sleep(1)
                 if self.is_in_room():
-                    logger.info('EvoZone count limit out')
+                    logger.info('Yes, now is in room, to exit!')
                     break
+                else:
+                    logger.info('Not in the room')
 
             if datetime.now() - self.start_time >= self.limit_time:
+                logger.info('EvoZone time limit out, and to check if in room')
+                sleep(1)
                 if self.is_in_room():
-                    logger.info('EvoZone time limit out')
+                    logger.info('Yes, now is in room, to exit!')
                     break
+                else:
+                    logger.info('Not in the room')
 
 
 
