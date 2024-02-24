@@ -455,7 +455,7 @@ class BaseTask(GlobalGameAssets, CostumeBase):
             self.screenshot()
         return self.appear_then_click(self.I_UI_REWARD, action=self.C_UI_REWARD, interval=0.4, threshold=0.6)
 
-    def ui_get_reward(self, click_image: RuleImage or RuleOcr or RuleClick, click_interval: float=1):
+    def ui_get_reward(self, click_image: RuleImage or RuleOcr or RuleClick, click_interval: float=2):
         """
         传进来一个点击图片 或是 一个ocr， 会点击这个图片，然后等待‘获得奖励’，
         最后当获得奖励消失后 退出
@@ -492,7 +492,7 @@ class BaseTask(GlobalGameAssets, CostumeBase):
 
         return True
 
-    def ui_click(self, click, stop, interval=1):
+    def ui_click(self, click, stop, interval=2):
         """
         循环的一个操作，直到出现stop
         :param click:
@@ -511,7 +511,7 @@ class BaseTask(GlobalGameAssets, CostumeBase):
             elif isinstance(click, RuleOcr) and self.ocr_appear_click(click, interval=interval):
                 continue
 
-    def ui_click_until_disappear(self, click, interval: float =1):
+    def ui_click_until_disappear(self, click, interval: float =2):
         """
         点击一个按钮直到消失
         :param interval:
