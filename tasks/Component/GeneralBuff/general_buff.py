@@ -25,7 +25,7 @@ class GeneralBuff(BaseTask, GeneralBuffAssets):
             self.screenshot()
             if self.appear(self.I_CLOUD):
                 break
-            if self.appear_then_click(self.I_BUFF_1, interval=2):
+            if self.appear_then_click(self.I_BUFF_1, interval=3):
                 continue
 
         check_image = self.I_AWAKE
@@ -46,7 +46,7 @@ class GeneralBuff(BaseTask, GeneralBuffAssets):
             self.screenshot()
             if not self.appear(self.I_CLOUD):
                 break
-            if self.appear_then_click(self.I_BUFF_1, interval=2):
+            if self.appear_then_click(self.I_BUFF_1, interval=3):
                 continue
 
     @staticmethod
