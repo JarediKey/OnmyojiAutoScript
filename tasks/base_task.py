@@ -453,7 +453,7 @@ class BaseTask(GlobalGameAssets, CostumeBase):
         """
         if screenshot:
             self.screenshot()
-        return self.appear_then_click(self.I_UI_REWARD, action=self.C_UI_REWARD, interval=0.4, threshold=0.6)
+        return self.appear_then_click(self.I_UI_REWARD, action=self.C_UI_REWARD, interval=1, threshold=0.6)
 
     def ui_get_reward(self, click_image: RuleImage or RuleOcr or RuleClick, click_interval: float=2):
         """
@@ -467,7 +467,7 @@ class BaseTask(GlobalGameAssets, CostumeBase):
             self.screenshot()
 
             if self.ui_reward_appear_click():
-                sleep(0.5)
+                sleep(2)
                 while 1:
                     self.screenshot()
                     # 等待动画结束
@@ -477,6 +477,7 @@ class BaseTask(GlobalGameAssets, CostumeBase):
 
                     # 一直点击
                     if self.ui_reward_appear_click():
+                        sleep(1)
                         continue
                 break
 
