@@ -6,6 +6,7 @@ from cached_property import cached_property
 from module.exception import TaskEnd
 from module.logger import logger
 from module.base.timer import Timer
+from datetime import timedelta, time, datetime
 
 from tasks.GameUi.game_ui import GameUi
 from tasks.GameUi.page import page_main, page_team, page_shikigami_records
@@ -107,9 +108,26 @@ class ScriptTask(GameUi, GeneralBattle, GeneralRoom, GeneralInvite, SwitchSoul, 
                 self.gold_100(False)
             self.close_buff()
 
-        self.set_next_run(task='GoldYoukai', success=True, finish=False)
+        self.next_run()
         raise TaskEnd('GoldYoukai')
 
+    def next_run(self):
+        begin_after_refresh: time = self.config.gold_youkai.gold_youkai.begin_after_refresh
+        if begin_after_refresh == time(hour=0, minute=0, second=0):
+            self.set_next_run(task='GoldYoukai', success=True, finish=False)
+            return
+        time_delta = timedelta(hours=begin_after_refresh.hour, minutes=begin_after_refresh.minute, seconds=begin_after_refresh.second)
+        now_datetime = datetime.now()
+        now_time = now_datetime.time()
+        if time(hour=0) <= now_time < time(hour=12):
+            # 如果是在0点到12点之间，那就设定下一次运行的时间为当天12点 + begin_after_refresh
+            next_run_datetime = datetime.combine(now_datetime.date(), time(hour=12))
+            next_run_datetime = next_run_datetime + time_delta
+        else:
+            # 如果是在12点到23点59分59秒之间，那就设定下一次运行的时间为第二天的0点 + begin_after_refresh
+            next_run_datetime = datetime.combine(now_datetime.date() + timedelta(days=1), time(hour=0))
+            next_run_datetime = next_run_datetime + time_delta
+        self.set_next_run(task='GoldYoukai', target=next_run_datetime)
 
 if __name__ == '__main__':
     from module.config.config import Config
