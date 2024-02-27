@@ -51,6 +51,10 @@ class ScriptTask(SecretScriptTask, GeneralInvite, WantedQuestsAssets):
                 if cu > total:
                     logger.warning('Current number of wanted quests is greater than total number')
                     cu = cu % 10
+                if cu == total and re == 0:
+                    logger.warning('This is a co-mission, only our part is done.')
+                    self.skip_co_mission(self.O_WQ_TEXT_1)
+                    continue
                 if cu < total and re != 0:
                     self.execute_mission(self.O_WQ_TEXT_1, total, number_challenge)
 
@@ -62,6 +66,9 @@ class ScriptTask(SecretScriptTask, GeneralInvite, WantedQuestsAssets):
                 if cu > total:
                     logger.warning('Current number of wanted quests is greater than total number')
                     cu = cu % 10
+                if cu == total and re == 0:
+                    logger.warning('This is a co-mission, only our part is done.')
+                    self.skip_co_mission(self.O_WQ_TEXT_2)
                 if cu < total and re != 0:
                     self.execute_mission(self.O_WQ_TEXT_2, total, number_challenge)
                 continue
@@ -133,6 +140,16 @@ class ScriptTask(SecretScriptTask, GeneralInvite, WantedQuestsAssets):
         self.ui_click_until_disappear(self.I_UI_BACK_RED)
         self.ui_goto(page_exploration)
         return True
+
+    def skip_co_mission(self, ocr):
+        logger.hr('Skip co-mission that only our part is done')
+        while 1:
+            self.screenshot()
+            if self.appear(self.I_TRACE_TRUE):
+                break
+            if self.click(ocr, interval=1):
+                continue
+        self.ui_click(self.I_TRACE_TRUE, self.I_TRACE_FALSE)
 
     def execute_mission(self, ocr, num_want: int, num_challenge: int):
         """
