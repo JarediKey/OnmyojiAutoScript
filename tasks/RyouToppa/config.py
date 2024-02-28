@@ -18,6 +18,8 @@ class RaidConfig(BaseModel):
     ryou_access: bool = Field(default=False, description='ryou_access_help')
     # 正式进攻会设定 2s - 10s 的随机延迟，避免攻击间隔及其相近被检测为脚本。
     random_delay: bool = Field(default=False, description='random_delay_help')
+    # 每日开启时间
+    daily_start_time = Field(default=Time(hour=8, minute=0, second=0), description='daily_start_time')
 
 
     # raid_mode: RaidMode = Field(title='Raid Mode', default=RaidMode.ATTACK_ALL,

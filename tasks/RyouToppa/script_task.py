@@ -2,7 +2,7 @@
 # @author runhey
 # github https://github.com/runhey
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta, datetime, time as datetime_time
 import random
 
 from tasks.Component.SwitchSoul.switch_soul import SwitchSoul
@@ -76,6 +76,10 @@ def random_delay(min_value: float = 1.0, max_value: float = 2.0, decimal: int = 
 class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
     medal_grid: ImageGrid = None
 
+    # 该脚本高度自定义化，添加每天阴阳寮突破开启时间
+    # 在单次突破任务完成后会根据现在的刷新时间选择下次攻打时间为1h/30m后
+    # 在攻破阴阳寮后会把下次开始时间改为“开启时间”
+
     def run(self):
         """
         执行
@@ -133,7 +137,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
 
         # 100% 攻破, 第二天再执行
         if ryou_toppa_success_penetration:
-            self.set_next_run(task='RyouToppa', finish=True, success=True)
+            self.run_next_day()
             raise TaskEnd
         if self.config.ryou_toppa.general_battle_config.lock_team_enable:
             logger.info("Lock team.")
@@ -145,17 +149,22 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
         # 开始突破
         # --------------------------------------------------------------------------------------------------------------
         area_index = 0
-        success = True
+        # success = True
         while 1:
+            # 当前突破次数用完，需要等待
             if not self.has_ticket():
                 logger.info("We have no chance to attack. Try again after 1 hour.")
-                success = False
+                # success = False
                 break
+            # 完成设置中的突破次数
             if self.current_count >= ryou_config.raid_config.limit_count:
                 logger.warning("We have attacked the limit count.")
+                # success = True
                 break
+            # 完成设置中的突破时间
             if datetime.now() >= self.start_time + time_delta:
                 logger.warning("We have attacked the limit time.")
+                # success = True
                 break
             # 进攻
             res = self.attack_area(area_index)
@@ -172,11 +181,39 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
         # 回 page_main 失败
         # self.ui_current = page_ryou_toppa
         # self.ui_goto(page_main)
-        if success:
-            self.set_next_run(task='RyouToppa', finish=True, server=True, success=True)
-        else:
-            self.set_next_run(task='RyouToppa', finish=True, server=True, success=False)
+        # if success:
+        #     self.set_next_run(task='RyouToppa', finish=True, server=True, success=True)
+        # else:
+        #     self.set_next_run(task='RyouToppa', finish=True, server=True, success=False)
+        self.run_next_refreshment()
         raise TaskEnd
+
+    def run_next_refreshment(self):
+        daily_start_time: datetime.time = self.config.ryou_toppa.raid_config.daily_start_time
+        now_datetime = datetime.now()
+        now_time = now_datetime.time()
+        if daily_start_time.hour + 6 > now_time.hour:
+            # 10分钟刷新一次
+            next_run_datetime = datetime.now() + timedelta(hours=1)
+        else:
+            # 5分钟刷新一次
+            next_run_datetime = datetime.now() + timedelta(minutes=30)
+        self.set_next_run(task='RyouToppa', target=next_run_datetime)
+
+    def run_next_day(self):
+        daily_start_time = self.config.ryou_toppa.raid_config.daily_start_time
+        if daily_start_time == datetime_time(hour=0, minute=0, second=0):
+            self.run_next_refreshment()
+            return
+        now_datetime = datetime.now()
+        now_time = now_datetime.time()
+        if now_time.hour < 5:
+            # 已经过了0点，设置新一天的开始时间为当天。
+            next_run_datetime = datetime.combine(now_datetime.date(), daily_start_time)
+        else:
+            # 没过0点，设置新一天开始时间为第二天。
+            next_run_datetime = datetime.combine(now_datetime.date() + timedelta(days=1), daily_start_time)
+        self.set_next_run(task='RyouToppa', target=next_run_datetime)
 
     def start_ryou_toppa(self):
         """
@@ -234,7 +271,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
         # 如果该区域已经被攻破则退出
         # Ps: 这时候能打过的都打过了，没有能攻打的结界了, 代表任务已经完成，set_next_run time=1d
         if self.appear(f3, threshold=0.8) or self.appear(f4, threshold=0.8):
-            self.set_next_run(task='RyouToppa', finish=True, success=True)
+            self.run_next_day()
             raise TaskEnd
         # 如果该区域攻略失败返回 False
         if self.appear(f1, threshold=0.8) or self.appear(f2, threshold=0.8):
