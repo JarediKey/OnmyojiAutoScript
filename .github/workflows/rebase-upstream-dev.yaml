@@ -1,0 +1,35 @@
+name: Rebase dev onto Upstream
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨 2 点自动执行
+  workflow_dispatch:       # 支持手动触发
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0   # 必须完整历史才能 rebase
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add Upstream
+        run: |
+          git remote add upstream https://github.com/runhey/OnmyojiAutoScript.git
+          git fetch upstream dev
+
+      - name: Rebase onto Upstream/dev
+        run: |
+          git rebase upstream/dev || (git rebase --abort && exit 1)
+
+      - name: Push to Fork
+        run: |
+          git push origin dev --force-with-lease
