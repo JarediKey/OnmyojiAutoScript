@@ -64,6 +64,7 @@ class Script:
             return config
         except RequestHumanTakeover:
             logger.critical('Request human takeover')
+            self.config.notifier.push(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> RequestHumanTakeover")
             exit(1)
         except Exception as e:
             logger.exception(e)
@@ -77,6 +78,7 @@ class Script:
             return device
         except RequestHumanTakeover:
             logger.critical('Request human takeover')
+            self.config.notifier.push(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> RequestHumanTakeover")
             exit(1)
         except Exception as e:
             logger.exception(e)
