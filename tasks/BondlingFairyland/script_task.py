@@ -129,7 +129,8 @@ class ScriptTask(GameUi, GeneralInvite, GeneralRoom, BondlingBattle, SwitchSoul,
                         continue
                     if self.appear(self.I_CREATE_TEAM, interval=1):
                         self.ensure_private()
-                        self.appear_then_click(self.I_CREATE_TEAM, interval=2)
+                        if self.appear_then_click(self.I_CREATE_TEAM, interval=2):
+                            sleep(2)
                         continue
                     # 求援
                     if self.appear(self.I_CHECK_BONDLING_FAIRYLAND, interval=1):
