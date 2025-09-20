@@ -338,7 +338,7 @@ class ScriptTask(GameUi, BaseActivity, SwitchSoul, ActivityShikigamiAssets):
                 self.click(buff_box, interval=1.5)
                 ok = (ok + 1) if self.appear(buff_box_empty_list[i]) else 0
                 # 卸下buff
-                self.appear_then_click(self.I_BUFF_DOWN, interval=0.5)
+                self.appear_then_click(self.I_BUFF_DOWN, interval=2)
             logger.info(f'Down {buff_list[i]} ok')
         for i, buff_box in enumerate(buff_box_list):
             logger.info(f'Start up {buff_list[i]}')
@@ -349,7 +349,7 @@ class ScriptTask(GameUi, BaseActivity, SwitchSoul, ActivityShikigamiAssets):
                 self.click(buff_box, interval=1.5)
                 ok = (ok + 1) if not self.appear(buff_box_empty_list[i]) else 0
                 # 装上buff
-                self.appear_then_click(self.I_BUFF_UP, buff_up_map[buff_list[i]], interval=0.5)
+                self.appear_then_click(self.I_BUFF_UP, buff_up_map[buff_list[i]], interval=2)
             logger.info(f'Up {buff_list[i]} ok')
 
     def put_status(self):
