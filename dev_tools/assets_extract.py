@@ -364,7 +364,7 @@ class AssetsExtractor:
         :return:
         """
         with open(self.assets_file, 'w', encoding='utf-8', newline='\n') as f:
-            f.write(self._result)
+            f.write('\n'.join(line.rstrip() for line in self._result.splitlines()).rstrip() + '\n')
 
     def extract(self) -> str:
         """
