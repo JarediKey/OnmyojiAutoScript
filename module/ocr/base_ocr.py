@@ -14,6 +14,7 @@ from module.base.utils import area_pad, crop, float2str
 from typing import Any
 
 from module.ocr.models import get_ocr_model
+from module.ocr.color_filter import OcrMethod, parse_ocr_method, apply_color_filter
 from module.exception import ScriptError
 from module.logger import logger
 
@@ -42,9 +43,6 @@ class OcrMode(Enum):
     DURATION = 5  # str: "Duration"
     QUANTITY = 6  # str: "Quantity"
 
-class OcrMethod(Enum):
-    DEFAULT = 1  # str: "Default"
-
 class BaseCor:
 
     lang: str = "ch"
@@ -53,7 +51,7 @@ class BaseCor:
 
     name: str = "ocr"
     mode: OcrMode = OcrMode.FULL
-    method: OcrMethod = OcrMethod.DEFAULT  # 占位符
+    method: OcrMethod = OcrMethod.DEFAULT
     roi: list = []  # [x, y, width, height]
     area: list = []  # [x, y, width, height]
     keyword: str = ""  # 默认为空
@@ -62,7 +60,7 @@ class BaseCor:
     def __init__(self,
                  name: str,
                  mode: str,
-                 method: str,
+                 method: str | OcrMethod,
                  roi: tuple,
                  area: tuple,
                  keyword: str) -> None:
@@ -80,10 +78,7 @@ class BaseCor:
             self.mode = OcrMode[mode.upper()]
         elif isinstance(mode, OcrMode):
             self.mode = mode
-        if isinstance(method, str):
-            self.method = OcrMethod[method.upper()]
-        elif isinstance(method, OcrMethod):
-            self.method = method
+        self.method, self._color_bounds = parse_ocr_method(method)
         self.roi: list = list(roi)
         self.area: list = list(area)
         self.keyword = keyword
@@ -99,12 +94,8 @@ class BaseCor:
         return get_ocr_model(self.lang)
 
     def pre_process(self, image):
-        """
-        重写
-        :param image:
-        :return:
-        """
-        return image
+        """Apply the configured filter before local or remote OCR inference."""
+        return apply_color_filter(image, self.method, self._color_bounds)
 
     def after_process(self, result):
         """
