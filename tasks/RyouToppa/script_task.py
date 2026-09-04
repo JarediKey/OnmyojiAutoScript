@@ -186,7 +186,8 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
                 break
             # 进攻
             result = self.attack_area(area_index)
-            # A battle return may refresh and reorder the visible target list.
+            # In "zombie guild" multi-account runs, concurrent attacks can refresh and
+            # reorder the visible target list while this account is in battle.
             if result is AttackAreaResult.BATTLE_RETURNED:
                 area_index = 0
                 continue
