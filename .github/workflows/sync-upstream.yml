@@ -1,0 +1,52 @@
+name: Sync Upstream Branches
+
+on:
+  schedule:
+    # Run once per day at 12:17 Asia/Shanghai (04:17 UTC).
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-branches
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPOSITORY: runhey/OnmyojiAutoScript
+
+jobs:
+  sync:
+    if: github.repository == 'JarediKey/OnmyojiAutoScript'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync dev exactly with upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh repo sync "$GITHUB_REPOSITORY" \
+            --source "$UPSTREAM_REPOSITORY" \
+            --branch dev \
+            --force
+
+      - name: Check out fork master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Merge upstream master
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream "https://github.com/${UPSTREAM_REPOSITORY}.git"
+          git fetch upstream master
+
+          if git merge-base --is-ancestor upstream/master HEAD; then
+            echo "master is already up to date"
+            exit 0
+          fi
+
+          git merge --no-edit upstream/master
+          git push origin HEAD:master
