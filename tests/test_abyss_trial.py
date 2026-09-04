@@ -34,7 +34,7 @@ class AbyssTrialTests(unittest.TestCase):
         cls.CodeList = CodeList
         cls.takeover = RequestHumanTakeover
         cls.root = Path(__file__).resolve().parents[1]
-        tree = ast.parse((cls.root / 'tasks/AbyssShadows/script_task.py').read_text())
+        tree = ast.parse((cls.root / 'tasks/AbyssShadows/script_task.py').read_text(encoding='utf-8'))
         task = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'ScriptTask')
         from tasks.AbyssShadows.config import EnemyType
         env = dict(Code=Code, EnemyType=EnemyType, MAX_BATTLE_COUNT=2, MAX_BATTLE_WAIT=300,
@@ -118,7 +118,7 @@ class AbyssTrialTests(unittest.TestCase):
         self.assertEqual(self.obj.device.screenshot_interval_set.call_args.args, ())
 
     def test_trial_config_has_no_unrequested_actions(self):
-        data = json.loads((self.root / 'deploy/examples/abyss-trial.json').read_text())['abyss_shadows']
+        data = json.loads((self.root / 'deploy/examples/abyss-trial.json').read_text(encoding='utf-8'))['abyss_shadows']
         cfg = self.config_type.model_validate(data)
         self.assertTrue(cfg.process_manage.trial_mode)
         self.assertFalse(cfg.abyss_shadows_time.try_start_abyss_shadows)
