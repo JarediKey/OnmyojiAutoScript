@@ -3,6 +3,7 @@
 # github https://github.com/runhey
 import time
 from datetime import datetime, timedelta, time as dt_time
+from enum import Enum, auto
 import random
 
 from tasks.Component.SwitchSoul.switch_soul import SwitchSoul
@@ -72,6 +73,15 @@ def random_delay(min_value: float = 1.0, max_value: float = 2.0, decimal: int = 
     """
     random_float_in_range = random.uniform(min_value, max_value)
     return (round(random_float_in_range, decimal))
+
+
+class AttackAreaResult(Enum):
+    SKIP_CURRENT = auto()
+    BATTLE_RETURNED = auto()
+
+
+MAX_ENTRY_CLICK_ATTEMPTS = 3
+
 
 class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
     medal_grid: ImageGrid = None
@@ -175,9 +185,13 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
                 logger.warning("We have attacked the limit time.")
                 break
             # 进攻
-            res = self.attack_area(area_index)
-            # 如果战斗失败或区域不可用，则弹出当前区域索引，开始进攻下一个
-            if not res:
+            result = self.attack_area(area_index)
+            # A battle return may refresh and reorder the visible target list.
+            if result is AttackAreaResult.BATTLE_RETURNED:
+                area_index = 0
+                continue
+            # Skip an unavailable target within the current list snapshot.
+            if result is AttackAreaResult.SKIP_CURRENT:
                 area_index += 1
                 if area_index >= len(area_map):
                     logger.warning('All areas are not available, it will flush the area cache')
@@ -286,13 +300,13 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
             self.device.swipe_adb(p1, p2, duration=duration)
             time.sleep(2)
 
-    def attack_area(self, index: int):
+    def attack_area(self, index: int) -> AttackAreaResult:
         """
-        :return: 战斗成功(True) or 战斗失败(False) or 区域不可用（False） or 没有进攻机会（设定下次运行并退出）
+        :return: Whether to skip the current visual slot or rescan after returning from battle.
         """
         # 每次进攻前检查区域可用性
         if not self.check_area(index):
-            return False
+            return AttackAreaResult.SKIP_CURRENT
 
         # 正式进攻会设定 2s - 10s 的随机延迟，避免攻击间隔及其相近被检测为脚本。
         if self.config.ryou_toppa.raid_config.random_delay:
@@ -307,16 +321,22 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, RyouToppaAssets):
         click_failure_count = 0
         while True:
             self.screenshot()
-            if click_failure_count >= 5:
-                logger.warning("Click failure, check your click position")
-                return False
             if not self.appear(self.I_TOPPA_RECORD, threshold=0.85):
                 time.sleep(1)
                 self.screenshot()
                 if self.appear(self.I_TOPPA_RECORD, threshold=0.85):
                     continue
                 logger.info("Start attach area [%s]" % str(index + 1))
-                return self.run_general_battle(config=self.config.ryou_toppa.general_battle_config)
+                battle_succeeded = self.run_general_battle(
+                    config=self.config.ryou_toppa.general_battle_config
+                )
+                logger.info(f"Battle returned to target list, success={battle_succeeded}")
+                return AttackAreaResult.BATTLE_RETURNED
+            if click_failure_count >= MAX_ENTRY_CLICK_ATTEMPTS:
+                logger.warning(
+                    f"Failed to enter battle after {MAX_ENTRY_CLICK_ATTEMPTS} click attempts, skip current area"
+                )
+                return AttackAreaResult.SKIP_CURRENT
 
             if self.appear_then_click(RealmRaidAssets.I_FIRE, interval=2, threshold=0.8):
                 click_failure_count += 1
