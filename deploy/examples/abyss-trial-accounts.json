@@ -1,0 +1,66 @@
+{
+  "abyss-trial-1": {
+    "abyss_shadows": {
+      "process_manage": {
+        "lock_team_enable": true,
+        "attack_order": "A;B;D-1;C-1;D-2;D-3;C-2;C-3;D-4;D-5;D-6;C-4;C-5;C-6",
+        "mark_main": "NONE",
+        "enable_switch_soul_in_as": true,
+        "preset_boss": "7,2",
+        "preset_general": "7,2",
+        "preset_elite": "7,2",
+        "strategy_boss": "FALSE",
+        "strategy_general": "FALSE",
+        "strategy_elite": "FALSE"
+      }
+    }
+  },
+  "abyss-trial-2": {
+    "abyss_shadows": {
+      "process_manage": {
+        "lock_team_enable": true,
+        "attack_order": "A;B;D-1;C-1;D-2;D-3;C-2;C-3;D-4;D-5;D-6;C-4;C-5;C-6",
+        "mark_main": "NONE",
+        "enable_switch_soul_in_as": true,
+        "preset_boss": "7,1",
+        "preset_general": "7,1",
+        "preset_elite": "7,1",
+        "strategy_boss": "FALSE",
+        "strategy_general": "FALSE",
+        "strategy_elite": "FALSE"
+      }
+    }
+  },
+  "abyss-trial-3": {
+    "abyss_shadows": {
+      "process_manage": {
+        "lock_team_enable": true,
+        "attack_order": "C;D;B-1;A-1;B-2;B-3;A-2;A-3;B-4;B-5;B-6;A-4;A-5;A-6",
+        "mark_main": "NONE",
+        "enable_switch_soul_in_as": true,
+        "preset_boss": "6,1",
+        "preset_general": "6,1",
+        "preset_elite": "6,1",
+        "strategy_boss": "FALSE",
+        "strategy_general": "FALSE",
+        "strategy_elite": "FALSE"
+      }
+    }
+  },
+  "abyss-trial-4": {
+    "abyss_shadows": {
+      "process_manage": {
+        "lock_team_enable": true,
+        "attack_order": "C;D;B-1;A-1;B-2;B-3;A-2;A-3;B-4;B-5;B-6;A-4;A-5;A-6",
+        "mark_main": "NONE",
+        "enable_switch_soul_in_as": true,
+        "preset_boss": "2,1",
+        "preset_general": "2,1",
+        "preset_elite": "2,1",
+        "strategy_boss": "FALSE",
+        "strategy_general": "FALSE",
+        "strategy_elite": "FALSE"
+      }
+    }
+  }
+}
