@@ -127,11 +127,11 @@ class AbyssShadowsAssets:
 	# 选择难度按钮
 	I_SELECT_DIFFICULTY = RuleImage(roi_front=(703,645,50,55), roi_back=(703,645,50,55), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_select_difficulty.png")
 	# 容易难度
-	I_DIFFICULTY_EASY = RuleImage(roi_front=(620,445,90,210), roi_back=(620,445,90,210), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_difficulty_easy.png")
+	I_DIFFICULTY_EASY = RuleImage(roi_front=(648,392,29,39), roi_back=(620,380,90,64), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_difficulty_easy.png")
 	# 普通难度
-	I_DIFFICULTY_NORMAL = RuleImage(roi_front=(620,445,90,210), roi_back=(620,445,90,210), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_difficulty_normal.png")
+	I_DIFFICULTY_NORMAL = RuleImage(roi_front=(647,456,26,42), roi_back=(620,450,90,64), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_difficulty_normal.png")
 	# 困难难度
-	I_DIFFICULTY_HARD = RuleImage(roi_front=(620,445,90,210), roi_back=(620,445,90,210), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_difficulty_hard.png")
+	I_DIFFICULTY_HARD = RuleImage(roi_front=(642,527,38,39), roi_back=(620,520,90,64), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_difficulty_hard.png")
 	# 开启按钮
 	I_BTN_START = RuleImage(roi_front=(1120,570,100,120), roi_back=(1120,570,100,120), threshold=0.8, method="Template matching", file="./tasks/AbyssShadows/res/res_btn_start.png")
 	# 开启确认按钮

@@ -58,6 +58,13 @@ startup, not per region or battle. Lock mode does not disable this preload.
 
 ## Page transitions and latency
 
+- The first three difficulty menu rows use separate search regions: Easy
+  `(620,380,90,64)`, Normal `(620,450,90,64)`, Hard `(620,520,90,64)`.
+  They exclude the current-difficulty display below the dropdown. Existing
+  templates/thresholds are unchanged; Extreme is not supported. The supplied
+  recording shows Hard locked, so unlocked Hard selection is not live-verified.
+  Small UI-only open/closed menu crops are bundled as regression fixtures;
+  these do not contain account names, chat, or complete screenshots.
 - Reuse the account's global `costume_config`: battle and records templates are
   replaced by `CostumeBase` during task initialization. No Abyss-specific skin
   selector or duplicated skin assets are added. Offline tests apply the same mapping.

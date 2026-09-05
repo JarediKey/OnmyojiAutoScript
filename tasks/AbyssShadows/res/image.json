@@ -236,8 +236,8 @@
   {
     "itemName": "difficulty_easy",
     "imageName": "res_difficulty_easy.png",
-    "roiFront": "620,445,90,210",
-    "roiBack": "620,445,90,210",
+    "roiFront": "648,392,29,39",
+    "roiBack": "620,380,90,64",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "容易难度"
@@ -245,8 +245,8 @@
   {
     "itemName": "difficulty_normal",
     "imageName": "res_difficulty_normal.png",
-    "roiFront": "620,445,90,210",
-    "roiBack": "620,445,90,210",
+    "roiFront": "647,456,26,42",
+    "roiBack": "620,450,90,64",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "普通难度"
@@ -254,8 +254,8 @@
   {
     "itemName": "difficulty_hard",
     "imageName": "res_difficulty_hard.png",
-    "roiFront": "620,445,90,210",
-    "roiBack": "620,445,90,210",
+    "roiFront": "642,527,38,39",
+    "roiBack": "620,520,90,64",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "困难难度"
