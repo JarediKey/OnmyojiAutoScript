@@ -1,3 +1,5 @@
 {
-
+  "encounter_options": "Demon Encounter options",
+  "skip_all_battles": "Skip all battles",
+  "skip_all_battles_help": "Complete four discoveries and collect discovery rewards; continue quizzes and treasure boxes. Skip monsters, small bosses, realm battles, large-boss lanterns, the daily boss, and pre-battle soul switching. Existing treasure-box purchase rules still apply. Return to the courtyard and schedule the next run. Disable to keep the full original workflow."
 }
