@@ -16,7 +16,6 @@
       "try_complete_enemy_count": false
     },
     "process_manage": {
-      "trial_mode": true,
       "lock_team_enable": true,
       "attack_order": "A",
       "mark_main": "NONE",
