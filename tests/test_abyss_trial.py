@@ -29,23 +29,26 @@ class AbyssTrialTests(unittest.TestCase):
     def setUpClass(cls):
         ocr_checks.OcrPipelineTests.setUpClass()
         from tasks.AbyssShadows.config import AbyssShadows, Code, Condition, CodeList
-        from module.exception import RequestHumanTakeover
+        from module.exception import RequestHumanTakeover, TaskEnd
         cls.config_type = AbyssShadows
         cls.Code = Code
         cls.Condition = Condition
         cls.CodeList = CodeList
         cls.takeover = RequestHumanTakeover
+        cls.task_end = TaskEnd
         cls.root = Path(__file__).resolve().parents[1]
         tree = ast.parse((cls.root / 'tasks/AbyssShadows/script_task.py').read_text(encoding='utf-8'))
         task = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'ScriptTask')
         from tasks.AbyssShadows.config import EnemyType
         from tasks.GameUi.assets import GameUiAssets
         env = dict(Code=Code, EnemyType=EnemyType, MAX_BATTLE_COUNT=2, MAX_BATTLE_WAIT=300,
-                   MAX_ENTRY_WAIT=30, GameUiAssets=GameUiAssets,
+                   MAX_ENTRY_WAIT=30, GameUiAssets=GameUiAssets, TaskEnd=TaskEnd,
+                   AbyssShadows=cls.config_type, AbyssShadowsFinished=type('Finished', (Exception,), {}),
+                   datetime=Mock(),
                    logger=Mock(), Timer=FakeTimer, RequestHumanTakeover=RequestHumanTakeover)
         methods = [n for n in task.body if isinstance(n, ast.FunctionDef) and n.name in (
             'execute', 'run_battle', 'quit_battle', 'battle_entry_state', 'enter_battle',
-            'attack_enemy', 'exit_abyss_records', 'switch_soul_in_as')]
+            'attack_enemy', 'exit_abyss_records', 'switch_soul_in_as', 'run')]
         exec(compile(ast.Module(body=methods, type_ignores=[]), '<abyss-trial>', 'exec'), env)
         cls.methods = env
 
@@ -129,7 +132,7 @@ class AbyssTrialTests(unittest.TestCase):
     def test_trial_config_has_no_unrequested_actions(self):
         data = json.loads((self.root / 'deploy/examples/abyss-trial.json').read_text(encoding='utf-8'))['abyss_shadows']
         cfg = self.config_type.model_validate(data)
-        self.assertTrue(cfg.process_manage.trial_mode)
+        self.assertNotIn('trial_mode', cfg.process_manage.model_dump())
         self.assertTrue(cfg.process_manage.lock_team_enable)
         self.assertFalse(cfg.abyss_shadows_time.try_start_abyss_shadows)
         self.assertFalse(cfg.process_manage.enable_switch_soul_in_as)
@@ -147,6 +150,39 @@ class AbyssTrialTests(unittest.TestCase):
     def test_damage_threshold_includes_equality(self):
         self.assertTrue(self.Condition('1000').is_valid(1000))
         self.assertFalse(self.Condition('FALSE').is_valid(999999999))
+
+    def configure_task_completion(self):
+        cfg = self.config_type()
+        self.obj.config.abyss_shadows = cfg
+        self.obj.config.model.abyss_shadows = cfg
+        self.methods['datetime'].now.return_value.weekday.return_value = 6
+        self.obj.detect_area_status.return_value = ([], [])
+        self.obj.get_next.return_value = None
+
+    def test_normal_completion_schedules_without_human_takeover(self):
+        self.configure_task_completion()
+        with self.assertRaises(self.task_end):
+            self.methods['run'](self.obj)
+        self.obj.set_next_run.assert_called_once_with(task='AbyssShadows', finish=True, server=True, success=True)
+        self.obj.clear_saved_params.assert_called_once()
+        self.obj.request_takeover.assert_not_called()
+
+    def test_failed_targets_keep_progress_and_use_failure_schedule(self):
+        self.configure_task_completion()
+        self.obj.failed_list.append(self.code)
+        with self.assertRaises(self.task_end):
+            self.methods['run'](self.obj)
+        self.obj.set_next_run.assert_called_once_with(task='AbyssShadows', finish=True, server=True, success=False)
+        self.obj.clear_saved_params.assert_not_called()
+
+    def test_unavailable_entry_uses_normal_failure_schedule(self):
+        self.configure_task_completion()
+        self.obj.get_next.return_value = self.code
+        self.obj.select_boss.return_value = False
+        with self.assertRaises(self.task_end):
+            self.methods['run'](self.obj)
+        self.obj.set_next_run.assert_called_once_with(task='AbyssShadows', finish=False, server=False, success=False)
+        self.obj.request_takeover.assert_not_called()
 
     def test_difficulty_menu_rows_exclude_current_difficulty(self):
         import cv2

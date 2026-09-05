@@ -1507,7 +1507,6 @@
       "try_complete_enemy_count": false
     },
     "process_manage": {
-      "trial_mode": false,
       "lock_team_enable": false,
       "attack_order": "A-1;B-1;B;A-2;A-3;A-4;A-5;A-6",
       "mark_main": "BOSS_ONLY",

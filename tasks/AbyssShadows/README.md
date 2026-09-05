@@ -1,11 +1,11 @@
-# Abyss Shadows refactor trial
+# Abyss Shadows
 
 [简体中文](README.zh.md)
 
-This branch is based on Jared's `prod` and includes its guild-raid fix, the OCR
-color filters, and the archived Abyss refactor. Only Abyss source/assets were
-ported from the archive. Neither the published `prod` branch nor production
-instance files need to change for this trial.
+The task supports ordered region/enemy targets, independent soul preloading,
+locked lineups, and natural/timed/damage-based battle objectives. It uses shared
+navigation and the account's global skin settings. Publication of the code does
+not update an existing production checkout or private instance configuration.
 
 ## First trial configuration
 
@@ -32,9 +32,19 @@ production backend, whose older schema does not understand the new fields.
 - `lock_team_enable: true` skips every pre-battle preset change, including
   changes between enemy types. It does not click the game's lock/unlock control;
   set the desired locked lineup in the game. Soul preloading remains independent.
-- `trial_mode: true` stops with a human-takeover message after the run and keeps
-  target progress for inspection. The backend may display the instance as
-  warning; this is intentional and does not indicate that every target died.
+- Normal completion returns to the courtyard and schedules the next run, rather
+  than stopping the instance for human takeover. Protective failures still stop
+  for inspection. Stop supervised test instances manually after reviewing them.
+
+## Production deployment
+
+Back up production code and private configs, then stop the affected instances
+and backend before updating the checkout. Preserve each production account's
+device settings, current global skin selection, scheduler and unrelated tasks;
+do not copy an entire old trial config over production. Configure `process_manage`
+and `abyss_shadows_time` using the current model/examples, remove obsolete trial
+options, and review the resulting GUI schema before restarting. Publishing `prod`
+does not authorize starting services or enabling any account's task.
 
 ## Four-account settings
 
@@ -104,20 +114,27 @@ and screenshot frequency is restored on exceptions. Preparation/attack-phase
 confirmation failures also stop for inspection. The upstream fix for resuming
 an active map through Shenshe is retained.
 
-The old two-hour startup cutoff has been removed. Outside trial mode, the
-refactor uses its scheduler settings for the next run; the upstream version's
+There is no two-hour startup cutoff. The task uses its scheduler settings for
+the next run; the upstream version's
 separate Friday/Saturday/Sunday time fields are not part of this schema.
 The old `general_battle_config` and `switch_soul_config` groups are replaced by
 `process_manage`; do not expect upstream configurations to carry over implicitly.
 
-Progress is scoped to the calendar date and is preserved at trial completion.
-Before a fresh replay, clear the four `saved_params` fields while the instance
-is stopped. Progress writes reload configuration before saving unrelated fields.
-Concurrent editing of the running trial is still unsupported.
+Progress is scoped to the calendar date. Normal completion clears it if no
+failed targets remain; otherwise it is retained and the failure schedule is used.
+Completion schedules relative to finishing time with the success/failure interval.
+The shared scheduler treats `server_update=09:00` as no forced clock time; other
+values replace the interval result with `server_update`/`delay_date`, and
+`float_time` adds random delay. Failed region entry uses the failure interval
+relative to task start without the server-time override. Non-Friday/Saturday/Sunday
+runs exit using the success schedule without entering the activity.
+Before a deliberate fresh replay, clear `saved_params` only while stopped.
+Progress writes reload configuration before saving unrelated fields; concurrent
+editing of a running task remains unsupported.
 
 Recorded-frame tests cover records/map/preparation/battle discrimination across
 the four supplied accounts, including the alternate interface skin. This is
-offline evidence, not live validation of this revision. Region-sealed OCR and
+offline evidence, not live validation of the restored normal scheduling path. Region-sealed OCR and
 individual enemy-death classification still require separate verification.
 This trial does not add reliable per-enemy death recognition, unlimited retries,
 or automatic four-account group coordination. Multiple preset soul loadouts are

@@ -75,8 +75,6 @@
   "saved_params": "狭间运行进度",
   "attack_order": "攻击顺序",
   "attack_order_help": "英文分号分隔，例如A-1;B;C。A/B/C/D为四个区域，1为首领，2/3为副将，4/5/6为精英。区域缩写默认精英→副将→首领。",
-  "trial_mode": "单次试运行",
-  "abyss_trial_mode_help": "完成一次流程后请求人工接管并保留进度，不安排自动重跑。",
   "lock_team_enable": "锁定阵容",
   "abyss_lock_team_enable_help": "沿用游戏内已锁定的队伍，跳过所有战前换阵容，不操作游戏锁定开关。御魂预装独立执行，各敌人预设只用于预装；看到准备按钮才点击，已开战则直接等待结果。",
   "try_start_abyss_shadows": "尝试开启狭间",
