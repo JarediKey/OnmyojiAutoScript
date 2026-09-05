@@ -159,6 +159,7 @@ class PlatformBase(EmulatorManagerBase):
             # because this is just a trial
             if select.count == 1:
                 instance = select[0]
+                instance.serial = serial
                 logger.hr('Emulator instance', level=2)
                 logger.info(f'Found emulator instance: {instance}')
                 return instance
