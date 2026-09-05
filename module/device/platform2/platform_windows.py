@@ -180,7 +180,11 @@ class PlatformWindows(PlatformBase, EmulatorManager):
             # MuMuPlayer.exe -v 0
             if instance.MuMuPlayer12_id is None:
                 raise EmulatorUnknown(f'Cannot get MuMu instance index from name {instance.name!r}')
-            self.execute(f'"{exe}" -v {instance.MuMuPlayer12_id}', show_window=show_window)
+            if exe.lower().endswith('mumunxmain.exe'):
+                self.execute(f'"{Emulator.single_to_console(exe)}" control -v {instance.MuMuPlayer12_id} launch',
+                             show_window=show_window)
+            else:
+                self.execute(f'"{exe}" -v {instance.MuMuPlayer12_id}', show_window=show_window)
         elif instance == Emulator.LDPlayerFamily:
             # ldconsole.exe launch --index 0
             self.execute(f'"{Emulator.single_to_console(exe)}" launch --index {instance.LDPlayer_id}', show_window=show_window)
@@ -236,7 +240,10 @@ class PlatformWindows(PlatformBase, EmulatorManager):
             # MuMuManager.exe api -v 1 shutdown_player
             if instance.MuMuPlayer12_id is None:
                 raise EmulatorUnknown(f'Cannot get MuMu instance index from name {instance.name!r}')
-            self.execute(f'"{Emulator.single_to_console(exe)}" api -v {instance.MuMuPlayer12_id} shutdown_player')
+            if exe.lower().endswith('mumunxmain.exe'):
+                self.execute(f'"{Emulator.single_to_console(exe)}" control -v {instance.MuMuPlayer12_id} shutdown')
+            else:
+                self.execute(f'"{Emulator.single_to_console(exe)}" api -v {instance.MuMuPlayer12_id} shutdown_player')
         elif instance == Emulator.LDPlayerFamily:
             # ldconsole.exe quit --index 0
             self.execute(f'"{Emulator.single_to_console(exe)}" quit --index {instance.LDPlayer_id}')

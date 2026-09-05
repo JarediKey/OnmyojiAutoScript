@@ -60,6 +60,27 @@ class MuMuInstanceTests(unittest.TestCase):
                     namespace[method](owner, instance)
                 owner.execute.assert_not_called()
 
+    def test_nx_commands(self):
+        tree = ast.parse((ROOT / 'module/device/platform2/platform_windows.py').read_text(encoding='utf-8'))
+        methods = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)
+                   and n.name in ('_emulator_start', '_emulator_stop')]
+        emulator = SimpleNamespace(MuMuPlayer='old', MuMuPlayerX='x', MuMuPlayer12='mumu',
+                                  single_to_console=lambda _: 'MuMuManager.exe')
+        namespace = {'Emulator': emulator, 'EmulatorUnknown': ValueError, 'EmulatorInstance': object}
+        exec(compile(ast.Module(body=methods, type_ignores=[]), str(ROOT), 'exec'), namespace)
+        class Instance:
+            emulator = SimpleNamespace(path='D:/MuMu/nx_main/MuMuNxMain.exe')
+            name = 'MuMuPlayer-15.0-0'
+            MuMuPlayer12_id = 0
+            def __eq__(self, other):
+                return other == 'mumu'
+        device = SimpleNamespace(emulator_window_minimize=False, run_background_only=False)
+        owner = SimpleNamespace(config=SimpleNamespace(script=SimpleNamespace(device=device)), execute=Mock())
+        for method, operation in (('_emulator_start', 'launch'), ('_emulator_stop', 'shutdown')):
+            namespace[method](owner, Instance())
+            self.assertEqual(owner.execute.call_args.args[0],
+                             f'"MuMuManager.exe" control -v 0 {operation}')
+
 
 if __name__ == '__main__':
     unittest.main()
