@@ -148,6 +148,24 @@ class AbyssTrialTests(unittest.TestCase):
         self.assertTrue(self.Condition('1000').is_valid(1000))
         self.assertFalse(self.Condition('FALSE').is_valid(999999999))
 
+    def test_difficulty_menu_rows_exclude_current_difficulty(self):
+        import cv2
+        import numpy as np
+        from tasks.AbyssShadows.assets import AbyssShadowsAssets
+        rules = (AbyssShadowsAssets.I_DIFFICULTY_EASY,
+                 AbyssShadowsAssets.I_DIFFICULTY_NORMAL,
+                 AbyssShadowsAssets.I_DIFFICULTY_HARD)
+        for name, expected in (('open', True), ('closed', False)):
+            crop = cv2.imread(str(self.root / 'tests/fixtures/abyss_difficulty' / f'{name}.png'))
+            self.assertIsNotNone(crop)
+            self.assertEqual(crop.shape, (320, 90, 3))
+            frame = np.zeros((720, 1280, 3), dtype=np.uint8)
+            frame[380:700, 620:710] = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+            for rule in rules:
+                with self.subTest(menu=name, rule=rule.name):
+                    self.assertEqual(rule.match(frame), expected)
+                    self.assertLessEqual(rule.roi_back[1] + rule.roi_back[3], 584)
+
     def entry_frames(self, frames, locked=True):
         cfg = self.config_type()
         cfg.process_manage.lock_team_enable = locked
