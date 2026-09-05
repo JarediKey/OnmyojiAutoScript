@@ -267,6 +267,7 @@ class AbyssShadowsTime(ConfigBase):
 class ProcessManage(ConfigBase):
     # A trial finishes with a human-readable stop instead of scheduling another run.
     trial_mode: bool = Field(default=False, description='abyss_trial_mode_help')
+    lock_team_enable: bool = Field(default=False, description='abyss_lock_team_enable_help')
     # 攻击顺序 A,B,C,D 分别表示四个区域，123456表示区域内6个怪物，从上到下，从左到右的顺序
     #           1
     #       2       3

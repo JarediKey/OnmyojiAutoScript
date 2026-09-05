@@ -6,6 +6,7 @@
 from time import sleep
 
 from datetime import datetime, timedelta
+from pathlib import Path
 from module.exception import TaskEnd, RequestHumanTakeover
 from module.base.timer import Timer
 from module.logger import logger
@@ -22,6 +23,7 @@ from tasks.GameUi.page import page_main, page_guild
 # 单个首领/副将/精英 一次无法完成目标（一般是一次没打掉） 的情况下，最大战斗次数
 MAX_BATTLE_COUNT = 2
 MAX_BATTLE_WAIT = 300
+MAX_ENTRY_WAIT = 30
 
 
 class AbyssShadowsFinished(Exception):
@@ -49,6 +51,103 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
         self.failed_list: CodeList = CodeList('')
         # 是否已经切换过御魂
         self.switch_soul_done = False
+
+    def click(self, click=None, interval=None):
+        """Slow action retries only in Abyss, including shared component calls."""
+        return super().click(click, interval=interval * 2 if interval else interval)
+
+    def appear_then_click(self, target, action=None, interval=None, threshold=None, duration=None):
+        return super().appear_then_click(
+            target, action=action, interval=interval * 2 if interval else interval,
+            threshold=threshold, duration=duration)
+
+    def swipe(self, swipe, interval=None):
+        return super().swipe(swipe, interval=interval * 2 if interval else interval)
+
+    def request_takeover(self, stage: str, reason: str):
+        """Preserve the current frame without device input or notification side effects."""
+        from module.base.utils import save_image
+        from module.handler.sensitive_info import handle_sensitive_image
+
+        logger.error(f'Abyss stage={stage}: {reason}')
+        try:
+            stamp = datetime.now().strftime('%Y%m%d-%H%M%S-%f')
+            folder = Path('log/error/abyss') / f'{self.config.config_name}-{stamp}'
+            folder.mkdir(parents=True, exist_ok=False)
+            save_image(handle_sensitive_image(self.device.image.copy()), str(folder / f'{stage}.png'))
+            logger.info(f'Abyss diagnostic frame: {folder}')
+        except Exception as exc:
+            logger.warning(f'Could not save Abyss diagnostic frame: {exc}')
+        raise RequestHumanTakeover(f'Abyss {stage}: {reason}')
+
+    def battle_entry_state(self) -> str:
+        """Inspect the current frame; an exit button alone is not proof of battle."""
+        if self.appear(self.I_WIN) or self.appear(self.I_FALSE) or self.appear(self.I_REWARD):
+            return 'result'
+        if self.appear(self.I_PRESET_ENSURE):
+            return 'preset'
+        if self.appear(self.I_PREPARE_HIGHLIGHT):
+            return 'prepare'
+        if self.appear(self.I_PREPARE_DARK):
+            return 'prepare_loading'
+        if self.appear(self.I_BATTLE_INFO):
+            return 'battle'
+        if self.appear(self.I_EXIT):
+            return 'transition'
+        return 'unknown'
+
+    def enter_battle(self, item_code: Code):
+        """Handle manual preparation or locked-team auto-entry without blind clicks."""
+        process = self.config.model.abyss_shadows.process_manage
+        preset = {
+            EnemyType.BOSS: process.preset_boss,
+            EnemyType.GENERAL: process.preset_general,
+            EnemyType.ELITE: process.preset_elite,
+        }[item_code.get_enemy_type()]
+        timer = Timer(MAX_ENTRY_WAIT).start()
+        previous_state = None
+        pending_preset = None
+        while True:
+            self.screenshot()
+            state = self.battle_entry_state()
+            if state != previous_state:
+                logger.info(f'Abyss entry {item_code}: {state}, lock_team={process.lock_team_enable}')
+                previous_state = state
+            if pending_preset and state in ('prepare', 'battle', 'result'):
+                self.cur_preset = pending_preset
+                pending_preset = None
+            if state in ('battle', 'result'):
+                return
+            if timer.reached():
+                self.request_takeover('entry', f'{item_code}: no battle confirmation after {MAX_ENTRY_WAIT}s; state={state}')
+            if state != 'prepare':
+                continue
+            if not process.lock_team_enable and preset and preset != self.cur_preset:
+                self.switch_preset_team_with_str(preset)
+                pending_preset = preset
+                # Never act on the frame preceding the preset animation.
+                continue
+            self.appear_then_click(self.I_PREPARE_HIGHLIGHT, interval=0.6)
+
+    def exit_abyss_records(self):
+        """Leave records only while its own page marker is visible."""
+        timer = Timer(MAX_ENTRY_WAIT).start()
+        previous_state = None
+        while True:
+            self.screenshot()
+            in_records = self.appear(self.I_SOU_CHECK_IN)
+            on_map = self.appear(self.I_ABYSS_NAVIGATION) and self.appear(self.I_ABYSS_SHIKI)
+            if on_map and not in_records:
+                logger.info('Abyss records exit: map confirmed')
+                return
+            state = 'records' if in_records else 'transition'
+            if state != previous_state:
+                logger.info(f'Abyss records exit: {state}')
+                previous_state = state
+            if timer.reached():
+                self.request_takeover('records-exit', f'no map confirmation after {MAX_ENTRY_WAIT}s; state={state}')
+            if in_records:
+                self.appear_then_click(self.I_RECORD_SOUL_BACK, interval=2)
 
     def run(self):
         """ 狭间暗域主函数
@@ -314,7 +413,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
                 self.swipe(self.S_TO_ABBSY_SHADOWS, interval=3)
                 continue
             # 进入狭间
-            if self.appear_then_click(self.I_ABYSS_SHADOWS):
+            if self.appear_then_click(self.I_ABYSS_SHADOWS, interval=1):
                 logger.info("Enter abyss_shadows")
                 break
         return True
@@ -408,11 +507,17 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
         return True
 
     def attack_enemy(self):
-        # 点击战斗按钮
+        # Locked teams may bypass the preparation page entirely.
+        timer = Timer(MAX_ENTRY_WAIT).start()
         while 1:
             self.screenshot()
             if self.appear(self.I_CHECK_FINISH):
                 raise AbyssShadowsFinished
+            state = self.battle_entry_state()
+            if state in ('prepare', 'prepare_loading', 'preset', 'battle', 'result'):
+                return
+            if timer.reached():
+                self.request_takeover('challenge', f'no preparation or battle after {MAX_ENTRY_WAIT}s; state={state}')
             #
             if self.appear(self.I_ABYSS_ENEMY_FIRE):
                 self.click(self.I_ABYSS_ENEMY_FIRE, interval=0.4)
@@ -424,9 +529,6 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
             if self.appear_then_click(self.I_ENSURE_BUTTON, interval=1):
                 continue
             #
-            if self.appear(self.I_PREPARE_HIGHLIGHT):
-                break
-        return
 
     def start_abyss_shadows(self):
         # 尝试开启狭间暗域
@@ -559,18 +661,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
         """Complete one battle objective; never infer victory from elapsed time."""
         enemy_type = item_code.get_enemy_type()
         process = self.config.model.abyss_shadows.process_manage
-        preset = {
-            EnemyType.BOSS: process.preset_boss,
-            EnemyType.GENERAL: process.preset_general,
-            EnemyType.ELITE: process.preset_elite,
-        }[enemy_type]
-        if preset and preset != self.cur_preset:
-            self.switch_preset_team_with_str(preset)
-            self.cur_preset = preset
-        if not self.wait_until_appear(self.I_PREPARE_HIGHLIGHT, wait_time=10):
-            raise RequestHumanTakeover('Abyss preparation screen was not confirmed')
-        if not self.ui_click(self.I_PREPARE_HIGHLIGHT, stop=self.I_EXIT, interval=0.6, timeout=20):
-            raise RequestHumanTakeover('Abyss battle entry was not confirmed')
+        self.enter_battle(item_code)
 
         condition = process.generate_quit_condition(enemy_type)
         battle_timer = Timer(MAX_BATTLE_WAIT).start()
@@ -588,8 +679,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
             while True:
                 self.screenshot()
                 if battle_timer.reached():
-                    raise RequestHumanTakeover(
-                        f'Abyss battle has not settled after {MAX_BATTLE_WAIT}s; inspect before continuing')
+                    self.request_takeover('battle', f'{item_code}: no settlement after {MAX_BATTLE_WAIT}s')
                 if self.appear(self.I_FALSE):
                     logger.warning(f'{item_code}: defeat observed')
                     self.quit_battle()
@@ -621,7 +711,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
             if self.appear(self.I_ABYSS_NAVIGATION):
                 return
             if timer.reached():
-                raise RequestHumanTakeover('Abyss exit did not return to the map within 30s')
+                self.request_takeover('battle-exit', 'no map confirmation after 30s')
             for button in (self.I_FALSE, self.I_EXIT_ENSURE, self.I_WIN, self.I_REWARD, self.I_EXIT):
                 if self.appear_then_click(button, interval=1):
                     break
@@ -659,10 +749,8 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
         for v in soul_set:
             switch_soul(v)
 
+        self.exit_abyss_records()
         self.switch_soul_done = True
-        # 退出式神录
-        from tasks.GameUi.assets import GameUiAssets as gua
-        self.ui_click_until_disappear(gua.I_BACK_Y, interval=2)
 
     def check_available(self, item_code: Code):
         # 判断该怪物是否可用

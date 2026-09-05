@@ -5,6 +5,8 @@
   "attack_order_help": "Separate targets with semicolons: A-1;B;C. A-D are regions; 1 is boss, 2/3 generals, 4/5/6 elites. A region expands elites, generals, then boss.",
   "trial_mode": "Single trial",
   "abyss_trial_mode_help": "Stop for human inspection after one pass and preserve progress rather than scheduling another run.",
+  "lock_team_enable": "Locked lineup",
+  "abyss_lock_team_enable_help": "Keep the lineup locked in the game and skip all pre-battle preset changes; do not toggle the game lock. Soul preloading is independent and still uses the enemy presets. Click preparation only when visible; if battle already started, wait for its result.",
   "try_start_abyss_shadows": "Try to open Abyss",
   "try_start_abyss_shadows_help": "Only enable when authorized to open the activity; disabled for the trial.",
   "try_complete_enemy_count": "Fill 2/4/6 quotas",

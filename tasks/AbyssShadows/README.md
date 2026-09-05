@@ -29,9 +29,58 @@ production backend, whose older schema does not understand the new fields.
 - All strategies are `FALSE`: wait for natural settlement without timed retreat.
   Presets are empty and soul switching/marking are disabled, so prepare the
   current lineup manually. No saved preset is guessed from another task.
+- `lock_team_enable: true` skips every pre-battle preset change, including
+  changes between enemy types. It does not click the game's lock/unlock control;
+  set the desired locked lineup in the game. Soul preloading remains independent.
 - `trial_mode: true` stops with a human-takeover message after the run and keeps
   target progress for inspection. The backend may display the instance as
   warning; this is intentional and does not indicate that every target died.
+
+## Four-account settings
+
+[abyss-trial-accounts.json](../../deploy/examples/abyss-trial-accounts.json) contains
+sanitized **process_manage patches**, not complete runnable account configurations.
+Apply only the matching task subsection to a stopped, isolated trial instance;
+preserve its device, global settings, scheduler, and saved progress. Never replace
+an entire private configuration with this file. Preparing these patches does not
+deploy them to the production host.
+
+| Accounts | Primary targets | Backup targets | Presets (all enemy types) |
+|---|---|---|---|
+| 1 / 2 | All A, then all B | D boss, C boss, both D generals, both C generals, all D elites, all C elites | 7,2 / 7,1 |
+| 3 / 4 | All C, then all D | B boss, A boss, both B generals, both A generals, all B elites, all A elites | 6,1 / 2,1 |
+
+Primary regions still expand elites → generals → boss. Backup targets use explicit
+`A-1` notation; no new parser or automatic coordination is needed. All four
+patches enable locked-lineup mode and soul preloading, disable marking, and use
+`FALSE` battle strategies. Equal soul presets are preloaded only once per task
+startup, not per region or battle. Lock mode does not disable this preload.
+
+## Page transitions and latency
+
+- Reuse the account's global `costume_config`: battle and records templates are
+  replaced by `CostumeBase` during task initialization. No Abyss-specific skin
+  selector or duplicated skin assets are added. Offline tests apply the same mapping.
+- Exit records only while its page marker is visible. Stop once both the
+  Abyss navigation and shikigami-entry icons appear and records is gone. A yellow
+  back button on its own never authorizes another back click. Unknown transitions
+  wait and request takeover after 30 seconds.
+- Challenge entry accepts an already running battle, not just a preparation
+  page. Preparation/preset panels take precedence over the exit icon; battle
+  confirmation requires the globally themed battle-info marker.
+  A visible, enabled preparation button is retried; a dark button or an open
+  preset panel is not clicked. An exit icon alone does not prove battle entry.
+- With lock mode off, select the configured preset when needed, then inspect a
+  fresh frame before attempting preparation. With lock mode on, never select
+  a preset in battle preparation. An already running battle is never interrupted
+  to change lineups, regardless of lock mode.
+- Explicit click/swipe retry intervals are doubled within this task, including
+  shared components called by it: 0.6→1.2s, 1→2s, 2→4s. Shared component source,
+  screenshots, battle deadlines, action durations, fixed sleeps, and scheduler
+  intervals are not changed. Calls without a retry interval retain their contract.
+- Entry/records-exit state changes are logged. Protective entry, records-exit,
+  battle, or battle-exit timeouts preserve a diagnostic frame under
+  `log/error/abyss/`. Treat these frames as private; do not publish raw captures.
 
 ## Behavior and limits
 
@@ -59,7 +108,10 @@ Before a fresh replay, clear the four `saved_params` fields while the instance
 is stopped. Progress writes reload configuration before saving unrelated fields.
 Concurrent editing of the running trial is still unsupported.
 
-Region-sealed OCR and imported images remain unverified against today's UI.
+Recorded-frame tests cover records/map/preparation/battle discrimination across
+the four supplied accounts, including the alternate interface skin. This is
+offline evidence, not live validation of this revision. Region-sealed OCR and
+individual enemy-death classification still require separate verification.
 This trial does not add reliable per-enemy death recognition, unlimited retries,
 or automatic four-account group coordination. Multiple preset soul loadouts are
 preloaded in deterministic order; shared shikigami may still overwrite each
@@ -77,6 +129,8 @@ python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 Checks cover real OCR pixel filtering and mocked Abyss control flow. They do not
-consume an activity opportunity or verify current game screenshots. Regenerate
+consume an activity opportunity. To also run the private 44-frame regression,
+set `ABYSS_RECORDING_FRAMES` to the extracted-frame directory; the test skips
+when it is absent. Raw frames/recordings are not bundled or uploaded. Regenerate
 `assets.py` with `AssetsExtractor('tasks/AbyssShadows').extract()` from
 `dev_tools.assets_extract` after editing source JSON/images.
