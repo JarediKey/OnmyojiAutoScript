@@ -17,6 +17,7 @@
     },
     "process_manage": {
       "trial_mode": true,
+      "lock_team_enable": true,
       "attack_order": "A",
       "mark_main": "NONE",
       "enable_switch_soul_in_as": false,
