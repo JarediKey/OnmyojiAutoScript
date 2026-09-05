@@ -2,7 +2,6 @@
   "abyss-trial-1": {
     "abyss_shadows": {
       "process_manage": {
-        "trial_mode": true,
         "lock_team_enable": true,
         "attack_order": "A;B;D-1;C-1;D-2;D-3;C-2;C-3;D-4;D-5;D-6;C-4;C-5;C-6",
         "mark_main": "NONE",
@@ -19,7 +18,6 @@
   "abyss-trial-2": {
     "abyss_shadows": {
       "process_manage": {
-        "trial_mode": true,
         "lock_team_enable": true,
         "attack_order": "A;B;D-1;C-1;D-2;D-3;C-2;C-3;D-4;D-5;D-6;C-4;C-5;C-6",
         "mark_main": "NONE",
@@ -36,7 +34,6 @@
   "abyss-trial-3": {
     "abyss_shadows": {
       "process_manage": {
-        "trial_mode": true,
         "lock_team_enable": true,
         "attack_order": "C;D;B-1;A-1;B-2;B-3;A-2;A-3;B-4;B-5;B-6;A-4;A-5;A-6",
         "mark_main": "NONE",
@@ -53,7 +50,6 @@
   "abyss-trial-4": {
     "abyss_shadows": {
       "process_manage": {
-        "trial_mode": true,
         "lock_team_enable": true,
         "attack_order": "C;D;B-1;A-1;B-2;B-3;A-2;A-3;B-4;B-5;B-6;A-4;A-5;A-6",
         "mark_main": "NONE",

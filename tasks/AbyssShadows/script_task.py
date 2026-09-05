@@ -162,8 +162,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
             logger.info(f"Today is not abyss shadows day, exit")
             self.set_next_run(task='AbyssShadows', finish=False, server=True, success=True)
             raise TaskEnd
-        # Trial startup is controlled by the operator; avoid the old implicit
-        # two-hour cutoff based on the scheduler's special 09:00 default.
+        # Do not impose an implicit two-hour cutoff on the scheduler's start time.
 
         # 进入狭间
         self.goto_abyss_shadows()
@@ -191,8 +190,6 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
             if not self.select_boss(area_enter):
                 logger.warning("Failed to enter abyss shadows")
                 self.goto_main()
-                if cfg.process_manage.trial_mode:
-                    raise RequestHumanTakeover('Abyss trial could not enter the requested region')
                 self.set_next_run(task='AbyssShadows', finish=False, server=False, success=False)
                 raise TaskEnd
 
@@ -222,9 +219,6 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
         self.goto_main()
 
         # 设置下次运行时间
-        if cfg.process_manage.trial_mode:
-            self.flash_list()
-            raise RequestHumanTakeover('Abyss trial finished; inspect the recording and saved target states')
         self.set_next_run(task='AbyssShadows', finish=True, server=True,
                           success=not self.failed_list)
         if not self.failed_list:
