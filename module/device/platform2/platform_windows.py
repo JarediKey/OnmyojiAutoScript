@@ -179,7 +179,7 @@ class PlatformWindows(PlatformBase, EmulatorManager):
         elif instance == Emulator.MuMuPlayer12:
             # MuMuPlayer.exe -v 0
             if instance.MuMuPlayer12_id is None:
-                logger.warning(f'Cannot get MuMu instance index from name {instance.name}')
+                raise EmulatorUnknown(f'Cannot get MuMu instance index from name {instance.name!r}')
             self.execute(f'"{exe}" -v {instance.MuMuPlayer12_id}', show_window=show_window)
         elif instance == Emulator.LDPlayerFamily:
             # ldconsole.exe launch --index 0
@@ -235,7 +235,7 @@ class PlatformWindows(PlatformBase, EmulatorManager):
         elif instance == Emulator.MuMuPlayer12:
             # MuMuManager.exe api -v 1 shutdown_player
             if instance.MuMuPlayer12_id is None:
-                logger.warning(f'Cannot get MuMu instance index from name {instance.name}')
+                raise EmulatorUnknown(f'Cannot get MuMu instance index from name {instance.name!r}')
             self.execute(f'"{Emulator.single_to_console(exe)}" api -v {instance.MuMuPlayer12_id} shutdown_player')
         elif instance == Emulator.LDPlayerFamily:
             # ldconsole.exe quit --index 0
