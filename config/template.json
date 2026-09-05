@@ -338,6 +338,9 @@
       "best_demon_tsuchigumo": "group,team",
       "best_demon_gashadokuro": "group,team",
       "best_demon_namazu": "group,team"
+    },
+    "encounter_options": {
+      "skip_all_battles": false
     }
   },
   "daily_trifles": {

@@ -15,7 +15,7 @@ from module.base.timer import Timer
 from tasks.Component.SwitchSoul.switch_soul import SwitchSoul
 from tasks.DemonEncounter.config import BossType, DemonEncounter, convert_to_general_battle_config
 from tasks.GameUi.game_ui import GameUi
-from tasks.GameUi.page import page_demon_encounter, page_demon_encounter_realworld, page_shikigami_records
+from tasks.GameUi.page import page_demon_encounter, page_demon_encounter_realworld, page_shikigami_records, page_main
 from tasks.DemonEncounter.assets import DemonEncounterAssets
 from tasks.Component.GeneralBattle.general_battle import GeneralBattle
 from tasks.Component.GeneralBattle.config_general_battle import GeneralBattleConfig
@@ -44,12 +44,14 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
         # 切换御魂
         soul_config = self.config.demon_encounter.demon_soul_config
         best_soul_config = self.config.demon_encounter.best_demon_soul_config
-        if soul_config.enable or best_soul_config.enable:
+        if not self.conf.encounter_options.skip_all_battles and (soul_config.enable or best_soul_config.enable):
             self.ui_goto(page_shikigami_records)
             self.checkout_soul()
         self.ui_goto(page_demon_encounter_realworld)
         self.execute_lantern()
         self.execute_boss()
+        if self.conf.encounter_options.skip_all_battles:
+            self.ui_goto(page_main)
 
         self.set_next_run(task='DemonEncounter', success=True, finish=False)
         raise TaskEnd('DemonEncounter')
@@ -73,6 +75,9 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
         打boss
         :return:
         """
+        if self.conf.encounter_options.skip_all_battles:
+            logger.info('Skip all battles: daily Demon Encounter boss')
+            return
         logger.hr('Start boss battle', 1)
 
         def find_boss():
@@ -415,6 +420,9 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
             time.sleep(0.5)
 
     def _battle(self, target_click):
+        if self.conf.encounter_options.skip_all_battles:
+            logger.info('Skip all battles: monster or small boss lantern')
+            return
         while 1:
             self.screenshot()
             if not self.appear(self.I_DE_LOCATION):
@@ -437,6 +445,9 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
             logger.info('Battle End')
 
     def _realm(self, target_click):
+        if self.conf.encounter_options.skip_all_battles:
+            logger.info('Skip all battles: realm battle lantern')
+            return
         # 结界
         while 1:
             self.screenshot()
@@ -456,6 +467,9 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
         pass
 
     def _boss(self, target_click):
+        if self.conf.encounter_options.skip_all_battles:
+            logger.info('Skip all battles: large boss lantern')
+            return
         # 运气爆表，点灯笼出现大鬼王
         while 1:
             self.screenshot()
