@@ -23,6 +23,8 @@ zerorpc==0.6.3
 pydantic==2.10.0
 
 # Utils
+tzlocal==5.4.4
+tzdata==2026.3; platform_system == "Windows"
 rich==13.3.5
 pyyaml==6.0
 tqdm==4.65.0
