@@ -50,7 +50,7 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
             self.checkout_soul()
         self.ui_goto(page_demon_encounter_realworld)
         # 顶部"今日挑战次数:X/1"检测, 0/1表示今日已打过, 直接结束
-        if self.check_challenge_done():
+        if not self.conf.encounter_options.skip_all_battles and self.check_challenge_done():
             logger.info('Challenge count 0/1, already challenged today')
             self.set_next_run(task='DemonEncounter', success=True, finish=False)
             raise TaskEnd('DemonEncounter')
