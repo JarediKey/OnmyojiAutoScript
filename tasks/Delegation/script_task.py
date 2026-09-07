@@ -5,7 +5,8 @@ from time import sleep
 from datetime import time, datetime, timedelta
 
 from module.logger import logger
-from module.exception import TaskEnd
+from module.exception import TaskEnd, RequestHumanTakeover
+from module.atom.click import RuleClick
 from module.base.timer import Timer
 
 from tasks.GameUi.game_ui import GameUi
@@ -93,38 +94,59 @@ class ScriptTask(GameUi, DelegationAssets):
         # ui_click(self.C_D_5, self.I_D_SELECT_5)
         # self.ui_click_until_disappear(self.I_D_START)
 
+    def completed_card(self):
+        """Locate the first completed card without merging separate OCR matches."""
+        rule = self.O_D_DONE
+        results = rule.detect_and_ocr(self.device.image)
+        indices = rule.filter(results, rule.keyword) if results else []
+        if not indices:
+            return None
+        box = min((results[i].box for i in indices), key=lambda box: box[0, 1])
+        x = int((box[0, 0] + box[1, 0]) / 2 + rule.roi[0])
+        y = int(box[2, 1] + rule.roi[1] + 25)
+        # The completion ribbon is inert; click the portrait below it.
+        if not (10 <= x <= 1270 and 10 <= y <= 710):
+            raise RequestHumanTakeover('Completed delegation card is outside the screen')
+        area = (x - 8, y - 8, 16, 16)
+        return RuleClick(roi_front=area, roi_back=area, name='delegation_completed_card')
+
     def check_reward(self):
-        check_timer = Timer(3)
-        check_timer.start()
+        check_timer = Timer(3).start()
+        progress_timer = Timer(20).start()
+        attempts = 0
+        entry_timer = Timer(3).start()
+        reward_rules = (
+            self.I_REWARDS_GET, self.I_REWARDS_CHAT, self.I_CHAT_1,
+            self.I_CHAT_2, self.I_REWARDS_DONE, self.I_REWARDS_FALSE,
+        )
         while 1:
             self.screenshot()
-            if self.appear_then_click(self.I_REWARDS_GET, interval=1):
+            if progress_timer.reached():
+                raise RequestHumanTakeover('Delegation reward screen made no progress for 20 seconds')
+            if any(self.appear_then_click(rule, interval=1) for rule in reward_rules):
                 check_timer.reset()
+                progress_timer.reset()
+                attempts = 0
                 continue
-            if self.appear_then_click(self.I_REWARDS_CHAT, interval=1):
-                check_timer.reset()
-                continue
-            if self.appear_then_click(self.I_CHAT_1, interval=1):
-                check_timer.reset()
-                continue
-            if self.appear_then_click(self.I_CHAT_2, interval=1):
-                check_timer.reset()
-                continue
-            if self.appear_then_click(self.I_REWARDS_DONE, interval=1):
-                check_timer.reset()
-                continue
-            if self.appear_then_click(self.I_REWARDS_FALSE, interval=1):
-                check_timer.reset()
-                continue
-
-
             if not self.appear(self.I_REWARDS_MIN):
+                continue
+            card = self.completed_card()
+            if card is not None:
+                check_timer.reset()
+                if not entry_timer.reached():
+                    continue
+                if attempts >= 3:
+                    raise RequestHumanTakeover('Completed delegation did not open after 3 clicks')
+                self.click(card)
+                entry_timer.reset()
+                attempts += 1
+                logger.info(f'Open completed delegation card, attempt {attempts}/3')
+                continue
+            if attempts:
+                # A missing ribbon alone does not prove that rewards were collected.
                 continue
             if check_timer.reached():
                 break
-            if self.ocr_appear_click(self.O_D_DONE, interval=1):
-                check_timer.reset()
-                continue
 
 
 if __name__ == '__main__':
