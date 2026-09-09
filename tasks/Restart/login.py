@@ -173,6 +173,7 @@ class LoginHandler(BaseTask, RestartAssets, GameUiAssets, GeneralBuffAssets):
         logger.hr('Harvest')
         timer_harvest = Timer(5)  # 如果连续5秒没有发现任何奖励，退出
         skip_default = False
+        mail_attempted = False
         courtyard_affairs_done = False  # 庭院事务只执行一次
         while 1:
             self.device.screenshot()
@@ -250,9 +251,11 @@ class LoginHandler(BaseTask, RestartAssets, GameUiAssets, GeneralBuffAssets):
                 timer_harvest.reset()
                 continue
             # 判断是否勾选了收取邮件（不收取邮件可以查看每日收获）
-            if not skip_default and self.config.restart.harvest_config.enable_mail and self.harvest_mail():
-                timer_harvest.reset()
-                continue
+            if not skip_default and self.config.restart.harvest_config.enable_mail and not mail_attempted:
+                mail_attempted = True
+                if self.harvest_mail():
+                    timer_harvest.reset()
+                    continue
             if self.appear_then_click(self.I_HARVEST_AP, interval=1, threshold=0.7):
                 timer_harvest.reset()
                 continue
@@ -291,19 +294,22 @@ class LoginHandler(BaseTask, RestartAssets, GameUiAssets, GeneralBuffAssets):
         self.O_LOGIN_SPECIFIC_SERVE.keyword = character
 
     def harvest_mail(self) -> bool:
-        if not self.appear_multi_scale(self.I_HARVEST_MAIL,scale_range=(0.8, 1.1)) and \
-                not self.appear(self.I_HARVEST_MAIL_COPY):
-            if not self.appear(self.I_READ_ALL_MAIL):
-                return False
         logger.info('Harvest mail')
-        while 1:
+        # The toolbar envelope stays still while the courtyard courier moves.
+        entry_timer = Timer(12).start()
+        while not entry_timer.reached():
             self.screenshot()
             if self.appear(self.I_READ_ALL_MAIL):
                 break
+            if self.appear_then_click(self.I_MAIL_TOOLBAR, interval=1.5):
+                continue
             if self.appear_then_click_multi_scale(self.I_HARVEST_MAIL, interval=1.5, scale_range=(0.8, 1.1)):
                 continue
             if self.appear_then_click(self.I_HARVEST_MAIL_COPY, interval=1.5):
                 continue
+        else:
+            logger.warning('Mail entry timed out; defer collection until the next login')
+            return False
         timeout_timer = Timer(3).start()
         logger.info('Exec harvest mail')
         while 1:
