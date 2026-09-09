@@ -100,6 +100,7 @@ class EmulatorInstanceBase:
         Convert MuMu 12 instance name to instance id.
         Example names:
             MuMuPlayer-12.0-3
+            MuMuPlayerGlobal-15.0-1
             YXArkNights-12.0-1
 
         Returns:

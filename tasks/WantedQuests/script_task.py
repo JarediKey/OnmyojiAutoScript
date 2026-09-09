@@ -12,7 +12,7 @@ from cached_property import cached_property
 from module.atom.image import RuleImage
 from module.atom.ocr import RuleOcr
 from module.base.timer import Timer
-from module.exception import TaskEnd
+from module.exception import TaskEnd, GameStuckError
 from module.logger import logger
 from tasks.Component.Costume.config import MainType
 from tasks.Component.GeneralBattle.config_general_battle import GeneralBattleConfig
@@ -378,6 +378,7 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
                         self.device.click_record_clear()
                     continue
             success = self.run_general_battle(self.battle_config)
+            self.finish_secret_story()
         while 1:
             self.screenshot()
             if self.appear(self.I_CHECK_SECRET_ZONES):
@@ -390,6 +391,20 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
         self.ui_goto(page_exploration)
         self.wait_until_stable(self.I_CHECK_EXPLORATION)
         logger.info('Secret mission finished')
+
+    def finish_secret_story(self):
+        """Advance only recognized post-battle story frames, with a fixed deadline."""
+        timeout = Timer(30).start()
+        absent = Timer(1, count=2).start()
+        while not timeout.reached():
+            self.screenshot()
+            if self.appear(self.I_SECRET_STORY):
+                absent.reset()
+                self.click(self.C_SECRET_CHAT, interval=1.5)
+                continue
+            if absent.reached():
+                return
+        raise GameStuckError('Secret post-battle story did not finish within 30 seconds')
 
     def invite_random(self, add_button: RuleImage):
         self.screenshot()

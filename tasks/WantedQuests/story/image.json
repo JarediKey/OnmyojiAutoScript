@@ -1,0 +1,11 @@
+[
+  {
+    "itemName": "secret_story",
+    "imageName": "secret_story.png",
+    "roiFront": "321,567,178,17",
+    "roiBack": "295,552,225,45",
+    "method": "Template matching",
+    "threshold": 0.85,
+    "description": "Verified interface landmark"
+  }
+]

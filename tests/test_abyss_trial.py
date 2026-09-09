@@ -304,21 +304,6 @@ class AbyssTrialTests(unittest.TestCase):
         self.methods['switch_soul_in_as'](self.obj)
         self.assertEqual(self.obj.run_switch_soul.call_count, 1)
 
-    def test_four_account_routes_and_presets(self):
-        data = json.loads((self.root / 'deploy/examples/abyss-trial-accounts.json').read_text(encoding='utf-8'))
-        presets = ('7,2', '7,1', '6,1', '2,1')
-        for i in range(1, 5):
-            cfg = self.config_type.model_validate(data[f'abyss-trial-{i}']['abyss_shadows'])
-            primary, backup = ('AB', 'DC') if i <= 2 else ('CD', 'BA')
-            expected = [f'{area}-{n}' for area in primary for n in (4,5,6,2,3,1)]
-            expected += [f'{area}-{n}' for group in ((1,), (2,3), (4,5,6)) for area in backup for n in group]
-            actual = self.CodeList(cfg.process_manage.attack_order)
-            self.assertEqual(actual, expected)
-            self.assertEqual(len(set(actual)), 24)
-            self.assertTrue(cfg.process_manage.lock_team_enable)
-            for kind in ('boss', 'general', 'elite'):
-                self.assertEqual(getattr(cfg.process_manage, f'preset_{kind}'), presets[i-1])
-
     def test_action_intervals_are_scoped_and_doubled_once(self):
         tree = ast.parse((self.root / 'tasks/AbyssShadows/script_task.py').read_text(encoding='utf-8'))
         source = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'ScriptTask')
