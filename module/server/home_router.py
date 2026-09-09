@@ -11,11 +11,13 @@ from module.ocr.rpc import shutdown_ocr_server
 from module.server.main_manager import MainManager
 from module.server.updater import Updater
 from module.server.i18n import I18n
+from module.server.system_timezone import system_timezone_app
 
 home_app = APIRouter(
     prefix="/home",
     tags=["home"],
 )
+home_app.include_router(system_timezone_app)
 
 
 @home_app.get('/test')

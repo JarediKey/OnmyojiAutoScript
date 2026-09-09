@@ -79,6 +79,8 @@ starlette==0.27.0         # via fastapi
 sympy==1.12               # via onnxruntime
 tqdm==4.65.0              # via -r requirements-in.txt
 typing-extensions==4.12.2  # via fastapi, frida, pydantic, pydantic-core, uvicorn
+tzdata==2026.3; platform_system == "Windows"  # via -r requirements-in.txt, tzlocal
+tzlocal==5.4.4            # via -r requirements-in.txt
 uiautomator2==2.16.17     # via -r requirements-in.txt
 uiautomator2cache==0.3.0.1  # via -r requirements-in.txt
 urllib3==2.1.0            # via requests
