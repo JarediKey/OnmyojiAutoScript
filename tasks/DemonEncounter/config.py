@@ -129,8 +129,13 @@ class UtilizeScheduler(Scheduler):
     priority: int = Field(default=2, description='priority_help')
 
 
+class EncounterOptions(BaseModel):
+    skip_all_battles: bool = Field(default=False, description='skip_all_battles_help')
+
+
 class DemonEncounter(ConfigBase):
     scheduler: UtilizeScheduler = Field(default_factory=UtilizeScheduler)
+    encounter_options: EncounterOptions = Field(default_factory=EncounterOptions)
     box_buy_config: BoxBuyConfig = Field(default_factory=BoxBuyConfig)
     best_demon_boss_config: BestDemonBossSelect = Field(default_factory=BestDemonBossSelect)
     demon_soul_config: DemonConfig = Field(default_factory=DemonConfig)
