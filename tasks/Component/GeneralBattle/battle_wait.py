@@ -212,12 +212,15 @@ class battle_wait_strategy:
         if battle_wait_strategy.battle_wait_plan is None:
             # 首次装饰 func 初始化 battle_wait_plan
             battle_wait_strategy.battle_wait_plan = BattleWaitPlan(*arg, **kwargs)  # pylint: disable=unused-argument
-        elif self._temp_battle_wait_plan is None:
+        elif arg or kwargs:
             # 使用 with 上下文临时修改 battle_wait_plan
             self._temp_battle_wait_plan = BattleWaitPlan(*arg, **kwargs)
 
     def __enter__(self):
         self._previous_plan = battle_wait_strategy.battle_wait_plan
+        self._previous_options = battle_wait_strategy.options
+        if self._temp_options is not None:
+            battle_wait_strategy.options = self._temp_options
 
         if self._temp_battle_wait_plan is not None:
             battle_wait_strategy.battle_wait_plan = self._temp_battle_wait_plan
@@ -225,6 +228,7 @@ class battle_wait_strategy:
 
     def __exit__(self, *exc):
         battle_wait_strategy.battle_wait_plan = self._previous_plan
+        battle_wait_strategy.options = self._previous_options
         return False
 
     def __str__(self):

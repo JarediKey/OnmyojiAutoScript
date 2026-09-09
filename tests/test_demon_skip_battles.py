@@ -16,6 +16,7 @@ class SkipBattlesTests(unittest.TestCase):
         task = object.__new__(module.ScriptTask)
         task.conf = DemonEncounter(encounter_options={'skip_all_battles': enabled})
         task.config = SimpleNamespace(demon_encounter=task.conf)
+        task.check_challenge_done = Mock(return_value=False)
         return task
 
     def test_default_and_frontend_schema(self):
@@ -62,6 +63,7 @@ class SkipBattlesTests(unittest.TestCase):
             task.run()
         task.checkout_soul.assert_not_called()
         task.execute_lantern.assert_called_once()
+        task.check_challenge_done.assert_not_called()
         self.assertEqual([c.args[0] for c in task.ui_goto.call_args_list],
                          [module.page_demon_encounter_realworld, module.page_main])
         task.set_next_run.assert_called_once_with(task='DemonEncounter', success=True, finish=False)
@@ -83,6 +85,22 @@ class SkipBattlesTests(unittest.TestCase):
         task.execute_boss.assert_called_once()
         self.assertEqual([c.args[0] for c in task.ui_goto.call_args_list],
                          [module.page_shikigami_records, module.page_demon_encounter_realworld])
+        task.set_next_run.assert_called_once_with(task='DemonEncounter', success=True, finish=False)
+
+    def test_completed_battle_count_ends_full_workflow(self):
+        task = self.make_task(False)
+        task.check_time = Mock(return_value=True)
+        task.check_challenge_done.return_value = True
+        task.ui_get_current_page = Mock()
+        task.ui_goto = Mock()
+        task.checkout_soul = Mock()
+        task.execute_lantern = Mock()
+        task.execute_boss = Mock()
+        task.set_next_run = Mock()
+        with self.assertRaises(TaskEnd):
+            task.run()
+        task.execute_lantern.assert_not_called()
+        task.execute_boss.assert_not_called()
         task.set_next_run.assert_called_once_with(task='DemonEncounter', success=True, finish=False)
 
     def test_lantern_discoveries_rewards_and_noncombat_events_remain(self):

@@ -18,3 +18,7 @@ enable the task or alter an account's schedule.
 OASX retrieves additional translations when its navigation controller initializes.
 If the new label or help text is missing after a backend update, restart OASX
 so it reloads the task schema and translations.
+
+In the full workflow, a recognized zero remaining daily challenge count ends
+the task early. This check does not apply to **Skip all battles**, so discoveries
+and non-combat events remain available after the daily battle is complete.
