@@ -9,7 +9,7 @@ engine:
   id: codex
   model: gpt-5.6-luna
   env:
-    OPENAI_BASE_URL: https://api.ai-pixel.online
+    OPENAI_BASE_URL: https://ai-pixel.online
     OPENAI_API_KEY : ${{ secrets.PIXEL_API_KEY }}
 ---
 
