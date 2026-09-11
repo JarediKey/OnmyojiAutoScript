@@ -8,7 +8,7 @@ from cached_property import cached_property
 from enum import Enum
 from datetime import timedelta
 
-from module.exception import TaskEnd, RequestHumanTakeover
+from module.exception import TaskEnd, RequestHumanTakeover, GameStuckError
 from module.logger import logger
 from module.base.timer import Timer
 from module.atom.ocr import RuleOcr
@@ -263,21 +263,39 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
                 raise RequestHumanTakeover
 
         logger.info('Swipe to the most matter')
-        # 还有一点很重要的，捐赠会有双倍的，需要领两次
-        reward_number = 0
-        while 1:
-            self.screenshot()
-
-            if reward_number >= 2:
-                break
-            if self.ui_reward_appear_click(False):
-                reward_number += 1
-                continue
-            if self.appear_then_click(self.I_CM_PRESENT, interval=1):
-                continue
-        self.ui_reward_appear_click(True)
+        self._submit_and_collect_rewards(self.I_CM_PRESENT)
         logger.info('Donate finished')
         return True
+
+    def _submit_and_collect_rewards(self, submit_button):
+        """Drain reward overlays and verify a stable return to the mission list."""
+        deadline = Timer(20).start()
+        list_stable = Timer(3, count=3).start()
+        reward_clicked = False
+        while not deadline.reached():
+            self.screenshot()
+            # Visibility is independent of click cooldown and takes priority
+            # over list controls that may still be visible below the overlay.
+            if self.appear(self.I_UI_REWARD, threshold=0.6):
+                list_stable.reset()
+                if self.ui_reward_appear_click(False):
+                    reward_clicked = True
+                continue
+
+            if self.appear(submit_button):
+                list_stable.reset()
+                if not reward_clicked:
+                    self.appear_then_click(submit_button, interval=1)
+                continue
+
+            if reward_clicked and self.appear(self.I_CM_RECORDS):
+                if list_stable.reached():
+                    logger.info('Donation rewards cleared; mission list is stable')
+                    return
+            else:
+                list_stable.reset()
+
+        raise GameStuckError('Donation did not return to the mission list within 20 seconds')
 
     def select_mission(self, missions_select: str) -> bool:
         """
@@ -374,19 +392,7 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
             for click in click_list:
                 self.click(click)
         logger.info('Finish to feed soul')
-        # 还有一点很重要的，捐赠会有双倍的，需要领两次
-        reward_number = 0
-        while 1:
-            self.screenshot()
-
-            if reward_number >= 2:
-                break
-            if self.ui_reward_appear_click(False):
-                reward_number += 1
-                continue
-            if self.appear_then_click(self.I_FEED_SUBMIT, interval=1):
-                continue
-        self.ui_reward_appear_click(True)
+        self._submit_and_collect_rewards(self.I_FEED_SUBMIT)
         logger.info('Donate finished')
         return True
 
