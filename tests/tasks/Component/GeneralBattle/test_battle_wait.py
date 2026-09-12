@@ -1,4 +1,6 @@
 import pytest
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 from tasks.Component.GeneralBattle.battle_wait import (
     BattleWait,
@@ -90,6 +92,7 @@ def test_setup_runs_before_the_wait_loop():
 
         def _bw_completion_finish(self, bw_ctx):
             self.events.append('completion')
+            bw_ctx.success = True
             return HookSignal.DONE
 
     battle_wait = OrderedBattleWait()
@@ -117,6 +120,7 @@ def test_custom_hook_is_resolved_and_executed_in_the_configured_sequence():
 
         def _bw_completion_finish(self, bw_ctx):
             self.events.append('completion')
+            bw_ctx.success = True
             return HookSignal.DONE
 
     battle_wait = CustomBattleWait()
@@ -207,6 +211,7 @@ def test_decorator_options_and_with_options_are_scoped_to_the_current_call():
 
         def _bw_completion_record(self, bw_ctx):
             received_options.append(bw_ctx.options)
+            bw_ctx.success = True
             return HookSignal.DONE
 
         @strategy
@@ -231,3 +236,31 @@ def test_decorator_options_and_with_options_are_scoped_to_the_current_call():
     assert battle_wait.battle_wait() is True
     assert received_options[-1] == decorator_options
     assert 'C_REWARD_1' in str(strategy)
+
+
+@pytest.mark.parametrize('won', [True, False])
+def test_completed_battle_returns_its_recorded_outcome(won):
+    class CompletedBattleWait(BattleWait):
+        def screenshot(self):
+            pass
+
+        def _bw_setup_finished(self, bw_ctx):
+            bw_ctx.success = won
+            bw_ctx.completion = True
+            return HookSignal.DONE
+
+    battle_wait = object.__new__(CompletedBattleWait)
+    assert battle_wait.battle_wait_with_strategy(
+        battle_wait_plan=BattleWaitPlan('setup_finished')) is won
+
+
+def test_defeat_clears_previous_success_before_completing():
+    battle_wait = SimpleNamespace(
+        I_FALSE=object(), appear=Mock(return_value=True),
+        ui_click_until_disappear=Mock())
+    context = SimpleNamespace(success=True, completion=False)
+
+    assert BattleWait._bw_failure_default(battle_wait, context) == HookSignal.CONTINUE
+    assert context.success is False
+    assert context.completion is True
+    battle_wait.ui_click_until_disappear.assert_called_once_with(battle_wait.I_FALSE)
