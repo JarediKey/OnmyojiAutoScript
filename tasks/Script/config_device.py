@@ -57,6 +57,7 @@ class Device(BaseModel):
     package_name: PackageName = Field(title='Package Name',
                                       default=PackageName.AUTO,
                                       description='package_name_help')
+    user_id: int = Field(default=-1, ge=-1, description='user_id_help')
     screenshot_method: ScreenshotMethod = Field(default=ScreenshotMethod.AUTO,
                                                 description='screenshot_method_help')
     control_method: ControlMethod = Field(default=ControlMethod.MINITOUCH,

@@ -23,7 +23,7 @@ _RECENT_ERROR_LOGS = 10
 
 # 白名单：只导出这些字段，不带出 URS 凭据
 _DEVICE_FIELDS = [
-    'control_method', 'screenshot_method', 'serial', 'package_name',
+    'control_method', 'screenshot_method', 'serial', 'package_name', 'user_id',
     'emulatorinfo_type', 'emulatorinfo_name',
 ]
 

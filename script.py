@@ -559,6 +559,7 @@ class Script:
             return False
 
         try:
+            self.device.ensure_app_user()
             self.device.screenshot()
             module_name = 'script_task'
             module_path = str(Path.cwd() / 'tasks' / command / (module_name+'.py'))
