@@ -1,0 +1,11 @@
+[
+  {
+    "itemName": "mail_toolbar",
+    "imageName": "mail_toolbar.png",
+    "roiFront": "1137,18,35,29",
+    "roiBack": "1120,0,70,70",
+    "method": "Template matching",
+    "threshold": 0.85,
+    "description": "Verified interface landmark"
+  }
+]

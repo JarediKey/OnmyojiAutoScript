@@ -195,6 +195,7 @@ class battle_wait_strategy:
     首次装饰 func 初始化 battle_wait_plan
     """
     battle_wait_plan: BattleWaitPlan = None
+    _context_options: dict | None = None
     options: dict[str: dict] = {
         'success': {
             'reward_exclude_click_1': ['C_END_MESSAGE_RIGHT_TOP', 'C_END_BUFF_AREA_1', 'C_END_BUFF_AREA_2', 'C_END_SOUL_RECORD', 'C_END_SOUL_DETAILS',],
@@ -215,7 +216,6 @@ class battle_wait_strategy:
                     raise
                 if not isinstance(value, dict):
                     raise TypeError(f'temp_options must be a dict, got {self._temp_options!r}')
-            battle_wait_strategy.options.update(self._temp_options)
 
         self._temp_battle_wait_plan = None
         if battle_wait_strategy.battle_wait_plan is None:
@@ -227,9 +227,10 @@ class battle_wait_strategy:
 
     def __enter__(self):
         self._previous_plan = battle_wait_strategy.battle_wait_plan
-        self._previous_options = battle_wait_strategy.options
-        if self._temp_options is not None:
-            battle_wait_strategy.options = self._temp_options
+        self._previous_options = battle_wait_strategy._context_options
+        options = dict(self._previous_options or {})
+        options.update(self._temp_options or {})
+        battle_wait_strategy._context_options = options
 
         if self._temp_battle_wait_plan is not None:
             battle_wait_strategy.battle_wait_plan = self._temp_battle_wait_plan
@@ -237,7 +238,7 @@ class battle_wait_strategy:
 
     def __exit__(self, *exc):
         battle_wait_strategy.battle_wait_plan = self._previous_plan
-        battle_wait_strategy.options = self._previous_options
+        battle_wait_strategy._context_options = self._previous_options
         return False
 
     def __str__(self):
@@ -245,6 +246,7 @@ class battle_wait_strategy:
         default_plan = getattr(self, 'battle_wait_plan', None)
         options = dict(battle_wait_strategy.options or {})
         options.update(self._temp_options or {})
+        options.update(battle_wait_strategy._context_options or {})
 
         if temp_plan is not None:
             plan = temp_plan
@@ -293,6 +295,7 @@ class battle_wait_strategy:
             # )
             options = dict(battle_wait_strategy.options or {})
             options.update(self._temp_options or {})
+            options.update(battle_wait_strategy._context_options or {})
             return func(owner, battle_wait_plan=current_plan, options=options) \
                 if options else func(owner, battle_wait_plan=current_plan)
 
@@ -306,13 +309,9 @@ class battle_wait_strategy:
                 raise TypeError()
             if not isinstance(v, dict):
                 raise TypeError()
-        # 先装饰器, 后临时变量
-        if battle_wait_strategy.options is None:
-            battle_wait_strategy.options = options
-            self._temp_options = None
-        else:
-            self._temp_options = options
-        return self
+        # A fresh context preserves the decorator's own options across calls.
+        return type(self)(options=options)
+
 
 
 class BattleWait(BaseTask, GeneralBattleAssets):

@@ -197,7 +197,7 @@ class RuleClickExclude(RuleClick):
 
     def coord_in_excluded(self, areas: list[str] | None = None) -> tuple:
         """
-        
+
         """
         if not areas:
             areas = ['C_END_1_1', 'C_END_1_2', 'C_END_1_3', 'C_END_1_4', 'C_END_1_5', 'C_END_1_6',
