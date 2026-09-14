@@ -43,11 +43,17 @@ appearances and actual sidebar gestures still need live validation.
 
 ## Shop return
 
-`MallNavbar.back_mall()` spaces yellow-back clicks at least 3 seconds apart while
-waiting for the mall marker. Rich Man and Mystery Shop share this method.
-Other return actions retain their own intervals.
+Rich Man and Mystery Shop share `MallNavbar.back_mall()` for final shop cleanup.
+It takes a fresh screenshot and checks the mall and courtyard before each possible
+return click. Either page completes cleanup without another click, and the detected
+page becomes `ui_current`. Courtyard detection uses the shared page matcher,
+including the configured courtyard skin.
 
-This interval reduces rapid repeated returns during transitions. It does not
-change the completion condition: arriving at the courtyard still does not satisfy
-the mall marker, so that case can reach the existing stuck timeout. The interval
-change has been checked locally; live game behavior has not been verified.
+While neither destination is visible, it clicks a recognized yellow-back button
+at least 3 seconds apart. If neither page is recognized within the 20-second wait
+window, it raises `GameStuckError` for the existing recovery flow; the task does not
+report success. Other return actions and purchase settings are unchanged.
+
+Offline regression checks: `python -m unittest discover -s tests -p test_mall_return.py -v`.
+These cover return transitions, click spacing, and timeout behavior. The corrected
+completion logic has not been live-tested in the game.

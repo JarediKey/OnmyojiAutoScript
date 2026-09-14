@@ -5,10 +5,10 @@ import re
 import time
 
 from module.logger import logger
-from module.exception import GameStuckError
 from module.base.timer import Timer
+from module.exception import GameStuckError
 
-from tasks.GameUi.page import page_main, page_guild
+from tasks.GameUi.page import page_main, page_guild, page_mall
 from tasks.GameUi.game_ui import GameUi
 from tasks.Component.Buy.buy import Buy
 from tasks.RichMan.assets import RichManAssets
@@ -138,11 +138,18 @@ class MallNavbar(GameUi, RichManAssets):
         raise GameStuckError(f'Shop category {target} not confirmed within 25 seconds')
 
     def back_mall(self):
-        """
-        返回商城
-        :return:
-        """
-        self.ui_click(self.I_UI_BACK_YELLOW, self.I_CHECK_MALL, interval=3)
+        """Finish shop cleanup at either the mall or the courtyard."""
+        timeout = Timer(20).start()
+        while True:
+            self.screenshot()
+            for page in (page_mall, page_main):
+                if self.ui_page_appear(page):
+                    self.ui_current = page
+                    logger.info(f'Shop return complete: {page}')
+                    return
+            if timeout.reached():
+                raise GameStuckError('Shop return did not reach the mall or courtyard within 20 seconds')
+            self.appear_then_click(self.I_UI_BACK_YELLOW, interval=3)
 
     def mall_resource(self, index: int) -> int:
         """
@@ -208,4 +215,3 @@ if __name__ == '__main__':
     c = Config('oas1')
     d = Device(c)
     t = MallNavbar(c, d)
-

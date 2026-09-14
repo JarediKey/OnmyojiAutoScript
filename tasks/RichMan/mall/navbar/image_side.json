@@ -57,7 +57,7 @@
     "itemName": "side_sure_medal",
     "imageName": "navbar_side_sure_medal.png",
     "roiFront": "1190,404,39,62",
-    "roiBack": "1156,352,112,128",
+    "roiBack": "1156,90,112,520",
     "method": "Template matching",
     "threshold": 0.7,
     "description": "勋章"
@@ -75,7 +75,7 @@
     "itemName": "side_sure_charisma",
     "imageName": "navbar_side_sure_charisma.png",
     "roiFront": "1181,502,59,58",
-    "roiBack": "1158,475,101,112",
+    "roiBack": "1156,90,112,520",
     "method": "Template matching",
     "threshold": 0.7,
     "description": "魅力值"
