@@ -7,5 +7,14 @@
     "method": "Template matching",
     "threshold": 0.85,
     "description": "Verified interface landmark"
+  },
+  {
+    "itemName": "secret_story_shantu",
+    "imageName": "secret_story_shantu.png",
+    "roiFront": "320,534,158,40",
+    "roiBack": "304,522,196,72",
+    "method": "Template matching",
+    "threshold": 0.9,
+    "description": "Shantu dialogue nameplate"
   }
 ]

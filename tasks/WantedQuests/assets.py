@@ -189,3 +189,5 @@ class WantedQuestsAssets:
 	# Image Rule Assets
 	# Verified interface landmark
 	I_SECRET_STORY = RuleImage(roi_front=(321,567,178,17), roi_back=(295,552,225,45), threshold=0.85, method="Template matching", file="./tasks/WantedQuests/story/secret_story.png")
+	# Shantu dialogue nameplate
+	I_SECRET_STORY_SHANTU = RuleImage(roi_front=(320,534,158,40), roi_back=(304,522,196,72), threshold=0.9, method="Template matching", file="./tasks/WantedQuests/story/secret_story_shantu.png")

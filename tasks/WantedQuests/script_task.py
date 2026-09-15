@@ -359,7 +359,8 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
     def secret(self, goto, num=1):
         self.ui_click(goto, self.I_WQSE_FIRE)
         for i in range(num):
-            self.wait_until_appear(self.I_WQSE_FIRE)
+            if not self.wait_until_appear(self.I_WQSE_FIRE, wait_time=10):
+                raise GameStuckError('Secret challenge did not appear within 10 seconds')
             # self.ui_click_until_disappear(self.I_WQSE_FIRE)
             # 又臭又长的对话针的是服了这个网易
             click_count = 0
@@ -379,7 +380,8 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
                     continue
             success = self.run_general_battle(self.battle_config)
             self.finish_secret_story()
-        while 1:
+        return_timeout = Timer(20).start()
+        while not return_timeout.reached():
             self.screenshot()
             if self.appear(self.I_CHECK_SECRET_ZONES):
                 break
@@ -387,24 +389,29 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
                 continue
             if self.appear_then_click(self.I_UI_BACK_BLUE, interval=1.5):
                 continue
+        else:
+            raise GameStuckError('Secret zone list did not appear within 20 seconds')
         self.ui_get_current_page()
         self.ui_goto(page_exploration)
         self.wait_until_stable(self.I_CHECK_EXPLORATION)
         logger.info('Secret mission finished')
 
     def finish_secret_story(self):
-        """Advance only recognized post-battle story frames, with a fixed deadline."""
+        """Advance recognized dialogue until a stable challenge or zone list appears."""
         timeout = Timer(30).start()
-        absent = Timer(1, count=2).start()
+        ready = Timer(1, count=2).start()
         while not timeout.reached():
             self.screenshot()
-            if self.appear(self.I_SECRET_STORY):
-                absent.reset()
+            if self.appear(self.I_SECRET_STORY) or self.appear(self.I_SECRET_STORY_SHANTU):
+                ready.reset()
                 self.click(self.C_SECRET_CHAT, interval=1.5)
                 continue
-            if absent.reached():
-                return
-        raise GameStuckError('Secret post-battle story did not finish within 30 seconds')
+            if self.appear(self.I_WQSE_FIRE) or self.appear(self.I_CHECK_SECRET_ZONES):
+                if ready.reached():
+                    return
+            else:
+                ready.reset()
+        raise GameStuckError('Secret post-battle challenge or zone list not confirmed within 30 seconds')
 
     def invite_random(self, add_button: RuleImage):
         self.screenshot()
