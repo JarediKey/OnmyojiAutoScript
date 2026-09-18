@@ -4,7 +4,7 @@
 import time
 from time import sleep
 
-from module.exception import TaskEnd
+from module.exception import TaskEnd, GameStuckError
 from module.logger import logger
 from module.base.timer import Timer
 
@@ -113,16 +113,20 @@ class ScriptTask(GameUi, WeeklyTriflesAssets):
         :return:
         """
         def back_boss():
-            while 1:
+            timeout = Timer(20).start()
+            while not timeout.reached():
                 self.screenshot()
-                if self.appear(self.I_WT_DAY_BATTLE) or self.appear(self.I_CHECK_EXPLORATION):
+                if (self.appear(self.I_WT_DAY_BATTLE) or self.appear(self.I_CHECK_EXPLORATION)
+                        or self.ui_page_appear(page_main)):
                     break
-                if self.appear_then_click(self.I_UI_BACK_RED, interval=1):
+                if self.appear_then_click(self.I_UI_BACK_RED, interval=3):
                     continue
-                if self.appear_then_click(self.I_UI_BACK_BLUE, interval=1):
+                if self.appear_then_click(self.I_UI_BACK_BLUE, interval=3):
                     continue
-                if self.appear_then_click(self.I_UI_BACK_YELLOW, interval=1):
+                if self.appear_then_click(self.I_UI_BACK_YELLOW, interval=3):
                     continue
+            else:
+                raise GameStuckError('Cannot leave Area Boss sharing within 20 seconds')
             logger.info('Back to boss')
         logger.hr('Share area boss')
         self.ui_get_current_page()
@@ -130,6 +134,12 @@ class ScriptTask(GameUi, WeeklyTriflesAssets):
 
         # 一路进去
         obtained = False
+        share_attempts = 0
+        entry_attempts = 0
+        day_attempts = 0
+        share_wait = Timer(3)
+        entry_wait = Timer(3)
+        enter_timeout = Timer(30).start()
         while 1:
             self.screenshot()
             if self.appear(self.I_WT_AB_WECHAT):
@@ -137,11 +147,33 @@ class ScriptTask(GameUi, WeeklyTriflesAssets):
             if self.appear(self.I_WT_NO_DAY):
                 obtained = True
                 break
-            if self.click(self.C_WT_AB_CLICK, interval=2.5):
+            if share_attempts >= 3 and share_wait.reached():
+                logger.warning('Skip Area Boss share: selector did not appear after 3 clicks; reward not confirmed')
+                back_boss()
+                return
+            if enter_timeout.reached():
+                logger.warning('Skip Area Boss share: entry timed out; reward not confirmed')
+                back_boss()
+                return
+            if self.appear(self.I_WT_SHARE_AB):
+                if share_wait.reached() and self.appear_then_click(self.I_WT_SHARE_AB, interval=3):
+                    share_attempts += 1
+                    share_wait.reset()
                 continue
-            if self.appear_then_click(self.I_WT_DAY_BATTLE, interval=2):
+            # Once sharing has been clicked, wait for its destination instead of
+            # clicking the challenge-list coordinates behind the current panel.
+            if share_attempts:
                 continue
-            if self.appear_then_click(self.I_WT_SHARE_AB, interval=1):
+            if day_attempts < 3 and self.appear_then_click(self.I_WT_DAY_BATTLE, interval=2):
+                day_attempts += 1
+                continue
+            if entry_attempts >= 3 and entry_wait.reached():
+                logger.warning('Skip Area Boss share: challenge record did not open after 3 clicks')
+                back_boss()
+                return
+            if entry_attempts < 3 and entry_wait.reached() and self.click(self.C_WT_AB_CLICK, interval=3):
+                entry_attempts += 1
+                entry_wait.reset()
                 continue
         # 再次检查一次这周有没有领取
         time.sleep(1)
