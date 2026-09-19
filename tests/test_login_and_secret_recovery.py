@@ -52,27 +52,113 @@ class RecoveryTests(unittest.TestCase):
         self.assertTrue(method('tasks/Restart/login.py', 'harvest_mail')(task))
         self.assertEqual(task.appear_then_click.call_args_list[0].args[0], 'MAIL_TOOLBAR')
 
-    def story(self, visible):
-        task = SimpleNamespace(screenshot=self.frame, appear=visible,
-                               click=Mock(), I_SECRET_STORY='story', C_SECRET_CHAT='advance')
+    def story(self, scene):
+        task = SimpleNamespace(screenshot=self.frame, appear=lambda target: target in scene(self.now),
+                               click=Mock(), I_SECRET_STORY='story', I_SECRET_STORY_SHANTU='shantu',
+                               I_WQSE_FIRE='challenge', I_CHECK_SECRET_ZONES='zones', C_SECRET_CHAT='advance')
         return task
 
-    def test_story_advances_until_it_disappears(self):
-        task = self.story(lambda _: self.now < 103)
+    def test_story_advances_until_challenge_is_confirmed(self):
+        task = self.story(lambda now: {'story'} if now < 103 else {'challenge'})
         method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
         self.assertTrue(task.click.called)
         self.assertLess(self.now, 106)
+        self.assertGreaterEqual(self.now, 104)
 
-    def test_non_story_page_is_not_clicked(self):
-        task = self.story(lambda _: False)
-        method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
+    def test_unknown_page_is_not_clicked_or_treated_as_completion(self):
+        task = self.story(lambda now: set())
+        with self.assertRaisesRegex(GameStuckError, 'not confirmed'):
+            method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
         task.click.assert_not_called()
+        self.assertLessEqual(self.now, 131)
 
     def test_story_never_ending_is_bounded(self):
-        task = self.story(lambda _: True)
+        task = self.story(lambda now: {'story'})
         with self.assertRaises(GameStuckError):
             method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
         self.assertLessEqual(self.now, 131)
+
+    def test_shantu_dialogue_keeps_advancing_when_old_marker_is_missing(self):
+        def scene(now):
+            if now < 102:
+                return {'story'}
+            if now < 105:
+                return {'shantu'}
+            return {'zones'}
+        task = self.story(scene)
+        clicks = []
+        task.click.side_effect = lambda *args, **kwargs: clicks.append((self.now, kwargs['interval']))
+        method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
+        self.assertTrue(any(now >= 102 for now, _ in clicks))
+        self.assertTrue(all(interval == 1.5 for _, interval in clicks))
+        self.assertGreaterEqual(self.now, 106)
+
+    def test_long_unrecognized_transition_does_not_finish_early(self):
+        def scene(now):
+            if now < 102:
+                return {'story'}
+            if now < 108:
+                return set()
+            return {'challenge'}
+        task = self.story(scene)
+        method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
+        self.assertGreaterEqual(self.now, 109)
+
+    def test_visible_story_takes_precedence_over_background_destination(self):
+        task = self.story(lambda now: {'shantu', 'challenge'} if now < 105 else {'challenge'})
+        method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
+        self.assertTrue(task.click.called)
+        self.assertGreaterEqual(self.now, 106)
+
+    def test_brief_destination_detection_must_be_confirmed_again(self):
+        task = self.story(lambda now: {'zones'} if now in (100.5, 101) or now >= 105 else set())
+        method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
+        self.assertGreaterEqual(self.now, 106)
+        task.click.assert_not_called()
+
+    def test_already_on_challenge_or_zone_list_finishes_without_clicks(self):
+        for destination in ('challenge', 'zones'):
+            with self.subTest(destination=destination):
+                self.now = 100
+                task = self.story(lambda now: {destination})
+                method('tasks/WantedQuests/script_task.py', 'finish_secret_story')(task)
+                task.click.assert_not_called()
+                self.assertGreater(self.now, 101)
+                self.assertLess(self.now, 103)
+
+    def secret_task(self):
+        task = Mock()
+        task.screenshot.side_effect = self.frame
+        task.appear.return_value = False
+        task.appear_then_click.return_value = False
+        task.wait_until_appear.return_value = True
+        return task
+
+    def test_missing_next_challenge_prevents_another_battle(self):
+        task = self.secret_task()
+        task.wait_until_appear.side_effect = [True, False]
+        with self.assertRaisesRegex(GameStuckError, 'challenge did not appear'):
+            method('tasks/WantedQuests/script_task.py', 'secret')(task, 'goto', 2)
+        self.assertEqual(task.run_general_battle.call_count, 1)
+        self.assertEqual(task.finish_secret_story.call_count, 1)
+        self.assertTrue(all(call.kwargs['wait_time'] == 10 for call in task.wait_until_appear.call_args_list))
+        task.ui_get_current_page.assert_not_called()
+
+    def test_unresolved_story_stops_before_next_battle_or_navigation(self):
+        task = self.secret_task()
+        task.finish_secret_story.side_effect = GameStuckError('Unresolved story')
+        with self.assertRaisesRegex(GameStuckError, 'Unresolved story'):
+            method('tasks/WantedQuests/script_task.py', 'secret')(task, 'goto', 2)
+        self.assertEqual(task.run_general_battle.call_count, 1)
+        self.assertEqual(task.wait_until_appear.call_count, 1)
+        task.ui_get_current_page.assert_not_called()
+
+    def test_missing_zone_list_has_a_bounded_exit(self):
+        task = self.secret_task()
+        with self.assertRaisesRegex(GameStuckError, 'zone list did not appear'):
+            method('tasks/WantedQuests/script_task.py', 'secret')(task, 'goto', 1)
+        self.assertLessEqual(self.now, 122)
+        task.ui_get_current_page.assert_not_called()
 
     def test_store_return_uses_current_page_navigation(self):
         task = SimpleNamespace(ui_get_current_page=Mock(), ui_goto=Mock(),
