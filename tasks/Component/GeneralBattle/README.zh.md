@@ -2,11 +2,17 @@
 
 [English](README.md)
 
-战斗等待选项依次合并全局默认值、装饰器选项和当前上下文选项，后者优先。
-覆盖以整个事件字典为单位。`with_options()` 返回独立上下文，退出时恢复之前的
-上下文并保留装饰器选项。此行为保留上游奖励点击排除区域，同时避免临时任务
-选项泄漏到后续调用。嵌套上下文退出后恢复外层上下文。
+战斗等待使用源头的类型化运行状态：`battle_wait_strategy` 选择处理函数，
+`battle_wait_options` 提供各事件的选项数据类。选项依次叠加类型默认值、装饰器
+覆盖值、当前上下文覆盖值。覆盖以整个事件选项对象为单位；未填写字段使用其默认值，
+包括奖励点击排除区域。嵌套上下文退出后恢复外层状态。装饰器调用结束或抛出异常时
+恢复调用前的选项，避免临时设置泄漏到后续任务。原 `with_options()` 接口由
+`with battle_wait_options(...)` 替代。
 
-`battle_wait_with_strategy()` 在完成时返回已记录的战斗结果：胜利为 `True`，
-失败为 `False`。仅完成不代表胜利。自定义完成钩子须按实际结果设置
-`bw_ctx.success`；默认失败钩子会先清除成功状态，再标记战斗完成。
+处理函数接收共享 `pub` 和各自的 `pri` 状态。任务所有者切换时重置任务状态，
+每次通过装饰器调用战斗时重置单场状态。完成阶段只有在 `pub.per_battle.success`
+为 `BattleResult.SUCCESS` 时返回 `True`；完成不等于胜利。失败处理先记录
+`BattleResult.FAILURE`，再开启完成阶段。
+
+回归检查：`python -m pytest tests/tasks/Component/GeneralBattle`。
+这些是离线检查，不代表游戏实测。
