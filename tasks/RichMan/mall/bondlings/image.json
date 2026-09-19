@@ -5,7 +5,7 @@
     "roiFront": "197,476,90,38",
     "roiBack": "197,476,90,38",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "兑换随机御魂"
   },
   {
@@ -14,7 +14,7 @@
     "roiFront": "493,472,89,42",
     "roiBack": "493,472,89,42",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "兑换契灵石头"
   },
   {
@@ -23,7 +23,7 @@
     "roiFront": "779,473,89,42",
     "roiBack": "779,473,89,42",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "兑换高级盘"
   },
   {
@@ -32,7 +32,7 @@
     "roiFront": "1079,476,93,40",
     "roiBack": "1079,476,93,40",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "兑换中级盘"
   }
 ]

@@ -6,6 +6,7 @@
       "serial": "auto",
       "handle": "",
       "package_name": "auto",
+      "user_id": -1,
       "screenshot_method": "auto",
       "control_method": "minitouch",
       "adb_restart": false,

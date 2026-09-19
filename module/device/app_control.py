@@ -3,15 +3,18 @@ from lxml import etree
 from module.device.method.adb import Adb
 from module.device.method.uiautomator_2 import Uiautomator2
 from module.device.method.utils import HierarchyButton
+from module.device.app_user import AndroidUserApp
 # from module.device.method.wsa import WSA
 from module.logger import logger
 
 
-class AppControl(Adb, Uiautomator2):
+class AppControl(AndroidUserApp, Adb, Uiautomator2):
     hierarchy: etree._Element
     _app_u2_family = ['uiautomator2', 'minitouch', 'scrcpy']
 
     def app_is_running(self) -> bool:
+        if self.config.script.device.user_id >= 0:
+            return self.app_current_user() == (self.config.script.device.user_id, self.package)
         method = self.config.script.device.control_method
         # if self.is_wsa:
         #     package = self.app_current_wsa()
@@ -25,6 +28,8 @@ class AppControl(Adb, Uiautomator2):
         return package == self.package
 
     def app_start(self):
+        if self.config.script.device.user_id >= 0:
+            return self.app_start_user()
         method = self.config.script.device.screenshot_method
         logger.info(f'App start: {self.package}')
         # if self.config.Emulator_Serial == 'wsa-0':
@@ -35,6 +40,8 @@ class AppControl(Adb, Uiautomator2):
             self.app_start_adb()
 
     def app_stop(self):
+        if self.config.script.device.user_id >= 0:
+            return self.app_stop_user()
         method = self.config.script.device.screenshot_method
         logger.info(f'App stop: {self.package}')
         if method in AppControl._app_u2_family:

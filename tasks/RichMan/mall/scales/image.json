@@ -5,7 +5,7 @@
     "roiFront": "110,261,100,100",
     "roiBack": "110,261,100,100",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "蛇皮"
   },
   {
@@ -14,7 +14,7 @@
     "roiFront": "707,260,100,100",
     "roiBack": "707,260,100,100",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "首领御魂"
   },
   {
@@ -23,7 +23,7 @@
     "roiFront": "995,258,100,100",
     "roiBack": "995,258,100,100",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "永生之海"
   },
   {

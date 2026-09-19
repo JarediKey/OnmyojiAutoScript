@@ -5,7 +5,7 @@
     "roiFront": "631,152,130,120",
     "roiBack": "165,121,859,431",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "黑蛋"
   },
   {
@@ -14,7 +14,7 @@
     "roiFront": "176,148,138,126",
     "roiBack": "139,115,887,464",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "蓝票"
   },
   {
@@ -23,7 +23,7 @@
     "roiFront": "842,395,145,123",
     "roiBack": "156,111,862,454",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "体力"
   },
   {
@@ -32,7 +32,7 @@
     "roiFront": "173,391,148,133",
     "roiBack": "121,116,898,476",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "随机御魂"
   },
   {
@@ -41,7 +41,7 @@
     "roiFront": "399,391,142,131",
     "roiBack": "115,114,908,452",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "白蛋"
   },
   {
@@ -50,7 +50,7 @@
     "roiFront": "618,390,146,129",
     "roiBack": "114,102,914,478",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "御灵挑战券"
   },
   {
@@ -59,7 +59,7 @@
     "roiFront": "847,146,137,129",
     "roiBack": "141,129,864,454",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "红蛋"
   },
   {
@@ -68,7 +68,7 @@
     "roiFront": "398,144,143,116",
     "roiBack": "146,116,866,475",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "破碎的咒符"
   },
   {

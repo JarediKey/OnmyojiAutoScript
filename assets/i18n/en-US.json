@@ -35,5 +35,7 @@
   "unavailable": "Targets in sealed regions",
   "unavailable_help": "Derived from region-sealed detection; imported assets need live validation.",
   "failed": "Failed targets",
-  "abyss_failed_targets_help": "Navigation failed or two unsuccessful battles; not proof of death/completion."
+  "abyss_failed_targets_help": "Navigation failed or two unsuccessful battles; not proof of death/completion.",
+  "user_id": "Android user ID",
+  "user_id_help": "-1: use existing app control. 0 or higher: select an Android user/clone. Before the first task and each game launch, validate the target, stop this game under other users on the same emulator, then start and verify the selected copy. Requires automatic error handling. Use only one OAS controller per emulator."
 }

@@ -5,7 +5,7 @@
     "roiFront": "400,138,141,135",
     "roiBack": "400,138,141,135",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "红蛋"
   },
   {
@@ -14,7 +14,7 @@
     "roiFront": "173,142,149,129",
     "roiBack": "173,142,149,129",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "破碎的咒符"
   },
   {
@@ -23,7 +23,7 @@
     "roiFront": "627,140,138,132",
     "roiBack": "627,140,138,132",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "description"
   },
   {

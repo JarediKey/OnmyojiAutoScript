@@ -174,5 +174,7 @@
   "enable_ap100_anti_detect_help": "100体爬塔战斗过程是否随机点击或滑动",
   "costume_main_16": "狐栖归处",
   "costume_battle_15": "灵狐寄愿",
-  "costume_shikigami_12": "拾光之窗"
+  "costume_shikigami_12": "拾光之窗",
+  "user_id": "Android 用户 ID",
+  "user_id_help": "-1：沿用原有应用控制。0 或更大：指定 Android 用户／分身。首次任务和每次启动游戏前验证目标，停止同一模拟器其他用户下的同包名游戏，再启动并确认指定分身。需要开启自动异常处理。同一模拟器只使用一个 OAS 控制实例。"
 }

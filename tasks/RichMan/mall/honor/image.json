@@ -5,7 +5,7 @@
     "roiFront": "868,152,100,100",
     "roiBack": "154,113,864,476",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "蓝票"
   },
   {
@@ -14,7 +14,7 @@
     "roiFront": "645,406,100,100",
     "roiBack": "145,96,883,491",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "黑蛋碎片"
   },
   {
@@ -23,7 +23,7 @@
     "roiFront": "424,399,100,100",
     "roiBack": "155,127,841,388",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "三星白蛋"
   }
 ]

@@ -815,6 +815,11 @@ class Connection(ConnectionAttr):
         Find all packages on device.
         Use dumpsys first for faster.
         """
+        if self.config.script.device.user_id >= 0:
+            output = self.adb_shell([
+                'pm', 'list', 'packages', '--user', self.config.script.device.user_id])
+            return re.findall(r'^package:([^\s]+)$', output, re.MULTILINE)
+
         # 80ms
         if show_log:
             logger.info('Get package list')

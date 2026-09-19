@@ -23,7 +23,7 @@
     "roiFront": "700,194,100,100",
     "roiBack": "700,194,100,100",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "寄售券"
   }
 ]

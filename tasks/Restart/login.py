@@ -31,6 +31,7 @@ class LoginHandler(BaseTask, RestartAssets, GameUiAssets, GeneralBuffAssets):
         confirm_timer = Timer(1.5, count=2).start()
         orientation_timer = Timer(10)
         login_success = False
+        enter_game_clicks = 0
 
         while 1:
             # Watch device rotation
@@ -140,7 +141,17 @@ class LoginHandler(BaseTask, RestartAssets, GameUiAssets, GeneralBuffAssets):
                 if self.appear_then_click(self.I_EARLY_SERVER_CANCEL):
                     logger.info('Cancel switch from early server to normal server')
                     continue
-            if self.ocr_appear_click(self.O_LOGIN_ENTER_GAME_ORIGIN, interval=3) or self.ocr_appear_click(self.O_LOGIN_ENTER_GAME, interval=3):
+            enter_game = next((target for target in (
+                self.O_LOGIN_ENTER_GAME_ORIGIN, self.O_LOGIN_ENTER_GAME)
+                if self.ocr_appear(target, interval=3)), None)
+            if enter_game is not None:
+                if enter_game_clicks >= 30:
+                    raise GameTooManyClickError('Enter game did not advance after 30 clicks')
+                x, y = enter_game.coord()
+                # This login-only counter replaces the generic repeated-click limit.
+                self.device.stuck_record_clear()
+                self.device.click(x=x, y=y, control_name=enter_game.name, control_check=False)
+                enter_game_clicks += 1
                 self.wait_until_appear(self.I_LOGIN_SPECIFIC_SERVE, True, wait_time=5)
                 continue
 
