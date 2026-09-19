@@ -1,0 +1,16 @@
+[
+  {
+    "itemName": "mall_categories_earlier",
+    "roiFront": "1190,210,30,30",
+    "roiBack": "1190,510,30,30",
+    "mode": "default",
+    "description": "Finger downward to reveal earlier sidebar categories"
+  },
+  {
+    "itemName": "mall_categories_later",
+    "roiFront": "1190,510,30,30",
+    "roiBack": "1190,210,30,30",
+    "mode": "default",
+    "description": "Finger upward to reveal later sidebar categories"
+  }
+]

@@ -188,15 +188,15 @@ class RichManAssets:
 
 	# Image Rule Assets
 	# 特殊 
-	I_SIDE_SURE_SPECIAL = RuleImage(roi_front=(1172,91,70,74), roi_back=(1172,91,70,74), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_sure_special.png")
+	I_SIDE_SURE_SPECIAL = RuleImage(roi_front=(1187,99,45,62), roi_back=(1156,90,112,520), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_sure_special.png")
 	# 特殊 
 	I_SIDE_CHECK_SPECIAL = RuleImage(roi_front=(0,0,26,34), roi_back=(1075,0,100,100), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_check_special.png")
-	# 荣誉 
-	I_SIDE_SUER_HONOR = RuleImage(roi_front=(1180,191,59,60), roi_back=(1150,159,103,132), threshold=0.6, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_suer_honor.png")
+	# Duel category
+	I_SIDE_SUER_HONOR = RuleImage(roi_front=(1189,194,41,61), roi_back=(1156,90,112,520), threshold=0.6, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_suer_honor.png")
 	# 荣誉 
 	I_SIDE_CHECK_HONOR = RuleImage(roi_front=(722,11,41,42), roi_back=(722,11,41,42), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_check_honor.png")
 	# 友情点 
-	I_SIDE_SURE_FRIENDS = RuleImage(roi_front=(1190,287,43,52), roi_back=(1159,258,97,296), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_sure_friends.png")
+	I_SIDE_SURE_FRIENDS = RuleImage(roi_front=(1190,287,43,52), roi_back=(1156,90,112,520), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_sure_friends.png")
 	# 友情点 
 	I_SIDE_CHECK_FRIENDS = RuleImage(roi_front=(908,8,39,43), roi_back=(9,8,1266,43), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_check_friends.png")
 	# 勋章 
@@ -207,6 +207,8 @@ class RichManAssets:
 	I_SIDE_SURE_CHARISMA = RuleImage(roi_front=(1181,502,59,58), roi_back=(1158,475,101,112), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_sure_charisma.png")
 	# 魅力值 
 	I_SIDE_CHECK_CHARISMA = RuleImage(roi_front=(906,5,48,46), roi_back=(886,1,114,80), threshold=0.7, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_side_check_charisma.png")
+	# Highlighted primary category left border
+	I_MALL_CATEGORY_SELECTED = RuleImage(roi_front=(1169,207,16,41), roi_back=(1156,90,112,520), threshold=0.9, method="Template matching", file="./tasks/RichMan/mall/navbar/navbar_category_selected.png")
 
 
 	# Ocr Rule Assets
@@ -424,5 +426,12 @@ class RichManAssets:
 	O_TT_BUY = RuleOcr(roi=(602,509,104,61), area=(602,509,104,61), mode="Full", method="Default", keyword="", name="tt_buy")
 	# Ocr-description 
 	O_TT_NUMBER = RuleOcr(roi=(576,415,58,49), area=(576,415,58,49), mode="Digit", method="Default", keyword="", name="tt_number")
+
+
+	# Swipe Rule Assets
+	# Finger downward to reveal earlier sidebar categories
+	S_MALL_CATEGORIES_EARLIER = RuleSwipe(roi_front=(1190,210,30,30), roi_back=(1190,510,30,30), mode="default", name="mall_categories_earlier")
+	# Finger upward to reveal later sidebar categories
+	S_MALL_CATEGORIES_LATER = RuleSwipe(roi_front=(1190,510,30,30), roi_back=(1190,210,30,30), mode="default", name="mall_categories_later")
 
 

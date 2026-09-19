@@ -5,6 +5,8 @@ import re
 import time
 
 from module.logger import logger
+from module.exception import GameStuckError
+from module.base.timer import Timer
 
 from tasks.GameUi.page import page_main, page_guild
 from tasks.GameUi.game_ui import GameUi
@@ -45,44 +47,95 @@ class MallNavbar(GameUi, RichManAssets):
         self.ui_click(self.I_MALL_SUNDRY, self.I_MALL_SUNDRY_CHECK)
 
     def _enter_special(self):
-        """
-        进入特殊
-        :return:
-        """
-        self._enter_sundry()
-        self.ui_click(self.I_SIDE_SURE_SPECIAL, self.I_SIDE_CHECK_SPECIAL)
+        self._enter_sundry_category('special')
 
     def _enter_honor(self):
-        """
-        进入荣誉 屋
-        :return:
-        """
-        self._enter_sundry()
-        self.ui_click(self.I_SIDE_SUER_HONOR, self.I_SIDE_CHECK_HONOR)
+        self._enter_sundry_category('duel')
 
     def _enter_friendship(self):
-        """
-        友情点
-        :return:
-        """
-        self._enter_sundry()
-        self.ui_click(self.I_SIDE_SURE_FRIENDS, self.I_SIDE_CHECK_FRIENDS)
+        self._enter_sundry_category('friendship')
 
     def _enter_medal(self):
-        """
-        勋章
-        :return:
-        """
-        self._enter_sundry()
-        self.ui_click(self.I_SIDE_SURE_MEDAL, self.I_SIDE_CHECK_MEDAL)
+        self._enter_sundry_category('medal')
 
     def _enter_charisma(self):
-        """
-        魅力
-        :return:
-        """
+        self._enter_sundry_category('charisma')
+
+    def _sundry_categories(self):
+        """Primary categories in sidebar order; Duel's children are not categories."""
+        return (
+            ('special', self.I_SIDE_SURE_SPECIAL),
+            ('duel', self.I_SIDE_SUER_HONOR),
+            ('friendship', self.I_SIDE_SURE_FRIENDS),
+            ('medal', self.I_SIDE_SURE_MEDAL),
+            ('charisma', self.I_SIDE_SURE_CHARISMA),
+        )
+
+    def _read_sundry_sidebar(self):
+        """Associate the primary-tab highlight with a recognized category label."""
+        categories = self._sundry_categories()
+        visible = {name: button for name, button in categories if self.appear(button)}
+        order = {name: index for index, (name, _) in enumerate(categories)}
+        positions = sorted(visible, key=lambda name: visible[name].roi_front[1])
+        if [order[name] for name in positions] != sorted(order[name] for name in visible):
+            return {}, None
+        selected = None
+        if self.appear(self.I_MALL_CATEGORY_SELECTED):
+            _, y, _, height = self.I_MALL_CATEGORY_SELECTED.roi_front
+            middle = y + height / 2
+            matches = [name for name, button in visible.items()
+                       if button.roi_front[1] <= middle <= button.roi_front[1] + button.roi_front[3]]
+            if len(matches) == 1:
+                selected = matches[0]
+        return visible, selected
+
+    def _enter_sundry_category(self, target):
+        """Reveal hidden tabs in the required direction, then confirm selection."""
         self._enter_sundry()
-        self.ui_click(self.I_SIDE_SURE_CHARISMA, self.I_SIDE_CHECK_CHARISMA)
+        order = [name for name, _ in self._sundry_categories()]
+        target_index = order.index(target)
+        timeout = Timer(25).start()
+        ready = Timer(1, count=2).start()
+        click_wait = Timer(3)
+        swipes = clicks = 0
+        previous = None
+        while not timeout.reached():
+            self.screenshot()
+            visible, selected = self._read_sundry_sidebar()
+            state = (tuple(visible), selected)
+            if state != previous:
+                logger.info(f'Shop sidebar visible={list(visible)}, selected={selected or "unknown"}, target={target}')
+                previous = state
+            if selected == target:
+                if ready.reached():
+                    return
+                continue
+            ready.reset()
+            if clicks >= 3 and click_wait.reached():
+                raise GameStuckError(f'Shop category {target} not selected after 3 clicks')
+            if target in visible:
+                if clicks < 3 and click_wait.reached():
+                    self.click(visible[target])
+                    clicks += 1
+                    click_wait.reset()
+                continue
+            # After clicking, allow the UI to settle without scrolling it away.
+            if clicks or not visible:
+                continue
+            indices = [order.index(name) for name in visible]
+            if target_index < min(indices):
+                swipe = self.S_MALL_CATEGORIES_EARLIER
+            elif target_index > max(indices):
+                swipe = self.S_MALL_CATEGORIES_LATER
+            else:
+                # A missing label inside the visible range is ambiguous.
+                continue
+            if swipes >= 3:
+                raise GameStuckError(f'Shop category {target} not found after 3 sidebar swipes')
+            self.swipe(swipe)
+            swipes += 1
+            time.sleep(1)
+        raise GameStuckError(f'Shop category {target} not confirmed within 25 seconds')
 
     def back_mall(self):
         """
