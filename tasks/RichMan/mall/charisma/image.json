@@ -5,7 +5,7 @@
     "roiFront": "623,142,145,111",
     "roiBack": "623,142,145,111",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "蓝票"
   },
   {
@@ -14,7 +14,7 @@
     "roiFront": "848,393,141,110",
     "roiBack": "848,393,141,110",
     "method": "Template matching",
-    "threshold": 0.8,
+    "threshold": 0.7,
     "description": "description"
   },
   {
