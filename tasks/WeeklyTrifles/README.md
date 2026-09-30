@@ -24,3 +24,14 @@ performed by the regression tests.
 
 Offline checks: `python -m unittest discover -s tests -p test_weekly_area_share.py -v`.
 Live game behavior has not been verified.
+
+## Touch Fish and execution order
+
+The enabled weekly steps run in this order: collection sharing, Area Boss sharing,
+secret-zone sharing, Ebisu Touch Fish storage, and broken-amulet summons. The
+`save_touch_fish` option defaults to false. When enabled, the task opens the guild
+activity panel, enters Touch Fish and uses the store-all button if the recognized
+ticket balance covers its cost. It handles the confirmation/reward overlays and
+returns to the courtyard. Insufficient tickets or a storage timeout are logged.
+This feature does not reduce AP consumption. Game navigation and storage still
+need live validation.

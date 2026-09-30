@@ -137,7 +137,7 @@ class AreaShareTests(unittest.TestCase):
 
     def test_failed_share_does_not_skip_remaining_weekly_steps(self):
         self.task.config.weekly_trifles.trifles = SimpleNamespace(
-            share_collect=True, share_area_boss=True, share_secret=True, broken_amulet=100)
+            share_collect=True, share_area_boss=True, share_secret=True, save_touch_fish=False, broken_amulet=100)
         self.task._share_area_boss = MethodType(self.share, self.task)
         with self.assertRaises(errors['TaskEnd']):
             self.run(self.task)
@@ -146,6 +146,19 @@ class AreaShareTests(unittest.TestCase):
         self.task._broken_amulet.assert_called_once_with(100)
         self.task.set_next_run.assert_called_once_with(task='WeeklyTrifles', success=True, finish=True)
         self.task.click_share.assert_not_called()
+        self.task._save_touch_fish.assert_not_called()
+
+    def test_enabled_touch_fish_runs_after_sharing_and_before_summons(self):
+        self.task.config.weekly_trifles.trifles = SimpleNamespace(
+            share_collect=True, share_area_boss=True, share_secret=True,
+            save_touch_fish=True, broken_amulet=100)
+        order = []
+        for name in ("_share_collect", "_share_area_boss", "_share_secret", "_save_touch_fish", "_broken_amulet"):
+            getattr(self.task, name).side_effect = lambda *args, n=name: order.append(n)
+        with self.assertRaises(errors["TaskEnd"]):
+            self.run(self.task)
+        self.assertEqual(order, ["_share_collect", "_share_area_boss", "_share_secret",
+                                 "_save_touch_fish", "_broken_amulet"])
 
     def test_absent_reward_marker_preserves_existing_already_obtained_flow(self):
         self.phase = 'selector'
