@@ -39,5 +39,6 @@
   "user_id": "Android user ID",
   "user_id_help": "-1: use existing app control. 0 or higher: select an Android user/clone. Before the first task and each game launch, validate the target, stop this game under other users on the same emulator, then start and verify the selected copy. Requires automatic error handling. Use only one OAS controller per emulator.",
   "save_touch_fish": "Ebisu Touch Fish",
-  "save_touch_fish_help": "Store all available attempts for the weekly Touch Fish activity. This supports the weekly True Orochi reward arrangement and does not save AP."
+  "save_touch_fish_help": "Store all available attempts for the weekly Touch Fish activity. This supports the weekly True Orochi reward arrangement and does not save AP.",
+  "frog_oas": "Oas weighted voting"
 }

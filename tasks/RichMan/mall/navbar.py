@@ -143,8 +143,8 @@ class MallNavbar(GameUi, RichManAssets):
         while True:
             self.screenshot()
             for page in (page_mall, page_main):
-                if self.ui_page_appear(page):
-                    self.ui_current = page
+                if self.match_page_once(page):
+                    self.navigator.current_page = self.navigator.pages[page.key]
                     logger.info(f'Shop return complete: {page}')
                     return
             if timeout.reached():

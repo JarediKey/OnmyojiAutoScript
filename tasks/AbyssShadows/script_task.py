@@ -381,16 +381,14 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
 
         #
         logger.info("Exiting abyss_shadows")
-        self.ui_get_current_page()
-        self.ui_goto(page_main)
+        self.goto_page(page_main)
 
     def goto_abyss_shadows(self) -> bool:
         """ 进入狭间
         :return bool
         """
-        self.ui_get_current_page()
         logger.info("Entering abyss_shadows")
-        self.ui_goto(page_guild)
+        self.goto_page(page_guild)
 
         while 1:
             self.screenshot()

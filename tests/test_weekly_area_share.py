@@ -47,7 +47,7 @@ class AreaShareTests(unittest.TestCase):
             setattr(self.task, attr, name)
         self.task.screenshot.side_effect = self.screenshot
         self.task.appear.side_effect = self.appear
-        self.task.ui_page_appear.side_effect = lambda page: self.phase == 'home'
+        self.task.match_page_once.side_effect = lambda page: self.phase == 'home'
         self.task.appear_then_click.side_effect = self.appear_then_click
         self.task.click.side_effect = self.click
         self.task.click_share.side_effect = self.complete_share

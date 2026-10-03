@@ -54,8 +54,7 @@ class SkipBattlesTests(unittest.TestCase):
         task.conf.demon_soul_config.enable = True
         task.conf.best_demon_soul_config.enable = True
         task.check_time = Mock(return_value=True)
-        task.ui_get_current_page = Mock()
-        task.ui_goto = Mock()
+        task.goto_page = Mock()
         task.checkout_soul = Mock()
         task.execute_lantern = Mock()
         task.set_next_run = Mock()
@@ -64,7 +63,7 @@ class SkipBattlesTests(unittest.TestCase):
         task.checkout_soul.assert_not_called()
         task.execute_lantern.assert_called_once()
         task.check_challenge_done.assert_not_called()
-        self.assertEqual([c.args[0] for c in task.ui_goto.call_args_list],
+        self.assertEqual([c.args[0] for c in task.goto_page.call_args_list],
                          [module.page_demon_encounter_realworld, module.page_main])
         task.set_next_run.assert_called_once_with(task='DemonEncounter', success=True, finish=False)
 
@@ -72,8 +71,7 @@ class SkipBattlesTests(unittest.TestCase):
         task = self.make_task(False)
         task.conf.demon_soul_config.enable = True
         task.check_time = Mock(return_value=True)
-        task.ui_get_current_page = Mock()
-        task.ui_goto = Mock()
+        task.goto_page = Mock()
         task.checkout_soul = Mock()
         task.execute_lantern = Mock()
         task.execute_boss = Mock()
@@ -83,7 +81,7 @@ class SkipBattlesTests(unittest.TestCase):
         task.checkout_soul.assert_called_once()
         task.execute_lantern.assert_called_once()
         task.execute_boss.assert_called_once()
-        self.assertEqual([c.args[0] for c in task.ui_goto.call_args_list],
+        self.assertEqual([c.args[0] for c in task.goto_page.call_args_list],
                          [module.page_shikigami_records, module.page_demon_encounter_realworld])
         task.set_next_run.assert_called_once_with(task='DemonEncounter', success=True, finish=False)
 
@@ -91,8 +89,7 @@ class SkipBattlesTests(unittest.TestCase):
         task = self.make_task(False)
         task.check_time = Mock(return_value=True)
         task.check_challenge_done.return_value = True
-        task.ui_get_current_page = Mock()
-        task.ui_goto = Mock()
+        task.goto_page = Mock()
         task.checkout_soul = Mock()
         task.execute_lantern = Mock()
         task.execute_boss = Mock()

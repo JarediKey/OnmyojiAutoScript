@@ -161,14 +161,14 @@ class RecoveryTests(unittest.TestCase):
         task.ui_get_current_page.assert_not_called()
 
     def test_store_return_uses_current_page_navigation(self):
-        task = SimpleNamespace(ui_get_current_page=Mock(), ui_goto=Mock(),
+        task = SimpleNamespace(goto_page=Mock(),
              run_store_sign=Mock(), run_buy_sushi=Mock(),
              config=SimpleNamespace(daily_trifles=SimpleNamespace(
                  trifles_config=SimpleNamespace(store_sign=True,buy_sushi_count=0))))
         fn = method('tasks/DailyTrifles/script_task.py', 'run_store')
         fn.__globals__['page_mall'] = 'mall'
         fn(task)
-        self.assertEqual(task.ui_goto.call_args.args, ('main',))
+        self.assertEqual(task.goto_page.call_args.args, ('main',))
 
 
 if __name__ == '__main__':

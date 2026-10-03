@@ -46,7 +46,7 @@ appearances and actual sidebar gestures still need live validation.
 Rich Man and Mystery Shop share `MallNavbar.back_mall()` for final shop cleanup.
 It takes a fresh screenshot and checks the mall and courtyard before each possible
 return click. Either page completes cleanup without another click, and the detected
-page becomes `ui_current`. Courtyard detection uses the shared page matcher,
+page becomes `navigator.current_page`. Courtyard detection uses the shared page matcher,
 including the configured courtyard skin.
 
 While neither destination is visible, it clicks a recognized yellow-back button

@@ -32,12 +32,12 @@ class MallReturnTests(unittest.TestCase):
         clock.start()
         self.addCleanup(clock.stop)
         # The courtyard marker represents the marker after skin selection.
-        self.mall = SimpleNamespace(check_button='mall')
-        self.courtyard = SimpleNamespace(check_button='custom-courtyard')
+        self.mall = SimpleNamespace(key='mall', recognizer=SimpleNamespace(evaluate=lambda task: task.appear('mall')))
+        self.courtyard = SimpleNamespace(key='main', recognizer=SimpleNamespace(evaluate=lambda task: task.appear('custom-courtyard')))
         namespace = dict(Timer=Timer, GameStuckError=GameStuckError, logger=Mock(),
                          page_mall=self.mall, page_main=self.courtyard)
         self.back = method('tasks/RichMan/mall/navbar.py', 'MallNavbar', 'back_mall', namespace)
-        self.matcher = method('tasks/GameUi/game_ui.py', 'GameUi', 'ui_page_appear', {})
+        self.matcher = method('tasks/GameUi/navigator.py', 'GameUi', 'match_page_once', {})
         self.appear_click = method('tasks/base_task.py', 'BaseTask', 'appear_then_click', {})
         self.frame_at = lambda elapsed: 'subpage'
         self.clicks = []
@@ -45,11 +45,11 @@ class MallReturnTests(unittest.TestCase):
         self.last_match = {}
         self.task = SimpleNamespace(
             I_UI_BACK_YELLOW=SimpleNamespace(name='yellow-back', coord=lambda: (40, 40)),
-            ui_current=None, screenshot=self.screenshot,
+            navigator=SimpleNamespace(current_page=None,pages={'mall':self.mall,'main':self.courtyard}), screenshot=self.screenshot,
             maybe_screenshot=lambda skip: None if skip else self.screenshot(),
             appear=self.appear,
             device=SimpleNamespace(click=lambda *args, **kwargs: self.clicks.append((self.now, self.frame))))
-        self.task.ui_page_appear = MethodType(self.matcher, self.task)
+        self.task.match_page_once = MethodType(self.matcher, self.task)
         self.task.appear_then_click = MethodType(self.appear_click, self.task)
         self.task.back_mall = MethodType(self.back, self.task)
 
@@ -75,20 +75,20 @@ class MallReturnTests(unittest.TestCase):
             with self.subTest(frame=frame):
                 self.frame_at = lambda elapsed: frame
                 self.task.back_mall()
-                self.assertIs(self.task.ui_current, page)
+                self.assertIs(self.task.navigator.current_page, page)
                 self.assertEqual(self.clicks, [])
 
     def test_return_to_mall_stops_before_another_back_click(self):
         self.frame_at = lambda elapsed: 'subpage' if elapsed < 1 else 'mall'
         self.task.back_mall()
         self.assertEqual(len(self.clicks), 1)
-        self.assertIs(self.task.ui_current, self.mall)
+        self.assertIs(self.task.navigator.current_page, self.mall)
 
     def test_return_directly_to_courtyard_finishes_without_waiting_for_mall(self):
         self.frame_at = lambda elapsed: 'subpage' if elapsed < 1 else 'custom-courtyard'
         self.task.back_mall()
         self.assertEqual(len(self.clicks), 1)
-        self.assertIs(self.task.ui_current, self.courtyard)
+        self.assertIs(self.task.navigator.current_page, self.courtyard)
         self.assertLess(self.now - self.started, 2)
 
     def test_delayed_transition_preserves_three_second_click_spacing(self):
@@ -104,14 +104,14 @@ class MallReturnTests(unittest.TestCase):
         with self.assertRaisesRegex(GameStuckError, '20 seconds'):
             self.task.back_mall()
         self.assertEqual(self.clicks, [])
-        self.assertIsNone(self.task.ui_current)
+        self.assertIsNone(self.task.navigator.current_page)
         self.assertLessEqual(self.now - self.started, 20.5)
 
     def test_visible_back_button_with_no_progress_also_has_a_deadline(self):
         with self.assertRaises(GameStuckError):
             self.task.back_mall()
         self.assertEqual(len(self.clicks), 7)
-        self.assertIsNone(self.task.ui_current)
+        self.assertIsNone(self.task.navigator.current_page)
         self.assertLessEqual(self.now - self.started, 20.5)
 
     def test_failed_return_does_not_schedule_rich_man_as_success(self):
