@@ -1,10 +1,16 @@
-# FrogBoss upstream implementation
+# FrogBoss implementation
 
 [简体中文](README.zh.md)
 
-This implementation uses FrogBoss from upstream dev `c1dc5059`, including
+This implementation is based on FrogBoss from upstream dev `c1dc5059`, including
 PR #1850 (`670f194a`). The custom amount-border prototype and local loss-transition
 implementation are retired; generated assets retain upstream rule values.
+
+The task loop confirms the rest marker continuously for five seconds across at
+least three fresh screenshots before ending. A missing marker resets confirmation;
+visible betting controls and win/loss settlement take priority. Brief loading rest
+frames therefore do not skip the round. Confirmation inside an active betting
+submission retains upstream behavior.
 
 Betting handles the reward-information overlay before background controls, selects
 the upper part of the matched 300000-coin bag once, and submits at most three times

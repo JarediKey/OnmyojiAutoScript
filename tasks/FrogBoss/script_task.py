@@ -89,10 +89,12 @@ class ScriptTask(RightActivity, FrogBossAssets, GeneralBattleAssets):
         self.enter_frog_boss()
         history_checked = False
         idle_timer = Timer(5).start()
+        rest_timer = Timer(5, count=2)
         # 进入主界面
         while 1:
             self.screenshot()
             if self._try_next_competition_fallback(idle_timer):
+                rest_timer.clear()
                 continue
 
             if not history_checked and self.config.model.frog_boss.frog_boss_config.strategy_frog == Strategy.Oas:
@@ -101,6 +103,7 @@ class ScriptTask(RightActivity, FrogBossAssets, GeneralBattleAssets):
                         or (self.appear(self.I_BET_LEFT) and self.appear(self.I_BET_RIGHT))):
                     self.record_oas_history_page()
                     history_checked = True
+                    rest_timer.clear()
                     idle_timer.reset()
                     continue
 
@@ -108,12 +111,9 @@ class ScriptTask(RightActivity, FrogBossAssets, GeneralBattleAssets):
             if self.appear(self.I_BETTED):
                 logger.info('You have betted')
                 break
-            # 休息中
-            if self.appear(self.I_FROG_BOSS_REST):
-                logger.info('Frog Boss Rest')
-                break
             # 竞猜成功
             if self.appear(self.I_BET_SUCCESS):
+                rest_timer.clear()
                 logger.info('You bet win')
                 self.detect()
                 while 1:
@@ -137,6 +137,7 @@ class ScriptTask(RightActivity, FrogBossAssets, GeneralBattleAssets):
                 continue
             # 竞猜失败
             if self.appear(self.I_BET_FAILURE):
+                rest_timer.clear()
                 logger.info('You bet lose')
                 if self.ui_click_until_disappear(self.I_NEXT_COMPETITION):
                     idle_timer.reset()
@@ -144,9 +145,21 @@ class ScriptTask(RightActivity, FrogBossAssets, GeneralBattleAssets):
                 continue
             # 正式竞猜
             if self.appear(self.I_BET_LEFT) and self.appear(self.I_BET_RIGHT):
+                rest_timer.clear()
                 self.do_bet()
                 idle_timer.reset()
                 continue
+
+            # Loading can briefly display the rest marker before betting opens.
+            if self.appear(self.I_FROG_BOSS_REST):
+                if not rest_timer.started():
+                    logger.info('FrogBoss rest detected; wait for stable confirmation')
+                    rest_timer.start()
+                if rest_timer.reached():
+                    logger.info('Frog Boss Rest confirmed for 5 seconds across at least 3 screenshots')
+                    break
+            else:
+                rest_timer.clear()
 
         logger.info('FrogBoss end')
         self.next_run()
