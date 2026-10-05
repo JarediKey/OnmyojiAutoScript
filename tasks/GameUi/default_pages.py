@@ -302,8 +302,9 @@ def handle_battle_page(task) -> bool:
     Returns:
         bool: 通用战斗执行结果。
     """
-    from tasks.Component.GeneralBattle.general_battle import run_task_or_default_general_battle
-    return run_task_or_default_general_battle(task)
+    from tasks.Component.GeneralBattle.general_battle import GeneralBattle
+    battle = task if isinstance(task, GeneralBattle) else GeneralBattle(task.config, task.device)
+    return battle.run_general_battle()
 
 
 # 战斗相关页面
