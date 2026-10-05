@@ -65,20 +65,20 @@
   {
     "itemName": "open_yellow",
     "imageName": "gb_open_yellow.png",
-    "roiFront": "774,299,13,18",
-    "roiBack": "766,133,35,366",
+    "roiFront": "854,338,38,37",
+    "roiBack": "844,133,60,369",
     "method": "Template matching",
-    "threshold": 0.6,
-    "description": "description"
+    "threshold": 0.9,
+    "description": "Active round buff switch"
   },
   {
     "itemName": "close_red",
     "imageName": "gb_close_red.png",
-    "roiFront": "773,365,12,20",
-    "roiBack": "764,134,38,369",
+    "roiFront": "854,270,38,37",
+    "roiBack": "844,133,60,369",
     "method": "Template matching",
-    "threshold": 0.6,
-    "description": "description"
+    "threshold": 0.9,
+    "description": "Paused round buff switch"
   },
   {
     "itemName": "cloud",
