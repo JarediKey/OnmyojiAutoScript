@@ -3,7 +3,7 @@
 # github https://github.com/runhey
 from cached_property import cached_property
 
-from module.exception import TaskEnd
+from module.exception import TaskEnd, GameStuckError
 from module.logger import logger
 from module.base.timer import Timer
 
@@ -50,31 +50,56 @@ class ScriptTask(GameUi, GeneralBattle, GeneralRoom, GeneralInvite, SwitchSoul, 
                 self.gold_exit(con)
             self.ensure_public()
             self.create_ensure()
-            # 进入到了房间里面
-            wait_timer = Timer(50)
-            wait_timer.start()
-            while 1:
-                self.screenshot()
-
-                if not self.is_in_room():
-                    continue
-                if wait_timer.reached():
-                    # 超过时间依然挑战
-                    logger.warning('Wait for too long and start the challenge')
-                    self.click_fire()
-                    count += 1
-                    self.run_general_battle()
-                    break
-                if not self.appear(self.I_ADD_5_1):
-                    # 有人进来了，可以进行挑战
-                    logger.info('There is someone in the room and start the challenge')
-                    self.click_fire()
-                    count += 1
-                    self.run_general_battle()
-                    break
+            self.wait_for_full_team()
+            count += 1
+            self.run_general_battle()
         # 退出 (要么是在组队界面要么是在庭院)
         self.gold_exit(con)
 
+
+    def wait_for_full_team(self):
+        """Start at five players, or after 180 seconds; confirm actual battle entry."""
+        wait_timer = Timer(180).start()
+        full_timer = Timer(2, count=2)
+        entry_timer = Timer(15)
+        slots = (self.I_ADD_5_1, self.I_ADD_5_2, self.I_ADD_5_3, self.I_ADD_5_4)
+        self.device.stuck_record_clear()
+        self.device.stuck_record_add('PREPARE_BEFORE_BATTLE')
+        logger.info('Wait for five players; start after at most 180 seconds')
+        try:
+            while True:
+                self.screenshot()
+                if self.is_in_prepare(False) or self.is_in_real_battle(False):
+                    logger.info('GoldYoukai battle entry confirmed')
+                    return
+                if entry_timer.started() and entry_timer.reached():
+                    raise GameStuckError('GoldYoukai challenge did not enter battle within 15 seconds')
+
+                in_room = self.is_in_room(False) or self.appear(self.I_GI_IN_ROOM)
+                expired = wait_timer.reached()
+                if not in_room:
+                    full_timer.clear()
+                    if expired and not entry_timer.started():
+                        raise GameStuckError('GoldYoukai room not confirmed after 180 seconds')
+                    continue
+
+                full = not any(self.appear(slot) for slot in slots)
+                if full and self.appear(self.I_FIRE, threshold=0.7):
+                    full_timer.start()
+                    ready = full_timer.reached()
+                else:
+                    full_timer.clear()
+                    ready = False
+                if not ready and not expired:
+                    continue
+                if not entry_timer.started():
+                    logger.info('GoldYoukai full team confirmed' if ready else
+                                'GoldYoukai waited 180 seconds; start with current players')
+                    entry_timer.start()
+                if self.appear_then_click(self.I_FIRE, interval=2, threshold=0.7):
+                    self.device.stuck_record_add('PREPARE_BEFORE_BATTLE')
+        finally:
+            self.device.stuck_record_clear()
 
     def battle_wait(self, random_click_swipt_enable: bool) -> bool:
         # 重写
