@@ -15,7 +15,8 @@ from tasks.Restart.login import LoginHandler
 
 def config(name):
     return SimpleNamespace(model=SimpleNamespace(running_task=name),
-                           global_game=SimpleNamespace(costume_config=CostumeConfig()))
+                           global_game=SimpleNamespace(costume_config=CostumeConfig()),
+                           restart=SimpleNamespace(login_character_config=SimpleNamespace(character='test')))
 
 
 def test_collective_login_hook_constructs_real_login_helper():
