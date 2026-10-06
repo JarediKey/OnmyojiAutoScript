@@ -80,7 +80,9 @@ class BaseTask(GlobalGameAssets, CostumeBase):
             uppercase_first_letter=True,
         )
 
-        if model_task_name and model_task_name != path_task_name:
+        # Entry scripts must match their scheduled task. Shared helpers inherit
+        # the caller's task identity even when defined in another task folder.
+        if Path(class_file).name == 'script_task.py' and model_task_name and model_task_name != path_task_name:
             raise ScriptError(
                 f'Task name mismatch: model={model_task_name}, path={path_task_name}'
             )
