@@ -6,7 +6,7 @@ import random
 import re
 from cached_property import cached_property
 from enum import Enum
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from module.exception import TaskEnd, RequestHumanTakeover, GameStuckError
 from module.logger import logger
@@ -65,6 +65,7 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
         mission, index = self.detect_best()
         logger.info(f'Best mission is {mission}')
         logger.info(f'Best mission index is {index}')
+        mission_complete = True
         if mission == MC.BL:
             # 契灵单独处理
             self._bondling_fairyland(index)
@@ -77,7 +78,7 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
             self._donate(index)
         elif mission == MC.SO1 or mission == MC.SO2:
             # 御魂就捐御魂
-            self._soul(index)
+            mission_complete = self._soul(index) is not False
 
         # 退出
         while 1:
@@ -89,7 +90,11 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
             if self.appear_then_click(self.I_UI_BACK_YELLOW, interval=1):
                 continue
 
-        self.set_next_run(task='CollectiveMissions', success=True, finish=True)
+        if mission_complete:
+            self.set_next_run(task='CollectiveMissions', success=True, finish=True)
+        else:
+            self.set_next_run(task='CollectiveMissions', success=False, finish=True,
+                              server=False, target=datetime.now() + timedelta(minutes=10))
         raise TaskEnd('CollectiveMissions')
 
 
@@ -329,6 +334,37 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
 
 
 
+    def _select_souls(self) -> bool:
+        """Select visible souls before treating a zero submission count as empty."""
+        deadline = Timer(15).start()
+        missing_level = Timer(1, count=2).start()
+        attempts = 0
+        while not deadline.reached():
+            self.screenshot()
+            number_text = self.O_SL_NUMBER.ocr(self.device.image)
+            numbers = re.findall(r'\d+', number_text)
+            if not numbers:
+                missing_level.reset()
+                continue
+            if int(numbers[-1]) > 0:
+                return True
+
+            # The level marker is positive evidence that a selectable soul exists.
+            if not self.ocr_appear(self.O_SL_LEVEL):
+                if missing_level.reached():
+                    logger.warning('No selectable soul level detected across multiple frames')
+                    return False
+                continue
+            missing_level.reset()
+            if attempts >= 3:
+                logger.warning('Soul selection still shows zero submissions after three long presses')
+                return False
+            if self.click(self.L_SL_LONG, interval=2.5):
+                attempts += 1
+                time.sleep(1)
+        logger.warning('Soul selection was not confirmed within 15 seconds')
+        return False
+
     def _soul(self, index: int):
         """
         搞收御魂的任务
@@ -341,22 +377,10 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
             2: self.C_CM_3,
         }
         self.ui_click(match_click[index], self.I_SL_SUBMIT)
-        while 1:
-            self.screenshot()
-            number_text = self.O_SL_NUMBER.ocr(self.device.image)
-            submit_number = int(re.findall(r'\d+', number_text)[-1])
-            if submit_number > 0:
-                break
-
-            if self.ocr_appear(self.O_SL_LEVEL):
-                # 如果没有识别到这个，那就说明没有御魂可以提交了，要退出
-                logger.warning('No soul can be submit')
-                self.ui_click(self.I_UI_BACK_RED, self.I_CM_RECORDS)
-                return False
-
-            if self.click(self.L_SL_LONG, interval=2.5):
-                time.sleep(1)
-                continue
+        if not self._select_souls():
+            self.device.save_screenshot(genre='collective_soul_selection')
+            self.ui_click(self.I_UI_BACK_RED, self.I_CM_RECORDS)
+            return False
         # 领取奖励
         logger.info('Start to collect soul rewards')
         check_timer = Timer(3)
