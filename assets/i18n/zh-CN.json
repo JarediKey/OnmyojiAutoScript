@@ -185,5 +185,11 @@
   "user_id_help": "-1：沿用原有应用控制。0 或更大：指定 Android 用户／分身。首次任务和每次启动游戏前验证目标，停止同一模拟器其他用户下的同包名游戏，再启动并确认指定分身。需要开启自动异常处理。同一模拟器只使用一个 OAS 控制实例。",
   "save_touch_fish": "惠比寿的摸鱼行动",
   "save_touch_fish_help": "默认使用全部存储按钮，主要目的是为了配合真蛇每周打一次即可获得俩次奖励(并不会节省体力)",
-  "frog_oas": "Oas 加权预测"
+  "frog_oas": "Oas 加权预测",
+  "OtherWorldTwilight": "彼世逢魔",
+  "other_world_twilight_config": "彼世逢魔配置",
+  "green_mark_type": "绿标匹配方式",
+  "green_mark_type_help": "按坐标点击指定绿标，或按式神名OCR 匹配后点击",
+  "green_mark_name": "绿标式神名称",
+  "green_mark_name_help": "仅当绿标按式神名匹配时生效，填写目标式神名"
 }
