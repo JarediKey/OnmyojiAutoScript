@@ -2,12 +2,22 @@ name: Sync Upstream Branches
 
 on:
   schedule:
-    # Run once per day at 12:17 Asia/Shanghai (04:17 UTC).
+    # 12:17 Asia/Shanghai (04:17 UTC).
     - cron: "17 4 * * *"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Sync branches, or test the local subscription Codex without publishing
+        type: choice
+        options: [sync, ai-smoke]
+        default: sync
+      retry_ai:
+        description: Explicitly retry a failed AI attempt for the same prod/dev revisions
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: sync-upstream-branches
@@ -15,38 +25,228 @@ concurrency:
 
 env:
   UPSTREAM_REPOSITORY: runhey/OnmyojiAutoScript
+  PYTHONUTF8: "1"
+  GIT_AUTHOR_NAME: JarediKey
+  GIT_AUTHOR_EMAIL: JarediKey@users.noreply.github.com
+  GIT_COMMITTER_NAME: JarediKey
+  GIT_COMMITTER_EMAIL: JarediKey@users.noreply.github.com
 
 jobs:
-  sync:
-    if: github.repository == 'JarediKey/OnmyojiAutoScript'
+  sync_dev:
+    if: github.repository == 'JarediKey/OnmyojiAutoScript' && github.ref == 'refs/heads/master' && inputs.mode != 'ai-smoke'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - name: Sync dev exactly with upstream
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh repo sync "$GITHUB_REPOSITORY" \
-            --source "$UPSTREAM_REPOSITORY" \
-            --branch dev \
-            --force
+        run: gh repo sync "$GITHUB_REPOSITORY" --source "$UPSTREAM_REPOSITORY" --branch dev --force
 
-      - name: Check out fork master
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+  sync_master:
+    needs: sync_dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: master
           fetch-depth: 0
-
       - name: Merge upstream master
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "$GIT_AUTHOR_NAME"
+          git config user.email "$GIT_AUTHOR_EMAIL"
           git remote add upstream "https://github.com/${UPSTREAM_REPOSITORY}.git"
           git fetch upstream master
-
-          if git merge-base --is-ancestor upstream/master HEAD; then
-            echo "master is already up to date"
-            exit 0
-          fi
-
+          if git merge-base --is-ancestor upstream/master HEAD; then exit 0; fi
           git merge --no-edit upstream/master
           git push origin HEAD:master
+
+  prepare_prod:
+    needs: sync_dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      state: ${{ steps.merge.outputs.state }}
+      base: ${{ steps.merge.outputs.base }}
+      dev: ${{ steps.merge.outputs.dev }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: prod
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.10"
+      - name: Attempt ordinary merge
+        id: merge
+        run: python control/.github/scripts/prod_sync.py prepare --repo candidate --bundle "$RUNNER_TEMP/prod-candidate/candidate.bundle"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: steps.merge.outputs.state == 'ready'
+        with:
+          name: prod-candidate
+          path: ${{ runner.temp }}/prod-candidate/candidate.bundle
+          retention-days: 7
+          if-no-files-found: error
+
+  resolve_conflict:
+    needs: prepare_prod
+    if: needs.prepare_prod.outputs.state == 'conflict'
+    runs-on: [self-hosted, oas-codex-subscription]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ needs.prepare_prod.outputs.base }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve pinned conflict with subscription Codex
+        env:
+          PROD_SHA: ${{ needs.prepare_prod.outputs.base }}
+          DEV_SHA: ${{ needs.prepare_prod.outputs.dev }}
+          OAS_RETRY_AI: ${{ inputs.retry_ai && '1' || '0' }}
+        run: |
+          "$OAS_PYTHON_BIN" control/.github/scripts/prod_sync.py resolve \
+            --repo candidate --base "$PROD_SHA" --dev "$DEV_SHA" \
+            --bundle "$RUNNER_TEMP/prod-candidate/candidate.bundle" \
+            --logs "$OAS_AUTOMATION_STATE/logs/$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: prod-candidate
+          path: ${{ runner.temp }}/prod-candidate/candidate.bundle
+          retention-days: 7
+          if-no-files-found: error
+
+  validate_prod:
+    needs: [prepare_prod, resolve_conflict]
+    if: always() && !cancelled() && needs.prepare_prod.result == 'success' && (needs.prepare_prod.outputs.state == 'ready' || needs.resolve_conflict.result == 'success')
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ needs.prepare_prod.outputs.base }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: prod-candidate
+          path: bundle
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: candidate/requirements.txt
+      - name: Verify merge identity and changed source files
+        env:
+          PROD_SHA: ${{ needs.prepare_prod.outputs.base }}
+          DEV_SHA: ${{ needs.prepare_prod.outputs.dev }}
+        run: python control/.github/scripts/prod_sync.py inspect --repo candidate --base $env:PROD_SHA --dev $env:DEV_SHA --bundle bundle/candidate.bundle
+      - name: Install Windows test dependencies
+        working-directory: candidate
+        run: python -m pip install -r requirements.txt pytest pytest-subtests
+      - name: Run offline regression suite
+        working-directory: candidate
+        run: python -m pytest -q tests tasks/FrogBoss/test_frog_oas.py tasks/FrogBoss/test_betting_flow.py
+
+  publish_prod:
+    needs: [prepare_prod, validate_prod]
+    if: always() && !cancelled() && needs.validate_prod.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: prod
+          path: candidate
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: prod-candidate
+          path: bundle
+      - name: Publish only if branch tips still match
+        env:
+          PROD_SHA: ${{ needs.prepare_prod.outputs.base }}
+          DEV_SHA: ${{ needs.prepare_prod.outputs.dev }}
+        run: |
+          git -C candidate fetch origin prod dev
+          test "$(git -C candidate rev-parse origin/prod)" = "$PROD_SHA"
+          test "$(git -C candidate rev-parse origin/dev)" = "$DEV_SHA"
+          python control/.github/scripts/prod_sync.py inspect --repo candidate --base "$PROD_SHA" --dev "$DEV_SHA" --bundle bundle/candidate.bundle
+          git -C candidate push origin HEAD:prod
+          echo "Published validated dev $DEV_SHA into prod." >> "$GITHUB_STEP_SUMMARY"
+
+  runner_smoke:
+    if: github.repository == 'JarediKey/OnmyojiAutoScript' && github.ref == 'refs/heads/master' && inputs.mode == 'ai-smoke'
+    runs-on: [self-hosted, oas-codex-subscription]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - name: Resolve an isolated fixture without touching remote branches
+        run: |
+          "$OAS_PYTHON_BIN" control/.github/scripts/prod_sync.py smoke \
+            --repo "$RUNNER_TEMP/smoke-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --logs "$OAS_AUTOMATION_STATE/logs/smoke-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          echo 'PASS: local subscription Codex resolved the fixture; no production changes.' >> "$GITHUB_STEP_SUMMARY"
+
+  baseline_validation:
+    if: github.repository == 'JarediKey/OnmyojiAutoScript' && github.ref == 'refs/heads/master' && inputs.mode == 'ai-smoke'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: prod
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - run: python -m pip install -r requirements.txt pytest pytest-subtests
+      - run: python -m pytest -q tests tasks/FrogBoss/test_frog_oas.py tasks/FrogBoss/test_betting_flow.py
+
+  summary:
+    needs: [sync_dev, sync_master, prepare_prod, resolve_conflict, validate_prod, publish_prod, runner_smoke, baseline_validation]
+    if: always() && github.repository == 'JarediKey/OnmyojiAutoScript' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Record results
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          printf '### OAS synchronization\n\n```json\n%s\n```\n' "$RESULTS" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Ebony is not deployed or restarted by this workflow.' >> "$GITHUB_STEP_SUMMARY"

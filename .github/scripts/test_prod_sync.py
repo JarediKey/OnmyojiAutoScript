@@ -1,0 +1,121 @@
+"""Exercise real merge/bundle boundaries and the local runner admission hook."""
+import importlib.util
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import patch
+
+HERE = Path(__file__).parent
+spec = importlib.util.spec_from_file_location('prod_sync', HERE / 'prod_sync.py')
+sync = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(sync)
+
+
+class MergeTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name) / 'repo'
+        self.root.mkdir()
+        sync.git(self.root, 'init', '-b', 'prod')
+        sync.identity(self.root)
+        self.write('settings.py', 'VALUE = 1\n')
+        self.commit('base')
+        self.common = sync.value(self.root, 'rev-parse', 'HEAD')
+
+    def write(self, name, text):
+        (self.root / name).write_text(text)
+
+    def commit(self, message):
+        sync.git(self.root, 'add', '.')
+        sync.git(self.root, 'commit', '-m', message)
+        return sync.value(self.root, 'rev-parse', 'HEAD')
+
+    def branches(self, conflict=False):
+        self.write('settings.py' if conflict else 'custom.py', 'CUSTOM = True\n')
+        base = self.commit('prod change')
+        sync.git(self.root, 'checkout', '-b', 'dev', self.common)
+        self.write('settings.py', 'VALUE = 2\n')
+        dev = self.commit('dev change')
+        sync.git(self.root, 'checkout', 'prod')
+        return base, dev
+
+    def test_unchanged_has_no_merge(self):
+        self.assertEqual(sync.begin(self.root, self.common, self.common), ('unchanged', []))
+
+    def test_clean_merge_bundle_and_identity(self):
+        base, dev = self.branches()
+        state, conflicts = sync.begin(self.root, base, dev)
+        self.assertEqual((state, conflicts), ('ready', []))
+        bundle = Path(self.temp.name) / 'candidate.bundle'
+        sync.finish(self.root, base, dev, bundle)
+        candidate = sync.value(self.root, 'rev-parse', 'HEAD')
+        sync.git(self.root, 'checkout', '--detach', base)
+        sync.inspect_bundle(self.root, base, dev, bundle)
+        self.assertEqual(sync.value(self.root, 'rev-parse', 'HEAD'), candidate)
+        self.assertTrue((self.root / 'custom.py').exists())
+
+    def test_real_conflict_is_distinguished_from_errors(self):
+        base, dev = self.branches(conflict=True)
+        self.assertEqual(sync.begin(self.root, base, dev), ('conflict', ['settings.py']))
+        with self.assertRaisesRegex(RuntimeError, 'Unmerged'):
+            sync.finish(self.root, base, dev, Path(self.temp.name) / 'bad.bundle')
+
+    def test_nonconflict_merge_error_is_not_sent_to_ai(self):
+        with self.assertRaisesRegex(RuntimeError, 'without conflicts'):
+            sync.begin(self.root, self.common, '0' * 40)
+
+    def test_dirty_checkout_is_not_overwritten(self):
+        self.write('settings.py', 'VALUE = 9\n')
+        with self.assertRaisesRegex(RuntimeError, 'clean'):
+            sync.begin(self.root, self.common, self.common)
+
+    def test_wrong_base_is_rejected(self):
+        base, dev = self.branches()
+        with self.assertRaisesRegex(RuntimeError, 'pinned'):
+            sync.begin(self.root, dev, base)
+
+    def test_invalid_resolution_does_not_commit(self):
+        base, dev = self.branches(conflict=True)
+        sync.begin(self.root, base, dev)
+        self.write('settings.py', 'VALUE = (\n')
+        sync.git(self.root, 'add', '.')
+        with self.assertRaises(SyntaxError):
+            sync.finish(self.root, base, dev, Path(self.temp.name) / 'bad.bundle')
+        self.assertEqual(sync.value(self.root, 'rev-parse', 'HEAD'), base)
+
+    def test_bundle_with_different_parents_is_rejected(self):
+        base, dev = self.branches()
+        sync.begin(self.root, base, dev)
+        bundle = Path(self.temp.name) / 'candidate.bundle'
+        sync.finish(self.root, base, dev, bundle)
+        with self.assertRaisesRegex(RuntimeError, 'pinned'):
+            sync.inspect_bundle(self.root, self.common, dev, bundle)
+
+    def test_api_credentials_never_reach_codex(self):
+        with patch.dict(os.environ, {'OPENAI_API_KEY': 'fake', 'CODEX_API_KEY': 'fake',
+                                    'GH_TOKEN': 'fake', 'GITHUB_TOKEN': 'fake', 'HOME': '/home/test'}):
+            env = sync.codex_environment()
+        self.assertEqual(env['HOME'], '/home/test')
+        self.assertFalse(set(env) & {'OPENAI_API_KEY', 'CODEX_API_KEY', 'GH_TOKEN', 'GITHUB_TOKEN'})
+
+    def test_runner_rejects_untrusted_event_branch_and_workflow(self):
+        env = {'PATH': os.environ['PATH'], 'GITHUB_REPOSITORY': 'JarediKey/OnmyojiAutoScript',
+               'GITHUB_REF': 'refs/heads/master', 'GITHUB_EVENT_NAME': 'workflow_dispatch',
+               'GITHUB_JOB': 'runner_smoke',
+               'GITHUB_WORKFLOW_REF': 'JarediKey/OnmyojiAutoScript/.github/workflows/sync-upstream.yml@refs/heads/master'}
+        def run(e):
+            return subprocess.run(['bash', str(HERE / 'runner-guard.sh')], env=e,
+                                  capture_output=True).returncode
+        self.assertEqual(run(env), 0)
+        for k, v in [('GITHUB_EVENT_NAME', 'pull_request'), ('GITHUB_REF', 'refs/heads/dev'),
+                     ('GITHUB_REPOSITORY', 'someone/fork'), ('GITHUB_JOB', 'arbitrary'),
+                     ('GITHUB_WORKFLOW_REF', 'wrong')]:
+            with self.subTest(k=k):
+                self.assertNotEqual(run(dict(env, **{k: v})), 0)
+
+
+if __name__ == '__main__':
+    unittest.main()
