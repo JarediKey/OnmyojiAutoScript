@@ -118,7 +118,7 @@ def fingerprint(root, names):
 def codex_environment():
     # Keep subscription credentials on the host; never pass GitHub/API tokens to Codex.
     keep = {'HOME', 'USER', 'LOGNAME', 'PATH', 'TMPDIR', 'LANG', 'LC_ALL',
-            'CODEX_HOME', 'SSL_CERT_FILE', 'SSL_CERT_DIR', 'SYSTEMROOT', 'TEMP', 'TMP'}
+            'CODEX_HOME', 'RUNNER_TRACKING_ID', 'SSL_CERT_FILE', 'SSL_CERT_DIR', 'SYSTEMROOT', 'TEMP', 'TMP'}
     return {k: v for k, v in os.environ.items() if k in keep}
 
 

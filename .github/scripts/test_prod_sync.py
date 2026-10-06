@@ -96,9 +96,11 @@ class MergeTests(unittest.TestCase):
 
     def test_api_credentials_never_reach_codex(self):
         with patch.dict(os.environ, {'OPENAI_API_KEY': 'fake', 'CODEX_API_KEY': 'fake',
-                                    'GH_TOKEN': 'fake', 'GITHUB_TOKEN': 'fake', 'HOME': '/home/test'}):
+                                    'GH_TOKEN': 'fake', 'GITHUB_TOKEN': 'fake', 'HOME': '/home/test',
+                                    'RUNNER_TRACKING_ID': 'test-job'}):
             env = sync.codex_environment()
         self.assertEqual(env['HOME'], '/home/test')
+        self.assertEqual(env['RUNNER_TRACKING_ID'], 'test-job')
         self.assertFalse(set(env) & {'OPENAI_API_KEY', 'CODEX_API_KEY', 'GH_TOKEN', 'GITHUB_TOKEN'})
 
     def test_runner_rejects_untrusted_event_branch_and_workflow(self):
