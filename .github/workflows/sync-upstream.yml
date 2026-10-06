@@ -166,7 +166,7 @@ jobs:
         run: python control/.github/scripts/prod_sync.py inspect --repo candidate --base $env:PROD_SHA --dev $env:DEV_SHA --bundle bundle/candidate.bundle
       - name: Install Windows test dependencies
         working-directory: candidate
-        run: python -m pip install -r requirements.txt pytest pytest-subtests
+        run: python -m pip install -r requirements.txt pytest==8.4.2 pytest-subtests==0.15.0 httpx==0.27.2
       - name: Run offline regression suite
         working-directory: candidate
         run: python -m pytest -q tests tasks/FrogBoss/test_frog_oas.py tasks/FrogBoss/test_betting_flow.py
@@ -235,7 +235,7 @@ jobs:
         with:
           python-version: "3.10"
           cache: pip
-      - run: python -m pip install -r requirements.txt pytest pytest-subtests
+      - run: python -m pip install -r requirements.txt pytest==8.4.2 pytest-subtests==0.15.0 httpx==0.27.2
       - run: python -m pytest -q tests tasks/FrogBoss/test_frog_oas.py tasks/FrogBoss/test_betting_flow.py
 
   summary:
