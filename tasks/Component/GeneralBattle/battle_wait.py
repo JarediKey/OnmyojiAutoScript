@@ -385,8 +385,10 @@ class PerBattleSuccess:
             areas: list[str] = None,
             name: str = 'success_exclude_click'
     ) -> RuleClickExclude:
+        # Statistics must stay excluded even when a task overrides reward areas.
+        protected = ['C_END_STATISTICS_TOP_LEFT', 'C_END_SOUL_DETAILS']
         inputs = []
-        for area in areas:
+        for area in dict.fromkeys(protected + list(areas or [])):
             click = getattr(onwer, area, None)
             if click is None:
                 raise ValueError(f'Unknown success exclusion click: {area!r}')

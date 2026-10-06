@@ -6,6 +6,12 @@
     "description": "右上角的聊天信息"
   },
   {
+    "itemName": "end_statistics_top_left",
+    "roiFront": "44,32,72,72",
+    "roiBack": "44,32,72,72",
+    "description": "Top-left statistics entry on the reward page"
+  },
+  {
     "itemName": "end_buff_area_1",
     "roiFront": "150,638,295,41",
     "roiBack": "150,638,295,41",

@@ -33,6 +33,8 @@ class GeneralBattleAssets:
 	# Click Rule Assets
 	# 右上角的聊天信息
 	C_END_MESSAGE_RIGHT_TOP = RuleClick(roi_front=(848,0,399,46), roi_back=(849,0,397,45), name="end_message_right_top")
+	# Top-left statistics entry on the reward page
+	C_END_STATISTICS_TOP_LEFT = RuleClick(roi_front=(44,32,72,72), roi_back=(44,32,72,72), name="end_statistics_top_left")
 	# description
 	C_END_BUFF_AREA_1 = RuleClick(roi_front=(150,638,295,41), roi_back=(150,638,295,41), name="end_buff_area_1")
 	# description
