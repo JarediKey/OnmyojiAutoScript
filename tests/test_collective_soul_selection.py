@@ -22,7 +22,7 @@ class SoulSelectionTask(ScriptTask):
         self.now += .4
         self.frame = next(self.frames, self.frame)
     def ocr_appear(self, rule):
-        return self.frame[1]
+        raise AssertionError("Selection must not depend on grade OCR")
     def click(self, rule, interval=None):
         assert rule is self.L_SL_LONG
         assert rule.duration == 1500 and interval == 2.5
@@ -51,14 +51,14 @@ def test_existing_selection_does_not_press_again():
     assert result and task.presses == 0
 
 
-def test_missing_level_needs_multiple_frames_and_does_not_click():
-    task, result = select([('0', False)])
-    assert not result and task.presses == 0 and task.now >= 101
-
-
-def test_transient_missing_level_can_recover():
-    task, result = select([('0', False), ('0', True), ('1', True)])
+def test_missing_level_still_selects_visible_souls():
+    task, result = select([('0', False), ('30', False)])
     assert result and task.presses == 1
+
+
+def test_empty_inventory_is_bounded_even_without_grade_text():
+    task, result = select([('0', False)])
+    assert not result and task.presses == 3
 
 
 def test_unresponsive_selection_is_bounded_to_three_presses():

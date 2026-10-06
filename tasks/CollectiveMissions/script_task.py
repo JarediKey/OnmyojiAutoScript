@@ -337,25 +337,18 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
     def _select_souls(self) -> bool:
         """Select visible souls before treating a zero submission count as empty."""
         deadline = Timer(15).start()
-        missing_level = Timer(1, count=2).start()
         attempts = 0
         while not deadline.reached():
             self.screenshot()
             number_text = self.O_SL_NUMBER.ocr(self.device.image)
             numbers = re.findall(r'\d+', number_text)
             if not numbers:
-                missing_level.reset()
                 continue
             if int(numbers[-1]) > 0:
                 return True
 
-            # The level marker is positive evidence that a selectable soul exists.
-            if not self.ocr_appear(self.O_SL_LEVEL):
-                if missing_level.reached():
-                    logger.warning('No selectable soul level detected across multiple frames')
-                    return False
-                continue
-            missing_level.reset()
+            # Grade OCR can be blank despite visible items. Try bounded selection
+            # on this confirmed submission page and trust the submission count.
             if attempts >= 3:
                 logger.warning('Soul selection still shows zero submissions after three long presses')
                 return False

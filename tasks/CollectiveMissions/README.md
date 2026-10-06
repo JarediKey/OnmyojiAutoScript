@@ -19,13 +19,12 @@ are unchanged.
 
 ## Soul selection
 
-A zero submission count means no selection yet. The first soul's level marker
-(the existing OCR keyword `古` for `+0`) is positive evidence of an item, not a
-reason to exit. While it is visible, attempt at most three 1.5-second long presses
-with the existing 2.5-second click interval, checking a fresh screenshot after each.
-A positive submission count proceeds to submission. Missing level text must persist
-for at least one second across three frames; unreadable counts are not treated as
-zero. Selection has a 15-second deadline.
+A zero submission count means no selection yet. On the confirmed submission page,
+attempt at most three 1.5-second long presses with the existing 2.5-second click
+interval, checking a fresh screenshot after each. A positive submission count
+proceeds to submission. Grade OCR (`+0`/`古`) does not decide item presence: it can
+be blank even with a populated list. Unreadable counts are not treated as zero.
+Selection has a 15-second deadline.
 
 Unconfirmed selection saves a private screenshot, leaves the submission panel,
 and schedules an unsuccessful retry ten minutes later, overriding the daily clock
