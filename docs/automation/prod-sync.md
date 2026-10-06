@@ -22,7 +22,8 @@ This workflow never deploys Ebony or restarts account processes.
    There is no automatic API-key fallback. The desktop app need not remain open.
 3. AI may modify the conflict files and corresponding generated task assets only.
    It cannot publish. The controller checks scope, index, syntax/JSON, conflict
-   markers, whitespace and merge identity, then builds a Git bundle.
+   markers, handwritten-code whitespace and merge identity, then builds a Git bundle.
+   Upstream-generated asset whitespace is reported but does not block publication.
 4. A fresh GitHub-hosted Windows job verifies the bundle and runs the offline
    regression suite. A separate write-enabled job rechecks remote branch tips,
    author/committer, and merge parents before a normal push. Concurrent changes
