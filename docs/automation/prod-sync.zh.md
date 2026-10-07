@@ -6,7 +6,9 @@
 08:10）执行，也支持手动触发。GitHub 可能延迟定时任务的实际开始时间。
 工作流先将 `runhey/dev` 完整镜像到 `origin/dev`，随后尝试普通合并到
 `origin/prod`。`master` 独立合并 `runhey/master`，失败不会取消 prod 流程。
-这个工作流不部署 Ebony，也不重启账号进程。
+prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空闲部署程序。
+主机只在北京时间 08:10–08:50 且所有存活工作进程确认安全等待后切换，否则推迟。
+运行协议见 prod 分支的[主机部署说明](https://github.com/JarediKey/OnmyojiAutoScript/blob/prod/deploy/safe-update.zh.md)。
 
 ## 执行与发布
 
@@ -31,7 +33,7 @@
 `.github/scripts/runner-guard.sh` 安装到检出目录和 Runner 程序目录之外，并将
 `ACTIONS_RUNNER_HOOK_JOB_STARTED` 指向其绝对路径。检查脚本只接受本仓库
 `master` 上的 `sync-upstream.yml`、定时/手动事件，以及 `resolve_conflict`
-或 `runner_smoke` 任务。不要在此 Runner 上启用外部 fork/PR 执行。
+、`runner_smoke` 或 `deploy_ebony` 任务。不要在此 Runner 上启用外部 fork/PR 执行。
 个人自托管 Runner 属于受信任机器，不是任意仓库代码的隔离沙箱；管理员须保护
 工作流修改权限。
 
@@ -41,6 +43,9 @@
 - `OAS_PYTHON_BIN`：Python 3.10 或更新版本的绝对路径。
 - `OAS_AUTOMATION_STATE`：存放尝试记录和日志的本机私有目录。
 - `ACTIONS_RUNNER_HOOK_JOB_STARTED`：已安装检查脚本的绝对路径。
+- `OAS_EBONY_HOST`、`OAS_EBONY_USER`、`OAS_EBONY_SSH_KEY`、
+  `OAS_EBONY_HOSTKEY_ALIAS`、`OAS_EBONY_AUTOMATION`：主机连接与自动化目录，
+  保存在 Runner 本机，不写入 GitHub。
 
 用相同系统用户执行 `codex login`，通过 `codex login status` 确认 ChatGPT 登录。
 凭据保留在本机。在仓库 Settings → Actions → Runners 使用 GitHub 短期注册令牌
@@ -62,7 +67,7 @@
   Actions 日志和工作流摘要显示状态及提交。失败通知沿用你的 GitHub 工作流通知
   偏好，没有额外添加邮件或桌面通知服务。
 - `svc.sh stop` 停止 Runner。禁用此工作流会停止它的定时分支更新。
-  失败时既有 prod 和 Ebony 进程保持不变。
+  源码合并失败时不会部署 Ebony。
 
 ## 验证
 
@@ -74,3 +79,12 @@
 [Runner 钩子](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/run-scripts)、
 [Codex 非交互模式](https://learn.chatgpt.com/docs/non-interactive-mode)、
 [Codex 认证](https://learn.chatgpt.com/docs/auth)。
+
+## Ebony 派发
+
+`deploy_ebony` 通过 SSH 启动手动 Windows 任务 `OAS-Safe-Update`，随后读取其结果。
+任务独立于 SSH 会话运行，Mac 或网络断开不会杀掉正在切换源码的更新进程。
+它使用桌面启动器 `OAS-Safe-Backend`，后台健康检查通过后才启动账号进程。
+普通部署不调用 AI。忙碌或过晚会报告 `deferred`，不代表已部署；下一次每日／手动
+同步会继续尝试，即使 prod 没有新提交。派发需要 Mac Runner 在线。连接诊断保留
+在其私有状态目录，Actions 只接收脱敏部署报告。

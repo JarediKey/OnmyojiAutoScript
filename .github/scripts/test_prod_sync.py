@@ -124,6 +124,7 @@ class MergeTests(unittest.TestCase):
             return subprocess.run(['bash', str(HERE / 'runner-guard.sh')], env=e,
                                   capture_output=True).returncode
         self.assertEqual(run(env), 0)
+        self.assertEqual(run(dict(env, GITHUB_JOB='deploy_ebony')), 0)
         for k, v in [('GITHUB_EVENT_NAME', 'pull_request'), ('GITHUB_REF', 'refs/heads/dev'),
                      ('GITHUB_REPOSITORY', 'someone/fork'), ('GITHUB_JOB', 'arbitrary'),
                      ('GITHUB_WORKFLOW_REF', 'wrong')]:

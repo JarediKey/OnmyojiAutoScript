@@ -238,8 +238,22 @@ jobs:
       - run: python -m pip install -r requirements.txt pytest==8.4.2 pytest-subtests==0.15.0 httpx==0.27.2
       - run: python -m pytest -q tests tasks/FrogBoss/test_frog_oas.py tasks/FrogBoss/test_betting_flow.py
 
+  deploy_ebony:
+    needs: [prepare_prod, publish_prod]
+    if: always() && !cancelled() && needs.prepare_prod.result == 'success' && (needs.prepare_prod.outputs.state == 'unchanged' || needs.publish_prod.result == 'success')
+    runs-on: [self-hosted, oas-codex-subscription]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - name: Dispatch the independent idle-only host updater
+        run: '"$OAS_PYTHON_BIN" control/.github/scripts/deploy_ebony.py'
+
   summary:
-    needs: [sync_dev, sync_master, prepare_prod, resolve_conflict, validate_prod, publish_prod, runner_smoke, baseline_validation]
+    needs: [sync_dev, sync_master, prepare_prod, resolve_conflict, validate_prod, publish_prod, runner_smoke, baseline_validation, deploy_ebony]
     if: always() && github.repository == 'JarediKey/OnmyojiAutoScript' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions: {}
@@ -249,4 +263,4 @@ jobs:
           RESULTS: ${{ toJSON(needs) }}
         run: |
           printf '### OAS synchronization\n\n```json\n%s\n```\n' "$RESULTS" >> "$GITHUB_STEP_SUMMARY"
-          echo 'Ebony is not deployed or restarted by this workflow.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Ebony activation requires its safe idle window; inspect the deploy_ebony report.' >> "$GITHUB_STEP_SUMMARY"

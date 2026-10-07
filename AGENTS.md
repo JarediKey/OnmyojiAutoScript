@@ -49,4 +49,5 @@
 - Conflict resolution uses the approved local Runner and ChatGPT-authenticated
   Codex CLI. Never introduce API-key fallback or export subscription credentials.
 - Keep validation and publication separate from AI execution. A failed or stale
-  candidate must not update `prod`. Do not deploy or restart Ebony from this flow.
+  candidate must not update `prod`. Ebony deployment must use its cooperative
+  idle controller and independent Windows task; never force-stop active workers.
