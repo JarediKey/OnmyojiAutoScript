@@ -117,3 +117,23 @@ class WorkerStartupTests(unittest.TestCase):
         with patch('websockets.connect', return_value=context), patch.object(module, 'status', side_effect=[{'workers': {}}, {'workers': {'M1': 42}}]) as read, patch.object(module.asyncio, 'sleep', new_callable=AsyncMock):
             asyncio.run(module.restore_workers(22288, ['M1']))
         self.assertEqual(read.call_count, 2)
+
+
+class PrivateConfigPathTests(unittest.TestCase):
+    def test_unicode_config_path_is_rejected_before_runtime_changes(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / 'repo'; root.mkdir()
+            module.git(root, 'init')
+            module.git(root, 'config', 'user.name', 'JarediKey')
+            module.git(root, 'config', 'user.email', 'JarediKey@users.noreply.github.com')
+            (root / 'base.txt').write_text('base')
+            module.git(root, 'add', '.')
+            module.git(root, 'commit', '-m', 'fixture base')
+            old = module.git(root, 'rev-parse', 'HEAD')
+            (root / 'config').mkdir()
+            (root / 'config/配置.json').write_text('{}')
+            module.git(root, 'add', '.')
+            module.git(root, 'commit', '-m', 'fixture configuration')
+            new = module.git(root, 'rev-parse', 'HEAD')
+            with self.assertRaisesRegex(RuntimeError, 'configuration change'):
+                module.prepare({'root': str(root), 'backup_root': str(Path(folder) / 'backups')}, old, new)

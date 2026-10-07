@@ -144,7 +144,7 @@ def prepare(settings, old, revision):
         git(root, 'worktree', 'add', '--detach', str(candidate), revision)
     if git(candidate, 'rev-parse', 'HEAD') != revision or git(candidate, 'status', '--porcelain', '--untracked-files=no'):
         raise RuntimeError('Staged candidate was modified')
-    changed = git(root, 'diff', '--name-only', old, revision).splitlines()
+    changed = [name for name in run(git_command(root, 'diff', '--name-only', '-z', old, revision)).stdout.split('\0') if name]
     if any(p in ('requirements.txt', 'requirements-in.txt') or p.startswith('toolkit/') for p in changed):
         raise RuntimeError('Runtime dependencies changed; update the runtime before automatic activation')
     if any(p.startswith('config/') and p != 'config/template.json' for p in changed):
