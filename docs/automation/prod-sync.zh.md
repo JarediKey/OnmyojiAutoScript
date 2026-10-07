@@ -82,9 +82,12 @@ prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空�
 
 ## Ebony 派发
 
-`deploy_ebony` 通过 SSH 启动手动 Windows 任务 `OAS-Safe-Update`，随后读取其结果。
+`deploy_ebony` 通过 SSH 启动 Windows 任务 `OAS-Safe-Update`，随后读取其结果。
 任务独立于 SSH 会话运行，Mac 或网络断开不会杀掉正在切换源码的更新进程。
 它使用桌面启动器 `OAS-Safe-Backend`，后台健康检查通过后才启动账号进程。
 普通部署不调用 AI。忙碌或过晚会报告 `deferred`，不代表已部署；下一次每日／手动
-同步会继续尝试，即使 prod 没有新提交。派发需要 Mac Runner 在线。连接诊断保留
+同步会继续尝试，即使 prod 没有新提交。这条即时派发路径需要 Mac Runner 在线。
+Ebony 还会每天北京时间 08:10 起、08:50 前每五分钟独立检查一次，因此 Mac 离线
+或 GitHub 启动延迟时，也能部署已经发布的 prod。本机定时器不会在窗口边界终止
+更新进程，由控制器拒绝在过晚时开始切换。连接诊断保留
 在其私有状态目录，Actions 只接收脱敏部署报告。

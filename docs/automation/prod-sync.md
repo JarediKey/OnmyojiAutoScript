@@ -93,11 +93,15 @@ References: [GitHub runners](https://docs.github.com/en/actions/reference/runner
 
 ## Ebony dispatch
 
-`deploy_ebony` uses SSH to start the manual Windows task `OAS-Safe-Update`, then
+`deploy_ebony` uses SSH to start the Windows task `OAS-Safe-Update`, then
 reads its result. The task runs independently of the SSH session, so a Mac/network
 disconnect does not kill an in-progress source switch. It uses the manual desktop
 launcher `OAS-Safe-Backend`; account workers start only after backend health passes.
 Normal deployment uses no AI. Busy or late updates report `deferred`, not deployed;
 the next daily/manual sync tries again even if prod has no new commits. The Mac
-Runner must be online to dispatch. Transport diagnostics remain in its private
+Runner must be online for this immediate dispatch path. Ebony also checks
+independently every five minutes from 08:10 to before 08:50 Asia/Shanghai each day,
+so an already published prod can deploy even when the Mac is offline or GitHub
+starts late. The native timer does not terminate an update at the window boundary;
+the controller itself refuses to begin a late activation. Transport diagnostics remain in its private
 state folder, while Actions receives the sanitized deployment report.
