@@ -45,7 +45,8 @@
 `backend_pidfile` 和 `test_pythonpath`。测试路径指向单独安装的测试依赖，生产
 启动器不得继承该路径。启动器是当前登录用户的手动 Windows 计划任务，以隐藏
 窗口从 `root` 执行 `toolkit\python.exe server.py --run-none`，将子进程 PID 写入
-`backend_pidfile`。MuMu IPC 需要桌面会话，不能从 SSH 会话 0 启动游戏后台。
+`backend_pidfile`。MuMu IPC 需要桌面会话，不能从 SSH 会话 0 启动游戏后台。Git 仅在每条命令中信任明确配置的仓库路径，
+不设置全局通配信任。
 
 `GET /maintenance/status` 仅向本机回环连接报告实际存活的工作进程与后台 PID，
 拒绝远程连接。`--run-none` 启动参数明确覆盖命令行和部署配置中的启动名单。

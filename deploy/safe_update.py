@@ -31,8 +31,14 @@ def run(args, cwd=None, env=None, timeout=120):
                           check=True, capture_output=True, text=True, encoding='utf-8', errors='replace')
 
 
+def git_command(root, *args):
+    # The interactive desktop user may differ from the administrator who
+    # unpacked OAS. Trust only the explicitly configured checkout per command.
+    return ['git', '-c', 'safe.directory=' + Path(root).as_posix(), '-C', root, *args]
+
+
 def git(root, *args):
-    return run(['git', '-C', root, *args]).stdout.strip()
+    return run(git_command(root, *args)).stdout.strip()
 
 
 def report(status, **details):
@@ -120,10 +126,13 @@ async def restore_workers(port, names):
                 data = json.loads(await ws.recv())
                 if data.get('state') == 1:
                     return
+    deadline = time.monotonic() + 20
     await asyncio.wait_for(asyncio.gather(*(start(name) for name in names)), timeout=20)
-    live = status(port)['workers']
-    if not set(names) <= set(live):
-        raise RuntimeError('Not all previously running workers are alive after activation')
+    while time.monotonic() < deadline:
+        if set(names) <= set(status(port)['workers']):
+            return
+        await asyncio.sleep(.25)
+    raise RuntimeError('Not all previously running workers are alive after activation')
 
 
 def prepare(settings, old, revision):
@@ -198,7 +207,7 @@ def activate(settings, old, revision, backup):
         try:
             stopped = True
             stop_backend(process)
-            run(['git', '-C', root, 'merge', '--ff-only', revision], timeout=15)
+            run(git_command(root, 'merge', '--ff-only', revision), timeout=15)
             if config_hashes(root) != hashes:
                 raise RuntimeError('Account/deployment configuration changed during source activation')
             ready = start_backend(settings)
@@ -216,7 +225,7 @@ def activate(settings, old, revision, backup):
                         stop_backend(failed)
                     except psutil.NoSuchProcess:
                         pass
-                run(['git', '-C', root, 'checkout', '--detach', old], timeout=15)
+                run(git_command(root, 'checkout', '--detach', old), timeout=15)
                 start_backend(settings)
                 asyncio.run(restore_workers(port, sorted(workers)))
             raise

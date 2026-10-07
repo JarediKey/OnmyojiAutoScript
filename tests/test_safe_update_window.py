@@ -106,3 +106,14 @@ class ProcessOwnershipTests(unittest.TestCase):
         backend.terminate.assert_called_once()
         emulator.terminate.assert_not_called()
         adb.terminate.assert_not_called()
+
+
+class WorkerStartupTests(unittest.TestCase):
+    def test_waits_for_actual_pid_after_early_running_message(self):
+        import asyncio
+        from unittest.mock import AsyncMock
+        context = AsyncMock()
+        context.__aenter__.return_value.recv.return_value = '{"state":1}'
+        with patch('websockets.connect', return_value=context), patch.object(module, 'status', side_effect=[{'workers': {}}, {'workers': {'M1': 42}}]) as read, patch.object(module.asyncio, 'sleep', new_callable=AsyncMock):
+            asyncio.run(module.restore_workers(22288, ['M1']))
+        self.assertEqual(read.call_count, 2)

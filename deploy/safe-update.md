@@ -57,7 +57,8 @@ The private settings JSON contains `root`, `backup_root`, `port`, `launcher_task
 dependencies; the production launcher must not inherit it. The launcher is a
 manual-only Windows Scheduled Task for the logged-in user, runs hidden
 `toolkit\python.exe server.py --run-none` from `root`, and writes the child PID to
-`backend_pidfile`. Use the desktop session for MuMu IPC, never SSH session 0.
+`backend_pidfile`. Use the desktop session for MuMu IPC, never SSH session 0. Git trusts only the
+explicitly configured checkout path per command; no global wildcard trust is set.
 
 `GET /maintenance/status` returns only actual live workers and backend PID to
 loopback clients. It rejects remote clients. The `--run-none` startup option
