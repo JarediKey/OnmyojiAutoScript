@@ -2,6 +2,7 @@
 # @author runhey
 # github https://github.com/runhey
 from pathlib import Path
+import os
 
 from contextlib import asynccontextmanager
 
@@ -66,6 +67,19 @@ if annotator_static_dir.exists():
     app.mount("/tool/annotator/static", NoCacheStaticFiles(directory=str(annotator_static_dir)), name="annotator_static")
 
 
+@app.get("/maintenance/status")
+async def maintenance_status(request: Request):
+    """Expose live worker identity only to the local deployment controller."""
+    if request.client is None or request.client.host not in ('127.0.0.1', '::1'):
+        return JSONResponse(status_code=403, content={'detail': 'Local maintenance only'})
+    workers = {}
+    for name, managed in mm.script_process.items():
+        process = managed._process
+        if process is not None and process.is_alive():
+            workers[name] = process.pid
+    return {'version': 1, 'backend_pid': os.getpid(), 'workers': workers}
+
+
 async def on_startup():
     """
     app.state 的生命周期在定义app的时候就有了
@@ -110,11 +124,15 @@ def fastapi_app():
         type=str,
         help="Run OAS by config names on startup",
     )
+    parser.add_argument("--run-none", action="store_true",
+                        help="Start the backend without starting any account workers")
     args, _ = parser.parse_known_args()
     # ------------------------------------------------------------------------------------------------------------------
 
     runs = None
-    if args.run:
+    if args.run_none:
+        runs = []
+    elif args.run:
         runs = args.run
     elif State.deploy_config.Run:
         # TODO: refactor poor_yaml_read() to support list

@@ -31,6 +31,7 @@ from module.config.config import Config
 from module.config.config_model import ConfigModel
 from module.config.instance_guard import InstanceGuard
 from module.config.anti_ban import AntiBanGuard
+from module.config.maintenance import maintenance_worker, maintenance_idle
 from module.device.device import Device
 from module.device.env import IS_WINDOWS
 from module.base.utils import load_module
@@ -294,6 +295,7 @@ class Script:
         return wrapper
 
     @_release_token_before_wait
+    @maintenance_idle
     def wait_until(self, future):
         """
         Wait until a specific time.
@@ -621,6 +623,7 @@ class Script:
             self.config.notifier.push(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> Exception occured")
             exit(1)
 
+    @maintenance_worker
     def loop(self):
         """
         Main loop of scheduler.
