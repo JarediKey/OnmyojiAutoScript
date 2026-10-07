@@ -9,6 +9,7 @@ from module.atom.long_click import RuleLongClick
 from module.atom.ocr import RuleOcr
 from module.base.timer import Timer
 from module.logger import logger
+from module.exception import GameStuckError
 
 from tasks.base_task import BaseTask
 from tasks.GameUi.assets import GameUiAssets
@@ -261,26 +262,68 @@ class SwitchSoul(BaseTask, SwitchSoulAssets):
             self.swipe(self.S_SS_TEAM_SWIPE_UP, 0.3)
         logger.info('Swipe up to find target team')
 
-        # 选中分组
-        while 1:
-            self.screenshot()
-            self.O_SS_TEAM_NAME.keyword = teamName
-            if self.ocr_appear_click(self.O_SS_TEAM_NAME):
-                break
-        logger.info(f'Select team {teamName}')
-        # 切换御魂
-        cnt_click: int = 0
-        self.O_SS_TEAM_NAME.keyword = teamName
-        while 1:
-            self.screenshot()
-            if cnt_click >= 4:
-                break
-            if self.appear_then_click(self.I_SOU_SWITCH_SURE, interval=0.8):
-                continue
-            if self.ocr_appear_click_by_rule(self.O_SS_TEAM_NAME, self.I_SOU_CLICK_PRESENT, interval=1.5):
-                cnt_click += 1
-                continue
+        # Locate the row by name, but never click the editable name label.
+        self._apply_soul_preset_by_name(teamName)
         logger.info(f'Switch soul_one group {groupName} team {teamName}')
+        return True
+
+    def _apply_soul_preset_by_name(self, team_name: str, timeout: float = 5) -> bool:
+        """Confirm changes, or accept a stable preset after bounded no-dialog retries."""
+        timer = Timer(timeout).start()
+        self.O_SS_TEAM_NAME.keyword = team_name
+        while not timer.reached():
+            self.screenshot()
+            if self.ocr_appear_click_by_rule(
+                    self.O_SS_TEAM_NAME, self.I_SOU_CLICK_PRESENT, interval=1.5):
+                break
+        else:
+            raise GameStuckError(f'Apply soul preset {team_name} timeout')
+
+        confirm_timer = Timer(timeout).start()
+        closed_timer = Timer(0.8, count=2).start()
+        confirmed = False
+        saw_dialog = False
+        apply_count = 1
+        retry_timer = Timer(1.5).start()
+        stable_preset = Timer(0.8, count=2).start()
+        preset_ready = False
+        preset_stable = False
+        while not confirm_timer.reached():
+            self.screenshot()
+            # Visibility must not use the click cooldown: a throttled click
+            # does not mean that the dialog has disappeared.
+            if self.appear(self.I_SOU_SWITCH_SURE):
+                saw_dialog = True
+                closed_timer.reset()
+                if self.appear_then_click(self.I_SOU_SWITCH_SURE, interval=0.8):
+                    confirmed = True
+                continue
+            if not saw_dialog:
+                preset_ready = (self.appear(self.I_SOU_CHECK_IN)
+                                and self.ocr_appear(self.O_SS_TEAM_NAME))
+                if not preset_ready:
+                    stable_preset.reset()
+                    preset_stable = False
+                    continue
+                if apply_count < 3 and retry_timer.reached():
+                    if self.ocr_appear_click_by_rule(
+                            self.O_SS_TEAM_NAME, self.I_SOU_CLICK_PRESENT):
+                        apply_count += 1
+                        retry_timer.reset()
+                        stable_preset.reset()
+                preset_stable = stable_preset.reached()
+                continue
+            if not confirmed or not self.appear(self.I_SOU_CHECK_IN):
+                closed_timer.reset()
+                continue
+            if closed_timer.reached():
+                logger.info(f'Apply soul preset {team_name}')
+                return True
+        if (not saw_dialog and apply_count == 3 and preset_ready
+                and preset_stable):
+            logger.info(f'Accept soul preset {team_name}: no confirmation after 3 applications')
+            return True
+        raise GameStuckError(f'Confirm soul preset {team_name} timeout')
 
     def ocr_appear_click_by_rule(self,
                                  target: RuleOcr,
@@ -303,7 +346,7 @@ class SwitchSoul(BaseTask, SwitchSoulAssets):
         x1, y1, w1, h1 = target.area
         x, y = action.coord()
 
-        self.device.click(x=x, y=y1, control_name=target.name)
+        self.device.click(x=x, y=int(y1 + h1 / 2), control_name=target.name)
         return True
 
 

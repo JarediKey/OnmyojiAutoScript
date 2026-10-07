@@ -271,7 +271,7 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
         logger.info('Donate finished')
         return True
 
-    def _submit_and_collect_rewards(self, submit_button):
+    def _submit_and_collect_rewards(self, submit_button, dismiss_soul_details=False):
         """Drain reward overlays and verify a stable return to the mission list."""
         deadline = Timer(20).start()
         list_stable = Timer(3, count=3).start()
@@ -291,6 +291,15 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
                 if not reward_clicked:
                     self.appear_then_click(submit_button, interval=1)
                 continue
+
+            if dismiss_soul_details and not reward_clicked:
+                text = self.O_SL_NUMBER.ocr(self.device.image)
+                count = re.search(r'将\s*提交\s*(\d+)\s*次\s*任务', text or '')
+                if count and int(count.group(1)) > 0:
+                    list_stable.reset()
+                    if self.click(self.O_SL_NUMBER, interval=3):
+                        logger.info('Clicked soul submission count to dismiss obscuring details')
+                    continue
 
             if reward_clicked and self.appear(self.I_CM_RECORDS):
                 if list_stable.reached():
@@ -376,20 +385,8 @@ class ScriptTask(GameUi, CollectiveMissionsAssets):
             return False
         # 领取奖励
         logger.info('Start to collect soul rewards')
-        check_timer = Timer(3)
-        check_timer.start()
-        while 1:
-            self.screenshot()
-            if self.ui_reward_appear_click(True):
-                check_timer.reset()
-                continue
-            if self.appear_then_click(self.I_SL_SUBMIT, interval=1):
-                check_timer.reset()
-                continue
-            if check_timer.reached():
-                break
+        self._submit_and_collect_rewards(self.I_SL_SUBMIT, dismiss_soul_details=True)
         logger.info('Finish to collect soul rewards')
-        self.wait_until_appear(self.I_CM_RECORDS)
 
     def _feed(self, index: int):
         logger.info('Start to feed soul')

@@ -39,3 +39,14 @@ python -m unittest discover -s tests -p test_collective_donation_rewards.py -v
 
 These deterministic checks simulate UI frames and time; they are not live
 verification of the game's reward timing.
+
+## Soul submission
+
+After selecting souls, if the submit button is not visible but OCR reads a
+positive “将提交 N 次任务” count, click that existing OCR region (813, 94, 187, 39)
+at most once every three seconds to dismiss obscuring details. Recheck a fresh
+screenshot before submitting; zero or unrecognized counts do not trigger this
+click. The title is not clicked after collecting a reward. Soul donations use the
+same bounded reward and stable-list confirmation above; three seconds without an
+action no longer counts as completion. Dismissing the overlay still needs live
+validation; offline tests verify the control flow only.

@@ -8,6 +8,7 @@ from time import sleep
 
 import cv2
 from module.base.timer import Timer
+from module.exception import GameStuckError
 
 from module.base.utils import get_color, color_similar
 from tasks.base_task import BaseTask
@@ -39,7 +40,8 @@ class GeneralBattle(BattleWait, GeneralBuff):
         self.current_count += 1
         logger.info(f"Current count: {self.current_count}")
         # 战前设置
-        self.battle_before(buff, config)
+        if not self.battle_before(buff, config):
+            raise GameStuckError("Battle preparation did not confirm battle start")
         # 绿标
         if self.is_in_battle(False):
             self.green_mark(config.green_enable, config.green_mark)
@@ -51,32 +53,55 @@ class GeneralBattle(BattleWait, GeneralBuff):
             return False
 
     def battle_before(self, buff: BuffClass | list[BuffClass], config: GeneralBattleConfig, timeout: float = 5) -> bool:
-        """战斗前设置
-        :return: True:进入战斗或点击了准备按钮且识别不到准备按钮了 False:超过timeout s还没有进入战斗且没有点击过准备
-        """
+        """Configure preparation and verify battle start on fresh screenshots."""
         timeout_timer = Timer(timeout).start()
-        confed = False
         while not timeout_timer.reached():
             self.screenshot()
-            if self.is_in_real_battle(False):  # 战斗阶段
+            if self._battle_started():
                 return True
-            if self.appear_then_click(self.I_DISABLE_7DAYS_DIFF_SOUL, interval=0.6):  # 关闭御魂不一致提示
+            if self.appear_then_click(self.I_DISABLE_7DAYS_DIFF_SOUL, interval=0.6):
                 continue
-            if self.appear_then_click(self.I_CONFIRM_CLOSE_DIFF_SOUL, interval=0.6):  # 确认关闭御魂不一致提示
+            if self.appear_then_click(self.I_CONFIRM_CLOSE_DIFF_SOUL, interval=0.6):
                 continue
-            if self.is_in_prepare(False):  # 战斗准备阶段
-                if not getattr(config, 'lock_team_enable', False):  # 没有锁定阵容
-                    if self.current_count == 1 and not confed:  # 第一次战斗且是本次第一次配置
-                        self.switch_preset_team(config.preset_enable, config.preset_group, config.preset_team)
-                        self.check_and_open_buff(buff)
-                        confed = True
-                    # 点击准备(锁定阵容自动点准备,不锁定阵容前面也已经配置完毕需要点准备)
-                    if self.appear_then_click(self.I_PREPARE_HIGHLIGHT, interval=0.8):
-                        continue
-                continue
-            # 未知界面, 既不是准备界面也不是战斗界面
-            # logger.info('Wait for preparation page')  # 这玩意刷屏
+            if self.is_in_prepare(False):
+                locked = getattr(config, 'lock_team_enable', False)
+                if not locked and self.current_count == 1:
+                    self.switch_preset_team(config.preset_enable, config.preset_group, config.preset_team)
+                    self.check_and_open_buff(buff)
+                return self._confirm_battle_start(timeout, click_prepare=not locked)
             sleep(random.uniform(0.4, 0.8))
+        return False
+
+    def _battle_started(self) -> bool:
+        """Accept a real battle or a verified result from a very short battle."""
+        if self.is_in_real_battle(False):
+            return True
+        if self.is_in_prepare(False):
+            return False
+        return (self.appear(self.I_WIN, threshold=0.8) or self.appear(self.I_DE_WIN)
+                or self.appear(self.I_FALSE, threshold=0.8)
+                or self.appear(self.I_REWARD, threshold=0.6)
+                or self.appear(self.I_REWARD_GOLD, threshold=0.8))
+
+    def _confirm_battle_start(self, timeout: float, click_prepare: bool) -> bool:
+        """Allow setup to settle, make three spaced attempts, then observe a deadline."""
+        sleep(2)
+        for attempt in range(3):
+            self.screenshot()
+            if self._battle_started():
+                return True
+            logger.info(f'Confirm battle preparation: attempt {attempt + 1}/3')
+            if click_prepare and self.is_in_prepare(False):
+                self.appear_then_click(self.I_PREPARE_HIGHLIGHT, interval=2)
+            sleep(2)
+
+        timeout_timer = Timer(timeout).start()
+        while not timeout_timer.reached():
+            self.screenshot()
+            if self._battle_started():
+                return True
+            sleep(0.3)
+        logger.warning('Battle did not start after three preparation checks and confirmation timeout')
         return False
 
     def run_general_battle_back(self, config: GeneralBattleConfig = None, exit_four: bool = False) -> bool:
