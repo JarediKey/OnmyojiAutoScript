@@ -3,7 +3,7 @@
 [简体中文](prod-sync.zh.md)
 
 `Sync Upstream Branches` lives on the default `master` branch. It runs daily at
-04:17 UTC (12:17 Asia/Shanghai) and supports manual dispatch. Scheduled start times
+00:10 UTC (08:10 Asia/Shanghai) and supports manual dispatch. Scheduled start times
 can be delayed by GitHub. Source `runhey/dev` is mirrored exactly to `origin/dev`;
 the workflow then attempts an ordinary merge into `origin/prod`. `master` is
 independently merged from `runhey/master`; its failure does not cancel prod work.

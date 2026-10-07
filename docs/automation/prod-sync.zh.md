@@ -2,8 +2,8 @@
 
 [English](prod-sync.md)
 
-`Sync Upstream Branches` 位于默认分支 `master`，每天 04:17 UTC（北京时间
-12:17）执行，也支持手动触发。GitHub 可能延迟定时任务的实际开始时间。
+`Sync Upstream Branches` 位于默认分支 `master`，每天 00:10 UTC（北京时间
+08:10）执行，也支持手动触发。GitHub 可能延迟定时任务的实际开始时间。
 工作流先将 `runhey/dev` 完整镜像到 `origin/dev`，随后尝试普通合并到
 `origin/prod`。`master` 独立合并 `runhey/master`，失败不会取消 prod 流程。
 这个工作流不部署 Ebony，也不重启账号进程。

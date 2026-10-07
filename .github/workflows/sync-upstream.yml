@@ -2,8 +2,8 @@ name: Sync Upstream Branches
 
 on:
   schedule:
-    # 12:17 Asia/Shanghai (04:17 UTC).
-    - cron: "17 4 * * *"
+    # 08:10 Asia/Shanghai (00:10 UTC).
+    - cron: "10 0 * * *"
   workflow_dispatch:
     inputs:
       mode:
