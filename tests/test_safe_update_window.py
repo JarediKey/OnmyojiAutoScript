@@ -91,3 +91,18 @@ class ActivationTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'worker failed'):
                     module.activate(self.settings, 'old', 'new', self.backup)
         self.assertFalse(any('checkout' in c.args[0] for c in self.commands.call_args_list))
+
+
+class ProcessOwnershipTests(unittest.TestCase):
+    def test_stop_leaves_emulator_and_adb_children_alive(self):
+        backend = Mock(); backend.exe.return_value = '/oas/toolkit/python.exe'
+        worker = Mock(); worker.exe.return_value = '/oas/toolkit/python.exe'
+        emulator = Mock(); emulator.exe.return_value = '/mumu/MuMu.exe'
+        adb = Mock(); adb.exe.return_value = '/oas/toolkit/adb.exe'
+        backend.children.return_value = [worker, emulator, adb]
+        with patch.object(module.psutil, 'wait_procs', return_value=([], [])):
+            module.stop_backend(backend)
+        worker.terminate.assert_called_once()
+        backend.terminate.assert_called_once()
+        emulator.terminate.assert_not_called()
+        adb.terminate.assert_not_called()

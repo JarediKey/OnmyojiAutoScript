@@ -30,7 +30,8 @@ review rather than a force reset. Test logs and private configuration snapshots
 remain in the host's backup directory.
 
 After admission the controller backs up configurations, stops only the verified
-OAS backend process tree, performs a fast-forward, verifies configuration hashes,
+OAS backend and its bundled-Python descendants (leaving emulator/ADB processes
+alive), performs a fast-forward, verifies configuration hashes,
 and launches the backend in the interactive desktop session with `--run-none`.
 Only after its health check succeeds are the previously live account workers
 started through the existing WebSocket API. Previously stopped/crashed workers

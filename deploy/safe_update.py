@@ -68,7 +68,16 @@ def check_process(root, pid):
 
 
 def stop_backend(process):
-    children = process.children(recursive=True)
+    runtime = Path(process.exe()).parent
+    children = []
+    for child in process.children(recursive=True):
+        try:
+            executable = Path(child.exe())
+            if executable.parent == runtime and executable.name.lower() in ('python.exe', 'pythonw.exe'):
+                children.append(child)
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    # Keep emulator/ADB descendants alive; only OAS Python processes are owned.
     # Workers have acknowledged idle and are reserved before this is called.
     for child in children:
         try:
