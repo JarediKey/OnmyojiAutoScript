@@ -15,6 +15,8 @@ Its acknowledgment includes PID, configuration digest and next wake time. The
 controller acquires all account locks without waiting, rejects stale identities,
 changed settings and wakes less than three minutes away, and holds the locks
 through activation. An admission lock prevents new workers entering game code.
+A newly started worker waits for its profile lock instead of failing when recovery
+holds it. It waits outside global admission, so unrelated profiles can start.
 A busy worker makes the update defer immediately; its task is not terminated.
 
 The deployment window is 08:10 inclusive to 08:50 exclusive in Asia/Shanghai.

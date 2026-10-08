@@ -93,3 +93,38 @@ class MaintenanceLeaseTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class RecoveryStartupTests(unittest.TestCase):
+    def test_held_profile_waits_without_blocking_another_profile(self):
+        import threading
+        import tempfile
+        from pathlib import Path
+        from module.config.maintenance import WorkerLease
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'config').mkdir()
+            for name in ('M1', 'M2'):
+                (root / 'config' / (name + '.json')).write_text('{}')
+            held = WorkerLease(root, 'M1').lock
+            held.acquire()
+            entered = threading.Event()
+            errors = []
+            def worker():
+                try:
+                    with WorkerLease(root, 'M1').active():
+                        entered.set()
+                except Exception as exc:
+                    errors.append(exc)
+            thread = threading.Thread(target=worker)
+            thread.start()
+            try:
+                self.assertFalse(entered.wait(.1))
+                with WorkerLease(root, 'M2').active():
+                    self.assertFalse(entered.is_set())
+            finally:
+                held.release()
+                thread.join(timeout=3)
+            self.assertFalse(thread.is_alive())
+            self.assertFalse(errors)
+            self.assertTrue(entered.is_set())

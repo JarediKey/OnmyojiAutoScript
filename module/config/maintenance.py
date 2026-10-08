@@ -48,12 +48,12 @@ class WorkerLease:
 
     @contextmanager
     def active(self):
-        # The admission lock also prevents a newly started worker from entering
-        # game code while a deployment owns the idle workers' leases.
-        with self.admission:
-            self.lock.acquire(timeout=0)
-            self.write('active')
+        # Wait outside global admission so a recovery hold on one profile does
+        # not block unrelated workers. Deployment takes all locks nonblocking.
+        self.lock.acquire()
         try:
+            with self.admission:
+                self.write('active')
             yield self
         finally:
             self.state_path.unlink(missing_ok=True)
