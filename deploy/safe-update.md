@@ -17,6 +17,9 @@ changed settings and wakes less than three minutes away, and holds the locks
 through activation. An admission lock prevents new workers entering game code.
 A newly started worker waits for its profile lock instead of failing when recovery
 holds it. It waits outside global admission, so unrelated profiles can start.
+The external recovery controller is maintained and deployed separately in
+OASRecovery. This checkout supplies its worker-lease/API integration; an OAS
+source update does not replace the independently installed recovery services.
 A busy worker makes the update defer immediately; its task is not terminated.
 
 The deployment window is 08:10 inclusive to 08:50 exclusive in Asia/Shanghai.
