@@ -120,6 +120,27 @@ class ScriptProcess(ScriptWSManager):
             return
 
 
+def report_terminal_failure(config, state_queue, error):
+    """Publish WARNING even if notifying fails; read settings without model writes."""
+    try:
+        state_queue.put({"state": ScriptState.WARNING})
+    except Exception as exc:
+        logger.warning(f'Cannot publish terminal state for {config}: {exc}')
+    try:
+        from module.notify.notify import Notifier
+        if Notifier.terminal_sent:
+            return
+        from module.config.utils import read_file, filepath_config
+        settings = read_file(filepath_config(config)).get('script', {}).get('error', {})
+        notifier = Notifier(settings.get('notify_config', 'provider: null'),
+                            enable=settings.get('notify_enable', False))
+        notifier.config_name = config.upper()
+        notifier.push_terminal(title='程序异常退出',
+            content=f'<{config}> Exception occured: {type(error).__name__}: {error}')
+    except Exception:
+        logger.exception(f'Cannot send terminal notification for {config}')
+
+
 def func(config: str, state_queue: multiprocessing.Queue, log_pipe_in) -> None:
     def signal_handler(signum, frame):
         logger.info(f'Script {config} received signal {signum}, exiting gracefully')
@@ -139,26 +160,25 @@ def func(config: str, state_queue: multiprocessing.Queue, log_pipe_in) -> None:
             logger.exception(f'Start log error')
             logger.error(f'Error: {e}')
             raise
-    start_log()
-    import time
     try:
-        # while 1:
-        #     time.sleep(1)
-        #     logger.info(f'Script {config} is running')
-        #     state_queue.put({"state": ScriptState.RUNNING})
+        from module.notify.notify import Notifier
+        Notifier.terminal_sent = False
+        start_log()
         from script import Script
         script = Script(config_name=config)
         script.state_queue = state_queue
         script.loop()
     except SystemExit as e:
+        if e.code is None or e.code == 0:
+            return
         logger.info(f'Script {config} process exit')
         logger.error(f'Error: {e}')
-        state_queue.put({"state": ScriptState.WARNING})
-        time.sleep(0.1)
-        exit(-1)
+        report_terminal_failure(config, state_queue, e)
+        raise
     except Exception as e:
         logger.exception(f'Run script {config} error')
         logger.error(f'Error: {e}')
+        report_terminal_failure(config, state_queue, e)
         raise
 
 
@@ -168,5 +188,4 @@ if __name__ == '__main__':
     from time import sleep
     sleep(10)
     logger.info(p._process.exitcode)
-
 

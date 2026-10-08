@@ -16,6 +16,9 @@ onepush.core.log = logger
 
 
 class Notifier:
+    # Process-local marker: the worker boundary must not resend a delivered fatal event.
+    terminal_sent = False
+
     def __init__(self, _config: str, enable: bool=False) -> None:
         self.config_name: str = ""
         self.enable: bool = enable
@@ -105,5 +108,10 @@ class Notifier:
         logger.info("Push notify success")
         return True
 
+    def push_terminal(self, **kwargs) -> bool:
+        sent = self.push(**kwargs)
+        if sent:
+            Notifier.terminal_sent = True
+        return sent
 
 

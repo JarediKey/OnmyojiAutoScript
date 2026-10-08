@@ -41,3 +41,26 @@ Run regression tests with `python -m pytest tests/test_system_timezone.py -q`
 (test-only dependencies: pytest and httpx). Tests cover HTTP responses, rejected
 writes, repeated reads, TZ isolation and detector failures. The real-system test
 checks only the OS on which the tests run; it does not modify the system timezone.
+
+## Worker terminal failures
+
+A worker that raises an unhandled exception or exits with a nonzero `SystemExit`
+now publishes `{"state":2}` (WARNING) to its parent state queue, including errors
+outside task execution such as scheduler configuration writes and initialization.
+The existing WebSocket state broadcaster updates its cached state and sends this
+warning to subscribed clients. A worker PID alone is not a runtime-state signal.
+
+When notifications are enabled, the worker boundary sends the configured OnePush
+terminal notification. It reads notification settings through the existing config
+file lock without constructing a model or writing configuration. Successfully
+sent task-level terminal notifications use `Notifier.push_terminal` and suppress
+an extra boundary notification. A failed task-level delivery gets one boundary
+attempt; WARNING is published even when notification delivery fails.
+
+Ordinary task retries use the existing notification behavior. Normal returns,
+zero exits and manual signal stops do not produce boundary failure alerts. This
+is an application exception boundary, not a parent process crash watchdog.
+
+OnePush and WebSocket state are separate channels. Native client notifications
+require a connected state subscription, enabled app notifications, and operating
+system notification permission; a log line by itself is not the WARNING event.

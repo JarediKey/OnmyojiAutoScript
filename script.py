@@ -608,19 +608,19 @@ class Script:
             logger.critical(e)
             self.exception_handler(e=e, command=command)
             logger.critical('This is likely to be a mistake of developers, but sometimes just random issues')
-            self.config.notifier.push(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> ScriptError")
+            self.config.notifier.push_terminal(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> ScriptError")
             exit(1)
         except RequestHumanTakeover as e:
             logger.critical(e)
             self.exception_handler(e=e, command=command)
             logger.critical('Request human takeover')
-            self.config.notifier.push(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> RequestHumanTakeover")
+            self.config.notifier.push_terminal(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> RequestHumanTakeover")
             exit(1)
         except Exception as e:
             logger.exception(e)
             self.exception_handler(e=e, command=command)
             self.save_error_log()
-            self.config.notifier.push(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> Exception occured")
+            self.config.notifier.push_terminal(title=f'{I18n.trans_zh_cn(command)}{command}', content=f"<{self.config_name}> Exception occured")
             exit(1)
 
     @maintenance_worker
@@ -711,7 +711,7 @@ class Script:
                                 "Please contact developers or try to fix it yourself.")
                 logger.critical('Request human takeover')
                 # 添加失败三次的推送通知
-                self.config.notifier.push(
+                self.config.notifier.push_terminal(
                     title=f'{I18n.trans_zh_cn(task)}{task}',
                     content=f"<{self.config_name}> 任务连续失败三次，请上线查看"
                 )
