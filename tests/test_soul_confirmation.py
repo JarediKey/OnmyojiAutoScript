@@ -23,7 +23,7 @@ class ConfirmationTests(unittest.TestCase):
         self.index = -1
         self.confirm_clicks = 0
         task = SimpleNamespace(O_SS_TEAM_NAME=SimpleNamespace(), I_SOU_CLICK_PRESENT='apply',
-                               I_SOU_SWITCH_SURE='confirm', I_SOU_CHECK_IN='records')
+                               I_UI_CONFIRM='confirm', I_SOU_CHECK_IN='records')
         def screenshot():
             self.now += 0.3
             self.index += 1

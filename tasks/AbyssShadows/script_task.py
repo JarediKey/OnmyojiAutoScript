@@ -704,7 +704,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
                 return
             if timer.reached():
                 self.request_takeover('battle-exit', 'no map confirmation after 30s')
-            for button in (self.I_FALSE, self.I_EXIT_ENSURE, self.I_WIN, self.I_REWARD, self.I_EXIT):
+            for button in (self.I_FALSE, self.I_UI_CONFIRM, self.I_WIN, self.I_REWARD, self.I_EXIT):
                 if self.appear_then_click(button, interval=1):
                     break
 

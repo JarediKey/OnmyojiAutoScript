@@ -2,6 +2,10 @@
 
 [简体中文](README.zh.md)
 
+Numeric and named preset flows use the shared `I_UI_CONFIRM` image from
+GlobalGame. Costume-specific soul confirmation templates are removed; confirmation
+recognition follows the current shared button region and threshold.
+
 Named switching locates the target row with OCR and clicks its apply button at
 the vertical center of the name box, avoiding the editable name.
 
