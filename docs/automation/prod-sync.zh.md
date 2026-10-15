@@ -2,8 +2,9 @@
 
 [English](prod-sync.md)
 
-`Sync Upstream Branches` 位于默认分支 `master`，每天 00:10 UTC（北京时间
-08:10）执行，也支持手动触发。GitHub 可能延迟定时任务的实际开始时间。
+`Sync Upstream Branches` 位于默认分支 `master`，由 Mac 每日派发程序在
+00:10 UTC（北京时间 08:10）请求运行。GitHub 自带每日定时保留为备用，因为它可能
+延迟实际开始时间。也支持手动触发。
 工作流先将 `runhey/dev` 完整镜像到 `origin/dev`，随后尝试普通合并到
 `origin/prod`。`master` 独立合并 `runhey/master`，失败不会取消 prod 流程。
 prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空闲部署程序。
@@ -22,8 +23,8 @@ prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空�
 3. AI 只能修改冲突文件及对应的任务生成资源，不能发布。控制脚本检查修改范围、
    索引、Python/JSON、冲突标记、手写代码空白错误和合并身份，然后生成 Git bundle。
    上游资源生成器产生的空白格式会报告，但不会阻止发布。
-4. 全新的 GitHub 托管 Windows 任务验证 bundle 并运行离线回归测试。另一个具有
-   写权限的任务再次核对远程分支、作者/提交者和父提交，之后普通推送。
+4. 全新的 GitHub 托管 Windows 任务验证 bundle 并运行离线回归测试。另一个 Mac
+   SSH 发布任务再次核对远程分支、作者/提交者和父提交，之后普通推送。
    并发改动导致发布失败，不会强推；下一次同步重新准备候选版本。
    离线检查不能证明所有游戏状态或 Ebony 独有补丁都正常。
 
@@ -32,8 +33,9 @@ prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空�
 在获准的 Mac 账号下使用 GitHub 官方 Actions Runner。将
 `.github/scripts/runner-guard.sh` 安装到检出目录和 Runner 程序目录之外，并将
 `ACTIONS_RUNNER_HOOK_JOB_STARTED` 指向其绝对路径。检查脚本只接受本仓库
-`master` 上的 `sync-upstream.yml`、定时/手动事件，以及 `resolve_conflict`
-、`runner_smoke` 或 `deploy_ebony` 任务。不要在此 Runner 上启用外部 fork/PR 执行。
+`master` 上的 `sync-upstream.yml`、定时/手动事件，以及 `sync_dev`、`sync_master`、
+`resolve_conflict`、`publish_prod`、`runner_smoke` 或 `deploy_ebony` 任务。
+不要在此 Runner 上启用外部 fork/PR 执行。
 个人自托管 Runner 属于受信任机器，不是任意仓库代码的隔离沙箱；管理员须保护
 工作流修改权限。
 
@@ -47,12 +49,36 @@ prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空�
   `OAS_EBONY_HOSTKEY_ALIAS`、`OAS_EBONY_AUTOMATION`：主机连接与自动化目录，
   保存在 Runner 本机，不写入 GitHub。
 
+源分支更新及 prod 发布复用此 Mac 账号已有的 `~/.ssh/id_ed25519` GitHub 访问权限，不使用
+`GITHUB_TOKEN`，因此可以同步包含工作流变更的源提交。将 GitHub 官方发布的 SSH
+主机公钥存入 `$OAS_AUTOMATION_STATE/github-known-hosts`。只有 dev 可以用固定旧
+提交的 lease 强制对齐；master 和 prod 仍普通推送。密钥保留在 Mac，不复制到
+GitHub 托管任务，也不传给 Codex。
+
 用相同系统用户执行 `codex login`，通过 `codex login status` 确认 ChatGPT 登录。
 凭据保留在本机。在仓库 Settings → Actions → Runners 使用 GitHub 短期注册令牌
 注册 Runner；令牌、`.credentials`、`.runner`、Codex 日志和登录文件都不得提交。
 通过 GitHub 的 `svc.sh` 安装、启动当前 Mac 用户的后台服务。Mac 需要联网且不休眠。
 离线期间 GitHub 排队，超过 24 小时未执行会失败；下一次定时或手动同步可以重新
 尝试尚未开始的任务。
+
+## Mac 每日派发程序
+
+为登录代理 `com.jared.oas-sync-dispatch` 安装固定的私有
+`.github/scripts/daily_dispatch.py` 副本。每 60 秒唤醒，在 UTC 00:10–00:50 内按
+UTC 日期每天派发一次。使用 UTC，不随 Mac 时区或夏令时改变北京时间计划。
+合并、订阅 Codex、回归测试和发布仍由 GitHub 工作流负责。
+
+派发使用 GitHub 官方 CLI，必须以 `JarediKey` 登录，并具有请求此仓库 Actions
+工作流运行的权限。首次需要交互授权：
+`gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key`。
+凭据保留在 CLI 的常规凭据存储中；派发本身不调用模型或 OpenAI API Key。
+Mac 必须联网且不休眠；未登录时在本机报告阻塞。
+
+私有状态防止同一天重复派发。网络响应不确定时，下次先核对远程同步运行，再决定
+是否重试；冒烟任务不计入。`dispatched` 只表示 GitHub 已接受请求，不代表 prod
+或 Ebony 已更新。`--force` 用于操作员授权的窗口外请求。停用此登录代理可关闭
+本机时钟，GitHub 定时仍作为备用。
 
 ## 控制与诊断
 
@@ -71,6 +97,7 @@ prod 发布成功或 dev 已完整合入时，本机 Runner 会派发 Ebony 空�
 
 ## 验证
 
+执行 `python .github/scripts/test_daily_dispatch.py` 验证时钟、账号及派发去重；
 执行 `python .github/scripts/test_prod_sync.py`，使用隔离的真实 Git 仓库验证无变化、
 正常合并、冲突、Git 错误、脏目录/过期候选、无效修复、bundle 历史/身份和 Runner
 准入条件。使用手动冒烟模式验证 GitHub → Mac → 订阅 Codex 以及 Windows 回归环境。

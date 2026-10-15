@@ -2,9 +2,10 @@
 
 [简体中文](prod-sync.zh.md)
 
-`Sync Upstream Branches` lives on the default `master` branch. It runs daily at
-00:10 UTC (08:10 Asia/Shanghai) and supports manual dispatch. Scheduled start times
-can be delayed by GitHub. Source `runhey/dev` is mirrored exactly to `origin/dev`;
+`Sync Upstream Branches` lives on the default `master` branch. The Mac's daily
+dispatcher requests it at 00:10 UTC (08:10 Asia/Shanghai). GitHub's daily cron is
+retained as a fallback because its start can be delayed. Manual dispatch is also
+supported. Source `runhey/dev` is mirrored exactly to `origin/dev`;
 the workflow then attempts an ordinary merge into `origin/prod`. `master` is
 independently merged from `runhey/master`; its failure does not cancel prod work.
 After a successful prod publication, or when dev is already integrated, the local
@@ -29,7 +30,7 @@ branch for the runtime protocol.
    markers, handwritten-code whitespace and merge identity, then builds a Git bundle.
    Upstream-generated asset whitespace is reported but does not block publication.
 4. A fresh GitHub-hosted Windows job verifies the bundle and runs the offline
-   regression suite. A separate write-enabled job rechecks remote branch tips,
+   regression suite. A separate Mac SSH publication job rechecks remote branch tips,
    author/committer, and merge parents before a normal push. Concurrent changes
    cause a failed publication, not a force push; the next sync prepares anew.
    Offline checks do not prove every in-game state or Ebony-only patch works.
@@ -40,7 +41,8 @@ Use the official GitHub Actions Runner on the authorized Mac account. Install
 `.github/scripts/runner-guard.sh` outside its checkout/application directory and
 set `ACTIONS_RUNNER_HOOK_JOB_STARTED` to that absolute path. The hook accepts only
 this repository's `master` version of `sync-upstream.yml`, schedule/manual events,
-and the `resolve_conflict`, `runner_smoke` or `deploy_ebony` jobs. Do not enable fork/PR execution
+and the `sync_dev`, `sync_master`, `resolve_conflict`, `publish_prod`, `runner_smoke` or `deploy_ebony`
+jobs. Do not enable fork/PR execution
 on this runner. A personal self-hosted runner remains a trusted machine, not a
 sandbox for arbitrary repository code; administrators must protect workflow edits.
 
@@ -54,6 +56,13 @@ Set these host environment entries in the Runner's `.env` file:
   `OAS_EBONY_HOSTKEY_ALIAS`, `OAS_EBONY_AUTOMATION`: private host connection
   and automation-folder settings, stored on the Runner rather than in GitHub.
 
+Source branch updates and prod publication use this Mac account's existing `~/.ssh/id_ed25519` GitHub
+access, not `GITHUB_TOKEN`. This permits mirroring upstream workflow changes.
+Store GitHub's officially published SSH host keys in
+`$OAS_AUTOMATION_STATE/github-known-hosts`. Only dev may be force-aligned, with an
+exact expected-tip lease; master and prod use ordinary pushes. Keys stay on the
+Mac and are never copied to GitHub-hosted jobs or passed to Codex.
+
 Log in with `codex login` as the same OS user, then verify `codex login status`
 reports ChatGPT. Keep credentials on the host. Register the runner in repository
 Settings → Actions → Runners using GitHub's short-lived registration token; do not
@@ -61,6 +70,27 @@ commit tokens, `.credentials`, `.runner`, Codex logs, or login files. Install/st
 GitHub's `svc.sh` service for the logged-in Mac user. The Mac must remain awake and
 online. GitHub queues jobs while it is unavailable, but a queue older than 24 hours
 fails. The next scheduled/manual sync can retry an unstarted job.
+
+## Mac daily dispatcher
+
+Install a pinned private copy of `.github/scripts/daily_dispatch.py` for the
+`com.jared.oas-sync-dispatch` login agent. It wakes every 60 seconds and dispatches
+once per UTC date during 00:10–00:50. It uses UTC rather than the Mac timezone,
+so the Shanghai schedule does not drift with daylight saving changes. GitHub
+still owns merging, subscription Codex, regression checks and publication.
+
+The dispatcher uses the official GitHub CLI, logged in as `JarediKey` with
+permission to dispatch this repository's Actions workflow. An interactive
+`gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key`
+authorization is required once. Login credentials remain in the CLI's normal
+credential store. The dispatcher does not use a model or an OpenAI API key.
+The Mac must be awake and online; blocked authentication is reported locally.
+
+Private state deduplicates daily requests. After an uncertain network response,
+the next tick checks matching remote sync runs before retrying; smoke runs do not
+count. `dispatched` means GitHub accepted the request, not that prod or Ebony was
+updated. `--force` permits an operator-authorized request outside the daily window.
+Stop this launch agent to disable the local clock; GitHub cron remains a fallback.
 
 ## Controls and diagnostics
 
@@ -81,7 +111,8 @@ fails. The next scheduled/manual sync can retry an unstarted job.
 
 ## Verification
 
-Run `python .github/scripts/test_prod_sync.py` for isolated real-Git checks covering
+Run `python .github/scripts/test_daily_dispatch.py` for clock, identity and
+dispatch-deduplication checks. Run `python .github/scripts/test_prod_sync.py` for isolated real-Git checks covering
 no-op/clean/conflicting merges, errors, dirty/stale candidates, invalid resolutions,
 bundle ancestry/identity and runner admission. Use the manual smoke mode to verify
 GitHub → Mac → subscription Codex and the Windows validation environment together.

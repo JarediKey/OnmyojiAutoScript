@@ -1,4 +1,5 @@
 name: Sync Upstream Branches
+run-name: OAS ${{ github.event_name }} ${{ inputs.mode || 'sync' }}
 
 on:
   schedule:
@@ -34,35 +35,50 @@ env:
 jobs:
   sync_dev:
     if: github.repository == 'JarediKey/OnmyojiAutoScript' && github.ref == 'refs/heads/master' && inputs.mode != 'ai-smoke'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, oas-codex-subscription]
     timeout-minutes: 10
     permissions:
-      contents: write
-    steps:
-      - name: Sync dev exactly with upstream
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh repo sync "$GITHUB_REPOSITORY" --source "$UPSTREAM_REPOSITORY" --branch dev --force
-
-  sync_master:
-    needs: sync_dev
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: master
           fetch-depth: 0
+          persist-credentials: false
+      - name: Sync dev exactly with upstream
+        run: |
+          export GIT_SSH_COMMAND="ssh -i \"$HOME/.ssh/id_ed25519\" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=\"$OAS_AUTOMATION_STATE/github-known-hosts\""
+          git remote set-url --push origin git@github.com:JarediKey/OnmyojiAutoScript.git
+          git fetch origin dev
+          previous=$(git rev-parse origin/dev)
+          git fetch "https://github.com/${UPSTREAM_REPOSITORY}.git" refs/heads/dev
+          upstream=$(git rev-parse FETCH_HEAD)
+          if test "$previous" = "$upstream"; then exit 0; fi
+          git push --force-with-lease="refs/heads/dev:$previous" origin "$upstream:refs/heads/dev"
+
+  sync_master:
+    needs: sync_dev
+    runs-on: [self-hosted, oas-codex-subscription]
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
       - name: Merge upstream master
         run: |
+          export GIT_SSH_COMMAND="ssh -i \"$HOME/.ssh/id_ed25519\" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=\"$OAS_AUTOMATION_STATE/github-known-hosts\""
+          git remote set-url --push origin git@github.com:JarediKey/OnmyojiAutoScript.git
           git config user.name "$GIT_AUTHOR_NAME"
           git config user.email "$GIT_AUTHOR_EMAIL"
           git remote add upstream "https://github.com/${UPSTREAM_REPOSITORY}.git"
           git fetch upstream master
           if git merge-base --is-ancestor upstream/master HEAD; then exit 0; fi
           git merge --no-edit upstream/master
+          test "$(git show -s --format='%an <%ae>|%cn <%ce>')" = 'JarediKey <JarediKey@users.noreply.github.com>|JarediKey <JarediKey@users.noreply.github.com>'
           git push origin HEAD:master
 
   prepare_prod:
@@ -174,10 +190,10 @@ jobs:
   publish_prod:
     needs: [prepare_prod, validate_prod]
     if: always() && !cancelled() && needs.validate_prod.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, oas-codex-subscription]
     timeout-minutes: 10
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -189,6 +205,7 @@ jobs:
           ref: prod
           path: candidate
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: prod-candidate
@@ -198,10 +215,12 @@ jobs:
           PROD_SHA: ${{ needs.prepare_prod.outputs.base }}
           DEV_SHA: ${{ needs.prepare_prod.outputs.dev }}
         run: |
+          export GIT_SSH_COMMAND="ssh -i \"$HOME/.ssh/id_ed25519\" -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=\"$OAS_AUTOMATION_STATE/github-known-hosts\""
+          git -C candidate remote set-url --push origin git@github.com:JarediKey/OnmyojiAutoScript.git
           git -C candidate fetch origin prod dev
           test "$(git -C candidate rev-parse origin/prod)" = "$PROD_SHA"
           test "$(git -C candidate rev-parse origin/dev)" = "$DEV_SHA"
-          python control/.github/scripts/prod_sync.py inspect --repo candidate --base "$PROD_SHA" --dev "$DEV_SHA" --bundle bundle/candidate.bundle
+          "$OAS_PYTHON_BIN" control/.github/scripts/prod_sync.py inspect --repo candidate --base "$PROD_SHA" --dev "$DEV_SHA" --bundle bundle/candidate.bundle
           git -C candidate push origin HEAD:prod
           echo "Published validated dev $DEV_SHA into prod." >> "$GITHUB_STEP_SUMMARY"
 
