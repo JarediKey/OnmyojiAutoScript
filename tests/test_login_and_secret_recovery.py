@@ -45,7 +45,7 @@ class RecoveryTests(unittest.TestCase):
                                appear_then_click=Mock(return_value=True),
                                appear_then_click_multi_scale=Mock(side_effect=AssertionError))
         for name in ['READ_ALL_MAIL','MAIL_TOOLBAR','HARVEST_MAIL','HARVEST_MAIL_COPY',
-                     'HARVEST_MAIL_CONFIRM','HARVEST_MAIL_ALL','MAIL_RED_POINT']:
+                     'HARVEST_MAIL_CONFIRM','UI_CONFIRM','HARVEST_MAIL_ALL','MAIL_RED_POINT']:
             setattr(task, 'I_'+name, name)
         task.ui_click_until_disappear = Mock()
         task.I_LOGIN_RED_CLOSE = 'close'
