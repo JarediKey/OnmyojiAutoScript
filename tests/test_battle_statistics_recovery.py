@@ -85,7 +85,7 @@ def test_reward_overlay_is_closed_before_reward_completion(monkeypatch):
         C_STATISTICS_CLOSE='close-statistics', screenshot=None,
         appear_then_click=lambda *args, **kwargs: False)
     for name in ['WIN', 'GREED_GHOST', 'REWARD', 'REWARD_GOLD', 'REWARD_GOLD_SNAKE_SKIN',
-                 'OVER_GHOST', 'END_FIX_1', 'END_FIX_2']:
+                 'UI_GOTIT_SMALL', 'END_FIX_1', 'END_FIX_2']:
         setattr(owner, 'I_' + name, name)
 
     def screenshot():
