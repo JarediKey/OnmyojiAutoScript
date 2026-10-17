@@ -502,9 +502,9 @@ class ScriptTask(ExtendGreenMark, GameUi, SwitchSoul, DokanSceneDetector):
             self.screenshot()
             if self.appear(self.I_CHECK_MAIN):
                 break
-            if self.appear(self.I_RYOU_DOKAN_QUIT_BATTLE_ENSURE):
+            if self.appear(self.I_UI_CONFIRM_DIALOG):
                 # 借用下,猜测是一样的确定按钮,如果不一样,会卡住
-                self.ui_click_until_disappear(self.I_RYOU_DOKAN_QUIT_BATTLE_ENSURE, interval=2)
+                self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG, interval=2)
                 continue
             if self.appear(self.I_RYOU_DOKAN_DOKAN_QUIT):
                 self.click(self.I_RYOU_DOKAN_DOKAN_QUIT, interval=3)
@@ -689,8 +689,8 @@ class ScriptTask(ExtendGreenMark, GameUi, SwitchSoul, DokanSceneDetector):
                 sleep(3)
                 if find_challengeable():
                     logger.info("find challengeable dokan")
-                    self.ui_click(self.I_CENTER_CHALLENGE, self.I_CHALLENGE_ENSURE, interval=1)
-                    self.ui_click_until_disappear(self.I_CHALLENGE_ENSURE, interval=1)
+                    self.ui_click(self.I_CENTER_CHALLENGE, self.I_UI_CONFIRM_DIALOG, interval=1)
+                    self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG, interval=1)
                     # 更新可挑战次数
                     self.config.dokan.attack_count_config.del_attack_count(1, self.config.save)
                     # 恢复初始位置信息,防止下次使用出错
@@ -702,8 +702,8 @@ class ScriptTask(ExtendGreenMark, GameUi, SwitchSoul, DokanSceneDetector):
             # 恢复初始位置信息,防止下次使用出错
             restore_roi()
             logger.info("=========refresh dokan list=========")
-            self.ui_click(self.C_DOKAN_REFRESH, self.I_REFRESH_ENSURE, interval=1)
-            self.ui_click_until_disappear(self.I_REFRESH_ENSURE, interval=1)
+            self.ui_click(self.C_DOKAN_REFRESH, self.I_UI_CONFIRM_DIALOG, interval=1)
+            self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG, interval=1)
 
             logger.info("Refresh Done")
             num_fresh += 1
@@ -711,8 +711,8 @@ class ScriptTask(ExtendGreenMark, GameUi, SwitchSoul, DokanSceneDetector):
         # 刷新次数用完,仍未找到符合条件的道馆,选择当前列表(约4个)中系数最低的
         if find_challengeable(ignore_score=True):
             logger.warning("can't find challengeable dokan,select random one")
-            self.ui_click(self.I_CENTER_CHALLENGE, self.I_CHALLENGE_ENSURE, interval=1)
-            self.ui_click_until_disappear(self.I_CHALLENGE_ENSURE, interval=1)
+            self.ui_click(self.I_CENTER_CHALLENGE, self.I_UI_CONFIRM_DIALOG, interval=1)
+            self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG, interval=1)
             # 更新可挑战次数
             self.config.dokan.attack_count_config.del_attack_count(1, self.config.save)
             return True
@@ -855,8 +855,8 @@ class ScriptTask(ExtendGreenMark, GameUi, SwitchSoul, DokanSceneDetector):
             self.screenshot()
             if self.appear(self.I_RYOU_DOKAN_CENTER_TOP):
                 break
-            if self.appear(self.I_RYOU_DOKAN_QUIT_BATTLE_ENSURE):
-                self.ui_click_until_disappear(self.I_RYOU_DOKAN_QUIT_BATTLE_ENSURE)
+            if self.appear(self.I_UI_CONFIRM_DIALOG):
+                self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG)
                 break
             # 退出时,意外弹出"确认退出集结场景" 弹窗,导致卡住
             # 只能怀疑是上面两个appear的耗时 导致screenshot 过时导致错误点击
@@ -870,9 +870,9 @@ class ScriptTask(ExtendGreenMark, GameUi, SwitchSoul, DokanSceneDetector):
 
     def abandoned_toppa(self):
         if self.appear(self.I_DOKAN_ABANDONED_TOPPA):
-            self.ui_click(self.I_DOKAN_ABANDONED_TOPPA, stop=self.I_DOKAN_ABANDONED_TOPPA_ENSURE)
+            self.ui_click(self.I_DOKAN_ABANDONED_TOPPA, stop=self.I_UI_CONFIRM_DIALOG)
             # 点击确认按钮后,会出现突破排名弹窗,需要点击空白区域关闭
-            self.ui_click(self.I_DOKAN_ABANDONED_TOPPA_ENSURE, stop=self.I_RYOU_DOKAN_TOPPA_RANK)
+            self.ui_click(self.I_UI_CONFIRM_DIALOG, stop=self.I_RYOU_DOKAN_TOPPA_RANK)
             self.click_until_smt_disappear(self.C_DOKAN_TOPPA_RANK_CLOSE_AREA, stop=self.I_DOKAN_ABANDONED_TOPPA_TITLE,
                                            interval=2)
 

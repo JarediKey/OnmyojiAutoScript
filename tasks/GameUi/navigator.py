@@ -45,7 +45,6 @@ class GameUi(BaseTask, GameUiAssets):
         ActivityShikigamiAssets.I_SKIP_BUTTON,
         GlobalGameAssets.I_UI_CONFIRM_SAMLL,
         GlobalGameAssets.I_UI_CONFIRM,
-        ExplorationAssets.I_E_EXIT_CONFIRM,
         GameUiAssets.I_BACK_DAILY,
         GlobalGameAssets.I_UI_BACK_YELLOW,
         SixRealmsAssets.I_EXIT_SIXREALMS,

@@ -434,7 +434,7 @@ class ScriptTask(GeneralBattle, GeneralInvite, GeneralBuff, GeneralRoom, GameUi,
                 while 1:
                     self.screenshot()
                     # 处理御魂溢出
-                    if self.appear_then_click(self.I_OVER_GHOST):
+                    if self.appear_then_click(self.I_UI_GOTIT_SMALL):
                         continue
 
                     action_click = random.choice([self.C_REWARD_1, self.C_REWARD_2, self.C_REWARD_3])
@@ -450,7 +450,7 @@ class ScriptTask(GeneralBattle, GeneralInvite, GeneralBuff, GeneralRoom, GameUi,
                 while 1:
                     self.screenshot()
                     # 处理御魂溢出
-                    if self.appear_then_click(self.I_OVER_GHOST):
+                    if self.appear_then_click(self.I_UI_GOTIT_SMALL):
                         continue
 
                     action_click = random.choice([self.C_REWARD_1, self.C_REWARD_2, self.C_REWARD_3])

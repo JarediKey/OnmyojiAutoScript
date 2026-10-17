@@ -76,18 +76,18 @@ class ScriptTask(RightActivity, FloatParadeAssets, TalismanPassAssets):
             # 批量选择
             if self.appear_then_click(self.I_BATCH_SELECTION, interval=1.5):
                 continue
-            if self.appear_then_click(self.I_BATCH_SELECTION_CONFIRM, interval=0.8):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=0.8):
                 continue
 
             if self.appear(self.I_FP_GIFT_FLAG1) and self.appear_then_click(match_level[level1], interval=0.8):
                 logger.info(f'Select {level1} reward')
-                if self.appear_then_click(self.I_OVERFLOW_CONFIRME, interval=0.8):
+                if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=0.8):
                     pass
                 check_timer.reset()
                 continue
             if self.appear(self.I_FP_GIFT_FLAG2) and self.appear_then_click(match_level[level2], interval=0.8):
                 logger.info(f'Select {level2} reward')
-                if self.appear_then_click(self.I_OVERFLOW_CONFIRME, interval=0.8):
+                if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=0.8):
                     pass
                 check_timer.reset()
                 continue

@@ -2,6 +2,9 @@
 
 [简体中文](README.zh.md)
 
+Soul-capacity notices during purchases and soul collection are dismissed with
+the shared acknowledgement button before further purchase or return clicks.
+
 Product-list icons in Honor, Charisma, Bondlings, Friendship, Scales, Special,
 Medal, and Consignment use a 0.7 matching threshold (27 rules). Purchase
 confirmations and scroll-end markers retain their existing thresholds. The

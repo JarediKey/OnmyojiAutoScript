@@ -360,7 +360,7 @@ class LoginHandler(BaseTask, RestartAssets, GameUiAssets, GeneralBuffAssets):
             if self.appear_then_click(self.I_UI_AWARD, interval=0.2):
                 continue
             # 式神满级，是否提取物经验？确定
-            if self.appear_then_click(self.I_CONFIRM, interval=1):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=1):
                 continue
 
             if self.appear_then_click(self.I_DAILY, interval=1):

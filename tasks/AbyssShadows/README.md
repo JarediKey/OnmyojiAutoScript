@@ -2,6 +2,9 @@
 
 [简体中文](README.zh.md)
 
+Activity opening and the no-reward continuation dialog use shared confirmation
+recognition. See [Shared dialogs](../GlobalGame/README.md).
+
 The task supports ordered region/enemy targets, independent soul preloading,
 locked lineups, and natural/timed/damage-based battle objectives. It uses shared
 navigation and the account's global skin settings. Publication of the code does

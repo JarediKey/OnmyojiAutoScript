@@ -31,8 +31,6 @@ class WeeklyTriflesAssets:
 	# Image Rule Assets
 	# 进入普通召唤
 	I_BM_ENTER = RuleImage(roi_front=(437,600,62,68), roi_back=(437,600,62,68), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/broken_amulet/broken_amulet_bm_enter.png")
-	# 确定
-	I_BM_CONFIRM = RuleImage(roi_front=(418,620,173,59), roi_back=(418,620,173,59), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/broken_amulet/broken_amulet_bm_confirm.png")
 	# 再次召唤
 	I_BM_AGAIN = RuleImage(roi_front=(686,617,178,60), roi_back=(686,617,178,60), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/broken_amulet/broken_amulet_bm_again.png")
 	# 破碎符咒召唤次数选择标志
@@ -94,8 +92,6 @@ class WeeklyTriflesAssets:
 	I_WT_OPEN_FOLD_WINDOW = RuleImage(roi_front=(28,155,21,21), roi_back=(28,155,21,21), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/touch_fish/touch_fish_wt_open_fold_window.png")
 	# 已经打开的折叠窗口
 	I_WT_FOLD_WINDOW = RuleImage(roi_front=(261,155,21,21), roi_back=(261,155,21,21), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/touch_fish/touch_fish_wt_fold_window.png")
-	# 确认储存的按钮
-	I_WT_TF_CONFIRM = RuleImage(roi_front=(672,588,139,56), roi_back=(672,588,139,56), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/touch_fish/touch_fish_wt_tf_confirm.png")
 	# 储存成功的标志
 	I_WT_TF_SAVE_SUCCESS = RuleImage(roi_front=(942,243,62,25), roi_back=(871,212,219,70), threshold=0.8, method="Template matching", file="./tasks/WeeklyTrifles/touch_fish/touch_fish_wt_tf_save_success.png")
 	# 上周存储界面

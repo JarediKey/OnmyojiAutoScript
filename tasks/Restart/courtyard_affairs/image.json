@@ -54,15 +54,6 @@
     "description": "暂无可完成的任务"
   },
   {
-    "itemName": "confirm",
-    "imageName": "courtyard_affairs_confirm.png",
-    "roiFront": "674,391,131,63",
-    "roiBack": "400,199,485,320",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "description"
-  },
-  {
     "itemName": "skip",
     "imageName": "courtyard_affairs_skip.png",
     "roiFront": "1170,36,56,28",

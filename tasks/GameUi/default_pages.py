@@ -339,8 +339,7 @@ page_battle_result.add_enter_success_hooks(lambda _task: random_click())
 page_reward = Page(
     any_of(
         GeneralBattleAssets.I_REWARD,
-        GeneralBattleAssets.I_GB_SKIN_CONFIRM,
-        GeneralBattleAssets.I_OVER_GHOST,
+        GlobalGameAssets.I_UI_GOTIT_SMALL,
         GeneralBattleAssets.I_REWARD_STATISTICS,
         GeneralBattleAssets.I_REWARD_GOLD,
         GeneralBattleAssets.I_REWARD_EXP_SOUL_4,
@@ -363,7 +362,7 @@ def handle_battle_reward_page(task) -> bool:
     Returns:
         bool: 执行结果
     """
-    if task.appear_then_click(GeneralBattleAssets.I_OVER_GHOST, interval=0.8):
+    if task.appear_then_click(GlobalGameAssets.I_UI_GOTIT_SMALL, interval=0.8):
         return True
     return task.click(random_click(), interval=0.8)
 

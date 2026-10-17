@@ -189,15 +189,6 @@
     "description": "放弃突破"
   },
   {
-    "itemName": "dokan_abandoned_toppa_ensure",
-    "imageName": "res_ryou_dokan_abandoned_toppa_ensure.png",
-    "roiFront": "0,0,1280,720",
-    "roiBack": "0,0,1280,720",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "放弃突破 确认按钮"
-  },
-  {
     "itemName": "dokan_abandoned_toppa_title",
     "imageName": "res_ryou_dokan_abandoned_toppa_title.png",
     "roiFront": "1020,160,260,80",
@@ -313,24 +304,6 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "状态：道馆投票 继续突破"
-  },
-  {
-    "itemName": "ryou_dokan_quit_battle_ensure",
-    "imageName": "res_ryou_dokan_quit_battle_ensure.png",
-    "roiFront": "0,0,1280,720",
-    "roiBack": "0,0,1280,720",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "道馆战斗界面 点击退出按钮后 弹出的确认按钮"
-  },
-  {
-    "itemName": "ryou_dokan_exit_ensure",
-    "imageName": "res_ryou_dokan_exit_ensure.png",
-    "roiFront": "678,395,125,56",
-    "roiBack": "678,395,125,56",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "道馆退出确认"
   },
   {
     "itemName": "ryou_dokan_cheering_scores",
@@ -466,24 +439,6 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "查找道馆时,挑战按钮"
-  },
-  {
-    "itemName": "challenge_ensure",
-    "imageName": "res_ryou_dokan_challenge_ensure.png",
-    "roiFront": "0,0,1280,720",
-    "roiBack": "0,0,1280,720",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "查找道馆时,确认挑战按钮"
-  },
-  {
-    "itemName": "refresh_ensure",
-    "imageName": "res_ryou_dokan_refresh_ensure.png",
-    "roiFront": "0,0,1280,720",
-    "roiBack": "0,0,1280,720",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "查找道馆时,确认刷新道馆列表按钮"
   },
   {
     "itemName": "rightpad_point_bounty",

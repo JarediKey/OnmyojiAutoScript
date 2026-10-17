@@ -16,8 +16,6 @@ class GlobalGameAssets:
 
 
 	# Image Rule Assets
-	# 长一点的确认（旧）
-	I_UI_CONFIRM_OLD = RuleImage(roi_front=(685,376,179,66), roi_back=(663,334,232,193), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_old.png")
 	# 长一点的确认
 	I_UI_CONFIRM = RuleImage(roi_front=(664,407,179,66), roi_back=(643,345,231,320), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm.png")
 	# 长一点的取消（旧）
@@ -48,6 +46,12 @@ class GlobalGameAssets:
 	I_UI_GOTIT_SMALL = RuleImage(roi_front=(678,396,127,60), roi_back=(622,371,242,100), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_gotit_small.png")
 	# 圆形返回按钮(移植自mine)
 	I_UI_BACK_CIRCLE = RuleImage(roi_front=(24,21,36,39), roi_back=(0,0,95,101), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_back_circle.png")
+	# 小尺寸确定
+	I_UI_CONFIRM_SMALL = RuleImage(roi_front=(672,513,131,60), roi_back=(350,300,600,400), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_small.png")
+	# 普通矩形确定
+	I_UI_CONFIRM_PLAIN = RuleImage(roi_front=(419,617,174,61), roi_back=(350,300,600,400), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_plain.png")
+	# 蓝色矩形确定
+	I_UI_CONFIRM_BLUE = RuleImage(roi_front=(377,630,206,62), roi_back=(350,300,600,400), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_blue.png")
 
 
 	# Image Rule Assets

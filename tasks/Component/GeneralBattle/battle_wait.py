@@ -1183,7 +1183,7 @@ class BattleWait(BaseTask, GeneralBattleAssets):
         # 比如 御魂溢出
 
         # 结算的时候御魂溢出提示，点击【知道了】
-        self.appear_then_click(self.I_OVER_GHOST)
+        self.appear_then_click(self.I_UI_GOTIT_SMALL)
 
         return HookSignal.CONTINUE
 
@@ -1216,12 +1216,12 @@ class BattleWait(BaseTask, GeneralBattleAssets):
                 continue
 
             # 发现御魂溢出，直接跳出，在interupt里面处理
-            if self.appear(self.I_OVER_GHOST):
+            if self.appear(self.I_UI_GOTIT_SMALL):
                 return HookSignal.CONTINUE
 
             # 结算的时候御魂溢出提示，点击【知道了】
-            if self.appear(self.I_OVER_GHOST):
-                self.click(self.I_OVER_GHOST)
+            if self.appear(self.I_UI_GOTIT_SMALL):
+                self.click(self.I_UI_GOTIT_SMALL)
 
             # 不小心点到了具体的奖励，他会弹出这个物品的详细描述 里面必定包含有“获取途径”
             if self.appear(self.I_END_FIX_1) or self.appear(self.I_END_FIX_2):

@@ -192,9 +192,9 @@ class ScriptTask(GameUi, GeneralBattle, DemonEncounterAssets, SwitchSoul):
 
                 logger.info('Boss battle people is not full')
 
-                if self.appear(self.I_BOSS_CONFIRM):
+                if self.appear(self.I_UI_CONFIRM_DIALOG):
                     self.ui_click(self.I_BOSS_NO_SELECT, self.I_BOSS_SELECTED)
-                    self.ui_click(self.I_BOSS_CONFIRM, self.I_BOSS_GATHER)
+                    self.ui_click(self.I_UI_CONFIRM_DIALOG, self.I_BOSS_GATHER)
                     break
                 if self.appear(self.I_BOSS_GATHER):
                     break

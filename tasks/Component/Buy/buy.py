@@ -140,6 +140,8 @@ class Buy(BaseTask, BuyAssets):
         # 购买确认
         while 1:
             self.screenshot()
+            if self.appear_then_click(self.I_UI_GOTIT_SMALL, interval=1):
+                continue
 
             if self.ui_reward_appear_click():
                 time.sleep(0.5)

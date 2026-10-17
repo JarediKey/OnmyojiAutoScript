@@ -66,7 +66,7 @@ class ScriptTask(GameUi, TalismanPassAssets):
             self.screenshot()
             if self.appear_then_click(match_level[level], interval=0.8):
                 logger.info(f'Select {level} reward')
-                if self.appear_then_click(self.I_OVERFLOW_CONFIRME):
+                if self.appear_then_click(self.I_UI_CONFIRM_DIALOG):
                     pass
                 check_timer.reset()
                 continue

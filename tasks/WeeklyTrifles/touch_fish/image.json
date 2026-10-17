@@ -63,15 +63,6 @@
     "description": "已经打开的折叠窗口"
   },
   {
-    "itemName": "wt_tf_confirm",
-    "imageName": "touch_fish_wt_tf_confirm.png",
-    "roiFront": "672,588,139,56",
-    "roiBack": "672,588,139,56",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "确认储存的按钮"
-  },
-  {
     "itemName": "wt_tf_save_success",
     "imageName": "touch_fish_wt_tf_save_success.png",
     "roiFront": "942,243,62,25",

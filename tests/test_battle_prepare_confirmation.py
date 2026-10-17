@@ -32,7 +32,7 @@ class PreparationTests(unittest.TestCase):
                                       preset_group=3, preset_team=3, green_enable=False,
                                       green_mark='left', random_click_swipt_enable=False)
         t = self.task = SimpleNamespace(current_count=1)
-        for name in ('I_DISABLE_7DAYS_DIFF_SOUL','I_CONFIRM_CLOSE_DIFF_SOUL',
+        for name in ('I_DISABLE_7DAYS_DIFF_SOUL','I_UI_CONFIRM_DIALOG',
                      'I_PREPARE_HIGHLIGHT','I_WIN','I_DE_WIN','I_FALSE','I_REWARD','I_REWARD_GOLD'):
             setattr(t,name,name)
         t.screenshot = self.screenshot

@@ -153,15 +153,6 @@
     "description": "更换领域"
   },
   {
-    "itemName": "ensure_button",
-    "imageName": "res_ensure_button.png",
-    "roiFront": "672,405,169,55",
-    "roiBack": "672,405,169,55",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "description"
-  },
-  {
     "itemName": "is_attack",
     "imageName": "res_is_attack.png",
     "roiFront": "576,54,91,45",

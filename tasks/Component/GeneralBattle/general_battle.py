@@ -61,7 +61,7 @@ class GeneralBattle(BattleWait, GeneralBuff):
                 return True
             if self.appear_then_click(self.I_DISABLE_7DAYS_DIFF_SOUL, interval=0.6):
                 continue
-            if self.appear_then_click(self.I_CONFIRM_CLOSE_DIFF_SOUL, interval=0.6):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=0.6):
                 continue
             if self.is_in_prepare(False):
                 locked = getattr(config, 'lock_team_enable', False)
@@ -253,6 +253,8 @@ class GeneralBattle(BattleWait, GeneralBuff):
         logger.info("Get reward")
         while 1:
             self.screenshot()
+            if self.appear_then_click(self.I_UI_GOTIT_SMALL, interval=1.5):
+                continue
             # 如果出现领奖励
             action_click = random.choice([self.C_REWARD_1, self.C_REWARD_2, self.C_REWARD_3])
             if (self.appear_then_click(self.I_REWARD, action=action_click, interval=1.5) or

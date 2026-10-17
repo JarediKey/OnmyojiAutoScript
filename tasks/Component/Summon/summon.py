@@ -116,11 +116,8 @@ class Summon(BaseTask, SummonAssets):
             time.sleep(0.5)
             while 1:
                 self.screenshot()
-                if self.appear(self.I_SM_CONFIRM, interval=0.6):
-                    self.ui_click_until_disappear(self.I_SM_CONFIRM)
-                    break
-                if self.appear(self.I_SM_CONFIRM_2, interval=0.6):
-                    self.ui_click_until_disappear(self.I_SM_CONFIRM_2)
+                if self.appear(self.I_UI_CONFIRM_DIALOG, interval=0.6):
+                    self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG)
                     break
                 if self.appear(self.I_ONE_TICKET, interval=1):
                     # 某些时候会点击到 “语言召唤”

@@ -476,7 +476,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
                 if self.click(click_area, interval=1.5):
                     click_times += 1
                     continue
-                if self.appear_then_click(self.I_ENSURE_BUTTON, interval=1):
+                if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=1):
                     continue
 
             # 点击前往按钮,知道该按钮消失或出现"挑战"字样
@@ -487,8 +487,8 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
                     raise AbyssShadowsFinished
                 if self.appear(self.I_ABYSS_FIRE):
                     break
-                if self.appear(self.I_ENSURE_BUTTON):
-                    self.click(self.I_ENSURE_BUTTON, interval=1)
+                if self.appear(self.I_UI_CONFIRM_DIALOG):
+                    self.click(self.I_UI_CONFIRM_DIALOG, interval=1)
                     continue
                 if self.appear(self.I_ABYSS_GOTO_ENEMY):
                     self.click(self.I_ABYSS_GOTO_ENEMY, interval=1)
@@ -518,7 +518,7 @@ class ScriptTask(GeneralBattle, GameUi, SwitchSoul, AbyssShadowsAssets):
             if self.appear_then_click(self.I_ABYSS_FIRE, interval=1):
                 continue
             # 挑战敌人后，如果是奖励次数上限，会出现确认框
-            if self.appear_then_click(self.I_ENSURE_BUTTON, interval=1):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=1):
                 continue
             #
 

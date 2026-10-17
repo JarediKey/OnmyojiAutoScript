@@ -416,7 +416,7 @@ class BaseExploration(GameUi, GeneralBattle, GeneralRoom, GeneralInvite, Replace
                 self.click(self.I_UI_BACK_BLUE)
                 continue
 
-            if self.appear_then_click(self.I_E_EXIT_CONFIRM, interval=0.8):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=0.8):
                 continue
             if self.appear_then_click(self.I_BACK_YOLLOW, interval=3.5):
                 continue
@@ -426,7 +426,7 @@ class BaseExploration(GameUi, GeneralBattle, GeneralRoom, GeneralInvite, Replace
 
     def _hook_special_reward(self) -> bool:
         if self.appear(self.I_STATISTICS) and not self.appear(self.I_REWARD) and not self.appear(self.I_WIN):
-            if self.appear_then_click(self.I_CONFIRM_CLOSE_DIFF_SOUL):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG):
                 return True
             self.click(self.C_RANDOM_CLICK, interval=1.5)
         return False

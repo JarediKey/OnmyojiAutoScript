@@ -2,6 +2,9 @@
 
 [简体中文](README.zh.md)
 
+Exit, challenge, refresh and abandon confirmations use the
+[shared dialog rules](../GlobalGame/README.md); Create keeps its distinct label.
+
 Dokan uses the existing shared scheduler after the day's available rounds
 finish or the day is skipped. For `scheduler.server_update` values other than
 `09:00:00`, it schedules that clock `scheduler.delay_date` calendar days later,

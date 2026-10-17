@@ -86,8 +86,6 @@ class RestartAssets:
 	# 暂无可完成的任务
 	I_NO_TASKS = RuleImage(roi_front=(538,225,205,32), roi_back=(492,214,291,51), threshold=0.8, method="Template matching", file="./tasks/Restart/courtyard_affairs/courtyard_affairs_no_tasks.png")
 	# description
-	I_CONFIRM = RuleImage(roi_front=(674,391,131,63), roi_back=(400,199,485,320), threshold=0.8, method="Template matching", file="./tasks/Restart/courtyard_affairs/courtyard_affairs_confirm.png")
-	# description
 	I_SKIP = RuleImage(roi_front=(1170,36,56,28), roi_back=(1144,0,109,99), threshold=0.8, method="Template matching", file="./tasks/Restart/courtyard_affairs/courtyard_affairs_skip.png")
 
 

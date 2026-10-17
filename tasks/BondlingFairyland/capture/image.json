@@ -90,15 +90,6 @@
     "description": "禁用优先连接羁绊式神"
   },
   {
-    "itemName": "caption_ensure",
-    "imageName": "capture_caption_ensure.png",
-    "roiFront": "665,610,129,56",
-    "roiBack": "652,601,153,77",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "结契设置确定"
-  },
-  {
     "itemName": "click_caption",
     "imageName": "capture_click_caption.png",
     "roiFront": "68,414,54,42",

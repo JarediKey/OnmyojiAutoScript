@@ -111,7 +111,7 @@ class ScriptTask(GameUi, WeeklyTriflesAssets):
                     self.appear_then_click(self.I_WT_SAVE_ALL)
                     not_save_flag = False
                     continue
-                if self.appear_then_click(self.I_WT_TF_CONFIRM):
+                if self.appear_then_click(self.I_UI_CONFIRM_DIALOG):
                     continue
                 if self.appear(self.I_WT_TF_SAVE_SUCCESS) and not self.appear(
                     self.I_WT_SAVE_ALL
@@ -309,13 +309,13 @@ class ScriptTask(GameUi, WeeklyTriflesAssets):
         """
 
         def exit_amulet():
-            self.wait_until_appear(self.I_BM_CONFIRM, wait_time=3)
+            self.wait_until_appear(self.I_UI_CONFIRM_DIALOG, wait_time=3)
             while 1:
                 self.screenshot()
-                if not self.appear(self.I_BM_CONFIRM):
+                if not self.appear(self.I_UI_CONFIRM_DIALOG):
                     break
                 else:
-                    self.appear_then_click(self.I_BM_CONFIRM, interval=1)
+                    self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=1)
             logger.info('Exit broken amulet')
 
         logger.hr('Broken amulet')

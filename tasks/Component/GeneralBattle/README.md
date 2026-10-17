@@ -2,6 +2,10 @@
 
 [简体中文](README.zh.md)
 
+Plain soul-difference confirmations use
+[shared dialog rules](../../GlobalGame/README.md). Both settlement implementations
+acknowledge soul-capacity notices with the shared Got It button before reward clicks.
+
 Battle wait uses the upstream typed runtime: `battle_wait_strategy` selects hooks,
 and `battle_wait_options` supplies event option dataclasses. Options combine typed
 defaults, decorator overrides, and active context overrides in that order. An

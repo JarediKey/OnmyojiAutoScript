@@ -63,15 +63,6 @@
     "description": "集结挑战"
   },
   {
-    "itemName": "boss_confirm",
-    "imageName": "boss_boss_confirm.png",
-    "roiFront": "671,400,175,61",
-    "roiBack": "671,400,175,61",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "description"
-  },
-  {
     "itemName": "boss_selected",
     "imageName": "boss_boss_selected.png",
     "roiFront": "543,339,37,41",

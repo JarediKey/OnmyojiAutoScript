@@ -2,6 +2,9 @@
 
 [English](README.md)
 
+退出、挑战、刷新和放弃的确认使用[通用弹窗规则](../GlobalGame/README.zh.md)，
+“建立”保留独立文字识别。
+
 当天可用的轮次结束或跳过当天时，道馆使用原有的通用调度器。
 `scheduler.server_update` 不为 `09:00:00` 时，任务排到 `scheduler.delay_date`
 个自然日后的该时间，再加上零至 `scheduler.float_time` 的一次随机延迟。

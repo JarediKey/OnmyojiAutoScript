@@ -99,15 +99,6 @@
     "description": "批量选择"
   },
   {
-    "itemName": "batch_selection_confirm",
-    "imageName": "fp_batch_selection_confirm.png",
-    "roiFront": "676,392,130,63",
-    "roiBack": "676,392,130,63",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "批量选择确认"
-  },
-  {
     "itemName": "fp_gift_close",
     "imageName": "fp_fp_gift_close.png",
     "roiFront": "1056,96,36,38",

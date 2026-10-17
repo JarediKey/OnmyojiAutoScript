@@ -21,18 +21,20 @@ from module.atom.swipe import RuleSwipe
 from module.base.timer import Timer
 from module.config.config import Config
 from module.device.device import Device
-from module.exception import ScriptError
+from module.exception import ScriptError, GameStuckError
 from module.logger import logger
 from module.ocr.base_ocr import OcrMode
 
 from tasks.Component.Costume.costume_base import CostumeBase
 from tasks.Component.config_base import Time
 from tasks.GlobalGame.assets import GlobalGameAssets
+from tasks.GlobalGame.confirmation import DialogConfirmation
 from tasks.GlobalGame.config_emergency import FriendInvitation
 
 
 
 class BaseTask(GlobalGameAssets, CostumeBase):
+    I_UI_CONFIRM_DIALOG = DialogConfirmation()
     config: Config = None
     device: Device = None
 
@@ -157,10 +159,8 @@ class BaseTask(GlobalGameAssets, CostumeBase):
         #     logger.warning(f"Network abnormal")
         #     raise GameStuckError
         #
-        # # 判断网络错误
-        # if self.appear(self.I_NETWORK_ERROR):
-        #     logger.warning(f"Network error")
-        #     raise GameStuckError
+        if self.appear(self.I_NETWORK_ERROR):
+            raise GameStuckError('Game server disconnected; restart required')
 
         return self.device.image
 

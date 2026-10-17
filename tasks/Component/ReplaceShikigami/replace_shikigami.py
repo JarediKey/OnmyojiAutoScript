@@ -113,7 +113,7 @@ class ReplaceShikigami(BaseTask, ReplaceShikigamiAssets):
             if not self.appear(stop_image):
                 break
 
-            if self.appear_then_click(self.I_U_CONFIRM_SMALL, interval=0.5):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=0.5):
                 clicked = False  # 点击了确认, 恢复选式神的操作
                 continue
 
@@ -130,7 +130,7 @@ class ReplaceShikigami(BaseTask, ReplaceShikigamiAssets):
                 clicked = True
                 continue
             if self.appear_then_click(self.I_U_CIRCLE_ALTERNATE, interval=2.5):
-                self.appear_then_click(self.I_U_CONFIRM_ALTERNATE, interval=1.5)
+                self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=1.5)
                 continue
         logger.info('Set shikigami: %d' % shikigami_order)
 

@@ -1,14 +1,5 @@
 [
   {
-    "itemName": "ui_confirm_old",
-    "imageName": "ui_ui_confirm_old.png",
-    "roiFront": "685,376,179,66",
-    "roiBack": "663,334,232,193",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "长一点的确认（旧）"
-  },
-  {
     "itemName": "ui_confirm",
     "imageName": "ui_ui_confirm.png",
     "roiFront": "664,407,179,66",
@@ -142,5 +133,32 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "圆形返回按钮(移植自mine)"
+  },
+  {
+    "itemName": "ui_confirm_small",
+    "imageName": "ui_ui_confirm_small.png",
+    "roiFront": "672,513,131,60",
+    "roiBack": "350,300,600,400",
+    "method": "Template matching",
+    "threshold": 0.8,
+    "description": "小尺寸确定"
+  },
+  {
+    "itemName": "ui_confirm_plain",
+    "imageName": "ui_ui_confirm_plain.png",
+    "roiFront": "419,617,174,61",
+    "roiBack": "350,300,600,400",
+    "method": "Template matching",
+    "threshold": 0.8,
+    "description": "普通矩形确定"
+  },
+  {
+    "itemName": "ui_confirm_blue",
+    "imageName": "ui_ui_confirm_blue.png",
+    "roiFront": "377,630,206,62",
+    "roiBack": "350,300,600,400",
+    "method": "Template matching",
+    "threshold": 0.8,
+    "description": "蓝色矩形确定"
   }
 ]

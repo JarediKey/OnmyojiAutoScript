@@ -193,7 +193,7 @@ class ExpTest(RightActivity, FastDevice, RestartAssets, ExplorationAssets):
                 continue
             if self.appear_then_click(self.I_UI_CONFIRM_SAMLL, interval=1):
                 continue
-            if self.appear_then_click(self.I_E_EXIT_CONFIRM, interval=1):
+            if self.appear_then_click(self.I_UI_CONFIRM_DIALOG, interval=1):
                 continue
             if self.appear_then_click(self.I_UI_BACK_BLUE, interval=1.5):
                 continue

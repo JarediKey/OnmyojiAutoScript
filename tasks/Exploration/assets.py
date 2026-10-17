@@ -61,17 +61,6 @@ class ExplorationAssets:
 	C_CLICK_PALY_TITLE = RuleClick(roi_front=(1178,172,77,28), roi_back=(1178,172,77,28), name="click_paly_title")
 
 
-	# Long Click Rule Assets
-	# description
-	L_ROTATE_1 = RuleLongClick(roi_front=(516,582,22,21), roi_back=(516,582,22,21), duration=1500, name="rotate_1")
-	# description
-	L_ROTATE_2 = RuleLongClick(roi_front=(650,587,21,21), roi_back=(650,587,21,21), duration=1500, name="rotate_2")
-	# description
-	L_ROTATE_3 = RuleLongClick(roi_front=(785,587,21,21), roi_back=(785,587,21,21), duration=1500, name="rotate_3")
-	# description
-	L_ROTATE_4 = RuleLongClick(roi_front=(921,590,21,21), roi_back=(921,590,21,21), duration=1500, name="rotate_4")
-
-
 	# Image Rule Assets
 	# 进入难度选择界面
 	I_E_EXPLORATION_OPEN = RuleImage(roi_front=(1077,248,37,80), roi_back=(1072,242,47,92), threshold=0.8, method="Template matching", file="./tasks/Exploration/res/res_e_exploration_open.png")
@@ -107,8 +96,6 @@ class ExplorationAssets:
 	I_BATTLE_START = RuleImage(roi_front=(555,688,39,27.5), roi_back=(221,677,561,41), threshold=0.8, method="Template matching", file="./tasks/Exploration/res/res_battle_start.png")
 	# description
 	I_RED_CLOSE = RuleImage(roi_front=(1027,129,41,42), roi_back=(1021,121,54,55), threshold=0.6, method="Template matching", file="./tasks/Exploration/res/res_red_close.png")
-	# description
-	I_E_EXIT_CONFIRM = RuleImage(roi_front=(694,380,163,49), roi_back=(694,380,163,49), threshold=0.8, method="Template matching", file="./tasks/Exploration/res/res_e_exit_confirm.png")
 	# 宝箱
 	I_TREASURE_BOX_CLICK = RuleImage(roi_front=(31,543,27,24), roi_back=(11,520,378,65), threshold=0.65, method="Template matching", file="./tasks/Exploration/res/res_treasure_box_click.png")
 	# 困28滚动到最后
@@ -170,3 +157,14 @@ class ExplorationAssets:
 	I_UP_COIN = RuleImage(roi_front=(330,529,74,74), roi_back=(1,317,1278,316), threshold=0.8, method="Sift Flann", file="./tasks/Exploration/highlight/highlight_up_coin.png")
 	# 达摩怪
 	I_UP_DARUMA = RuleImage(roi_front=(1146,510,80,80), roi_back=(1,265,1278,369), threshold=0.8, method="Sift Flann", file="./tasks/Exploration/highlight/highlight_up_daruma.png")
+
+
+	# Long Click Rule Assets
+	# description
+	L_ROTATE_1 = RuleLongClick(roi_front=(516,582,22,21), roi_back=(516,582,22,21), duration=1500, name="rotate_1")
+	# description
+	L_ROTATE_2 = RuleLongClick(roi_front=(650,587,21,21), roi_back=(650,587,21,21), duration=1500, name="rotate_2")
+	# description
+	L_ROTATE_3 = RuleLongClick(roi_front=(785,587,21,21), roi_back=(785,587,21,21), duration=1500, name="rotate_3")
+	# description
+	L_ROTATE_4 = RuleLongClick(roi_front=(921,590,21,21), roi_back=(921,590,21,21), duration=1500, name="rotate_4")

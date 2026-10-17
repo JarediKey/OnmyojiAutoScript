@@ -306,15 +306,6 @@
     "description": "战斗状态信息(移植自mine)"
   },
   {
-    "itemName": "gb_skin_confirm",
-    "imageName": "gb_gb_skin_confirm.png",
-    "roiFront": "594,447,90,55",
-    "roiBack": "594,447,90,55",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "皮肤确认弹窗(移植自mine)"
-  },
-  {
     "itemName": "gb_check_team_exit",
     "imageName": "gb_gb_check_team_exit.png",
     "roiFront": "507,288,270,54",
@@ -322,14 +313,5 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "队伍退出确认弹窗(移植自mine)"
-  },
-  {
-    "itemName": "over_ghost",
-    "imageName": "gb_over_ghost.png",
-    "roiFront": "697,409,89,32",
-    "roiBack": "697,409,89,32",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "契灵结算弹窗(移植自mine)"
   }
 ]

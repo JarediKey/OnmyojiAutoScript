@@ -540,7 +540,7 @@ class ScriptTask(GameUi, GeneralInvite, GeneralRoom, BondlingBattle, SwitchSoul,
         if mode == BondlingMode.MODE1:
             return None
         logger.info(f'Capture setting mode: {mode}')
-        self.ui_click(self.I_CLICK_CAPTION, self.I_CAPTION_ENSURE, interval=1)  # 打开结契设置
+        self.ui_click(self.I_CLICK_CAPTION, self.I_UI_CONFIRM_DIALOG, interval=1)  # 打开结契设置
         self.ui_click(self.I_C_AUTO_FALSE, self.I_C_AUTO_TRUE, interval=1)  # 自动结契
         self.ui_click(self.I_C_MINIMAL_MODE_DISABLE, self.I_C_MINIMAL_MODE_ENABLE, interval=0.8)  # 极简模式
 
@@ -568,7 +568,7 @@ class ScriptTask(GameUi, GeneralInvite, GeneralRoom, BondlingBattle, SwitchSoul,
         if target_first is not None:  # 是否使用羁绊式神
             self.ui_click_until_disappear(target_first, interval=1)
         # 点击确定退出
-        self.ui_click_until_disappear(self.I_CAPTION_ENSURE, interval=1)
+        self.ui_click_until_disappear(self.I_UI_CONFIRM_DIALOG, interval=1)
         return None
 
     def enter_shikigami_records(self) -> None:
