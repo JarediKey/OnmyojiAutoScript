@@ -270,15 +270,6 @@
     "description": "开启按钮"
   },
   {
-    "itemName": "start_ensure",
-    "imageName": "res_start_ensure.png",
-    "roiFront": "660,390,190,80",
-    "roiBack": "660,390,190,80",
-    "method": "Template matching",
-    "threshold": 0.8,
-    "description": "开启确认按钮"
-  },
-  {
     "itemName": "abyss_enemy_fire",
     "imageName": "res_abyss_enemy_fire.png",
     "roiFront": "1100,560,130,130",

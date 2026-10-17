@@ -68,6 +68,10 @@ startup, not per region or battle. Lock mode does not disable this preload.
 
 ## Page transitions and latency
 
+- When `try_start_abyss_shadows` is enabled, activity startup uses the shared
+  `I_UI_CONFIRM` rule to recognize and click the confirmation after selecting
+  the configured difficulty and clicking Start. It does not use a separate
+  Abyss confirmation template or depend on unknown-page recovery.
 - The first three difficulty menu rows use separate search regions: Easy
   `(620,380,90,64)`, Normal `(620,450,90,64)`, Hard `(620,520,90,64)`.
   They exclude the current-difficulty display below the dropdown. Existing
