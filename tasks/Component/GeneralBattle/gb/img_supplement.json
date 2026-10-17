@@ -34,5 +34,14 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "禁用御魂不一致提示7天"
+  },
+  {
+    "itemName": "battle_statistics_page",
+    "imageName": "gb_battle_statistics_page.png",
+    "roiFront": "515,43,255,50",
+    "roiBack": "470,20,355,95",
+    "method": "Template matching",
+    "threshold": 0.85,
+    "description": "Battle statistics page title"
   }
 ]

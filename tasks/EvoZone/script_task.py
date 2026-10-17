@@ -281,6 +281,8 @@ class ScriptTask(GeneralBattle, GeneralInvite, GeneralBuff, GeneralRoom, GameUi,
 
         while 1:
             self.screenshot()
+            if self.close_battle_statistics():
+                continue
 
             # 检查猫咪奖励
             if self.appear_then_click(self.I_PET_PRESENT, action=self.C_WIN_3, interval=1):

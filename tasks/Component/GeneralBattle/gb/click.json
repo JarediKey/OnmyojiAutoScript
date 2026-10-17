@@ -136,5 +136,23 @@
     "roiFront": "462,599,492,78",
     "roiBack": "462,599,492,78",
     "description": "Safe reward-page click: bottom"
+  },
+  {
+    "itemName": "end_statistics_bottom_left",
+    "roiFront": "20,610,120,100",
+    "roiBack": "20,610,120,100",
+    "description": "Bottom-left statistics entry on victory and reward pages"
+  },
+  {
+    "itemName": "statistics_close",
+    "roiFront": "560,692,160,24",
+    "roiBack": "560,692,160,24",
+    "description": "Continue below the battle statistics table"
+  },
+  {
+    "itemName": "overflow_ghost",
+    "roiFront": "456,381,160,82",
+    "roiBack": "456,381,160,82",
+    "description": "Existing soul overflow cleanup action"
   }
 ]

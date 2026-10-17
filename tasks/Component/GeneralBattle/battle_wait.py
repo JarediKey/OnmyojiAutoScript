@@ -89,6 +89,7 @@ from cached_property import cached_property
 
 from module.logger import logger
 from module.base.timer import Timer
+from module.exception import GameStuckError
 from module.atom.click import RuleClickExclude
 from module.atom.image import RuleImage
 from module.base.utils import get_color, color_similar
@@ -394,7 +395,8 @@ class PerBattleSuccess:
             name: str = 'success_exclude_click'
     ) -> RuleClickExclude:
         # Statistics must stay excluded even when a task overrides reward areas.
-        protected = ['C_END_STATISTICS_TOP_LEFT', 'C_END_SOUL_DETAILS']
+        protected = ['C_END_STATISTICS_TOP_LEFT', 'C_END_STATISTICS_BOTTOM_LEFT',
+                     'C_END_SOUL_DETAILS']
         inputs = []
         for area in dict.fromkeys(protected + list(areas or [])):
             click = getattr(onwer, area, None)
@@ -1114,6 +1116,22 @@ class BattleWait(BaseTask, GeneralBattleAssets):
     # ------------------------------------------------------------------------------------------------------------------
     # build in
     # ------------------------------------------------------------------------------------------------------------------
+    def close_battle_statistics(self) -> bool:
+        """Close a verified statistics page without changing the battle result."""
+        if not self.appear(self.I_BATTLE_STATISTICS_PAGE):
+            return False
+        logger.warning('Battle statistics page interrupted battle flow; closing it')
+        for attempt in range(3):
+            self.click(self.C_STATISTICS_CLOSE)
+            timer = Timer(2).start()
+            while not timer.reached():
+                self.screenshot()
+                if not self.appear(self.I_BATTLE_STATISTICS_PAGE):
+                    logger.info('Battle statistics page closed')
+                    return True
+                time.sleep(0.2)
+        raise GameStuckError('Battle statistics page did not close after three attempts')
+
     def _bw_setup_default(self, pub: PublicContext, pri: PrivateContext) -> HookSignal:
         self.C_REWARD_1.name = 'C_REWARD'
         self.C_REWARD_2.name = 'C_REWARD'
@@ -1194,6 +1212,8 @@ class BattleWait(BaseTask, GeneralBattleAssets):
         timer = Timer(20).start()
         while 1:
             self.screenshot()
+            if self.close_battle_statistics():
+                continue
 
             # 发现御魂溢出，直接跳出，在interupt里面处理
             if self.appear(self.I_OVER_GHOST):
@@ -1553,6 +1573,8 @@ class BattleWait(BaseTask, GeneralBattleAssets):
         timer = Timer(20).start()
         while 1:
             self.screenshot()
+            if self.close_battle_statistics():
+                continue
 
             _appear_ghost, _appear_reward, _appear_gold, _appear_skin = (
                 self.appear(self.I_GREED_GHOST, threshold=0.6),
@@ -1577,13 +1599,12 @@ class BattleWait(BaseTask, GeneralBattleAssets):
 
     @cached_property
     def exclude_click_activity(self, areas: list[str] = None) -> RuleClickExclude:
-        inputs = []
-        for area in ['C_END_MESSAGE_RIGHT_TOP', 'C_END_ACTIVITY_REWARD']:
-            click = getattr(self, area, None)
-            if click is None:
-                raise ValueError(f'Unknown success exclusion click: {area!r}')
-            inputs.append(click)
-        return RuleClickExclude(inputs, name='exclude_click_activity', strategy='rejection', distribution='uniform')
+        rule = PerBattleSuccess.reward_exclude_click(
+            self, ['C_END_MESSAGE_RIGHT_TOP', 'C_END_ACTIVITY_REWARD'],
+            name='exclude_click_activity')
+        rule.strategy = 'rejection'
+        rule.distribution = 'uniform'
+        return rule
 
     def _bw_success_activity(self, pub: PublicContext, pri: PrivateContext) -> HookSignal:
         """
@@ -1599,6 +1620,8 @@ class BattleWait(BaseTask, GeneralBattleAssets):
         timer = Timer(20).start()
         while 1:
             self.screenshot()
+            if self.close_battle_statistics():
+                continue
 
             # 不小心点到了具体的奖励，他会弹出这个物品的详细描述 里面必定包含有“获取途径”
             if self.appear(self.I_END_FIX_1) or self.appear(self.I_END_FIX_2) or self.appear(self.I_END_FIX_3):
@@ -1672,6 +1695,8 @@ class BattleWait(BaseTask, GeneralBattleAssets):
 
         while True:
             self.screenshot()
+            if self.close_battle_statistics():
+                continue
             hook_enabled = runtime.hook_enabled()
             # self.state_show()
             for handler in handlers:

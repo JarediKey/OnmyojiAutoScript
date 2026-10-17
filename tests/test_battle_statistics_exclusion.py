@@ -8,7 +8,7 @@ from tasks.Component.GeneralBattle.battle_wait import (
 )
 
 
-PROTECTED = [(44, 32, 72, 72), (383, 559, 52, 49)]
+PROTECTED = [(44, 32, 72, 72), (20, 610, 120, 100), (383, 559, 52, 49)]
 
 
 def intersects(first, second):
@@ -21,11 +21,20 @@ def intersects(first, second):
     None, [], ['C_END_MESSAGE_RIGHT_TOP'],
     OptionSuccessDefault().excludes_1, OptionSuccessDefault().excludes_2,
 ])
-def test_all_post_battle_allowed_rectangles_avoid_both_statistics_buttons(areas):
+def test_all_post_battle_allowed_rectangles_avoid_statistics_buttons(areas):
     rule = PerBattleSuccess.reward_exclude_click(GeneralBattleAssets, areas)
     for allowed in rule._allowed:
         assert not any(intersects(allowed, blocked) for blocked in PROTECTED)
     assert rule._allowed
+
+
+@pytest.mark.parametrize('areas', [[], OptionSuccessDefault().excludes_1,
+                                  OptionSuccessDefault().excludes_2])
+def test_observed_failure_clicks_are_never_allowed(areas):
+    rule = PerBattleSuccess.reward_exclude_click(GeneralBattleAssets, areas)
+    for x, y in [(82, 665), (79, 649)]:
+        assert not any(a <= x < a + w and b <= y < b + h
+                       for a, b, w, h in rule._allowed)
 
 
 @pytest.mark.parametrize('strategy', ['rejection', 'complement'])

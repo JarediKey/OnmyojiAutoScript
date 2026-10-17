@@ -59,8 +59,6 @@ class GeneralBattleAssets:
 	C_END_FRIENDS_32 = RuleClick(roi_front=(0,0,100,100), roi_back=(0,0,100,100), name="end_friends_32")
 	# description
 	C_END_FRIENDS_23 = RuleClick(roi_front=(0,0,100,100), roi_back=(0,0,100,100), name="end_friends_23")
-	# 御魂过多的【去清理】按钮
-	C_OVERFLOW_GHOST = RuleClick(roi_front=(456, 381, 160, 82), roi_back=(456, 381, 160, 82), name="overflow_ghost")
 
 
 	# Click Rule Assets
@@ -102,7 +100,7 @@ class GeneralBattleAssets:
 	C_END_3_6 = RuleClick(roi_front=(0,0,100,100), roi_back=(0,0,100,100), name="end_3_6")
 	# 其实贪吃鬼这个点了也是没事儿
 	C_END_GREED = RuleClick(roi_front=(138,16,512,93), roi_back=(138,16,512,93), name="end_greed")
-	# 中间的一堆奖励直接忽略。上面的end_1_1到end_3_6会容易UI变化失效 
+	# 中间的一堆奖励直接忽略。上面的end_1_1到end_3_6会容易UI变化失效
 	C_END_MASTER = RuleClick(roi_front=(251,145,811,530), roi_back=(248,143,815,535), name="end_master")
 
 
@@ -182,6 +180,12 @@ class GeneralBattleAssets:
 	C_RANDOM_RIGHT = RuleClick(roi_front=(1185,115,79,388), roi_back=(1185,115,79,388), name="random_right")
 	# Safe reward-page click: bottom
 	C_RANDOM_BOTTOM = RuleClick(roi_front=(462,599,492,78), roi_back=(462,599,492,78), name="random_bottom")
+	# Bottom-left statistics entry on victory and reward pages
+	C_END_STATISTICS_BOTTOM_LEFT = RuleClick(roi_front=(20,610,120,100), roi_back=(20,610,120,100), name="end_statistics_bottom_left")
+	# Continue below the battle statistics table
+	C_STATISTICS_CLOSE = RuleClick(roi_front=(560,692,160,24), roi_back=(560,692,160,24), name="statistics_close")
+	# Existing soul overflow cleanup action
+	C_OVERFLOW_GHOST = RuleClick(roi_front=(456,381,160,82), roi_back=(456,381,160,82), name="overflow_ghost")
 
 
 	# Image Rule Assets
@@ -270,3 +274,5 @@ class GeneralBattleAssets:
 	I_CONFIRM_CLOSE_DIFF_SOUL = RuleImage(roi_front=(571,404,135,54), roi_back=(517,374,226,112), threshold=0.8, method="Template matching", file="./tasks/Component/GeneralBattle/gb/gb_confirm_close_diff_soul.png")
 	# 禁用御魂不一致提示7天
 	I_DISABLE_7DAYS_DIFF_SOUL = RuleImage(roi_front=(547,342,27,36), roi_back=(524,325,70,71), threshold=0.8, method="Template matching", file="./tasks/Component/GeneralBattle/gb/gb_disable_7days_diff_soul.png")
+	# Battle statistics page title
+	I_BATTLE_STATISTICS_PAGE = RuleImage(roi_front=(515,43,255,50), roi_back=(470,20,355,95), threshold=0.85, method="Template matching", file="./tasks/Component/GeneralBattle/gb/gb_battle_statistics_page.png")

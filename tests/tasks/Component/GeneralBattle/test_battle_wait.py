@@ -84,6 +84,9 @@ def test_setup_runs_before_the_wait_loop():
         def __init__(self):
             self.events = []
 
+        def appear(self, target):
+            return False
+
         def screenshot(self):
             self.events.append('screenshot')
             runtime.hook_enabled_update(enable=('completion',), disable=())
@@ -108,6 +111,9 @@ def test_custom_hook_is_resolved_and_executed_in_the_configured_sequence():
     class CustomBattleWait(BattleWait):
         def __init__(self):
             self.events = []
+
+        def appear(self, target):
+            return False
 
         def screenshot(self):
             runtime.hook_enabled_update(enable=('completion',), disable=())
@@ -300,6 +306,9 @@ def test_runtime_distributes_typed_options_and_clears_previous_values():
 @pytest.mark.parametrize('outcome', [BattleResult.SUCCESS, BattleResult.FAILURE])
 def test_completion_returns_recorded_outcome(outcome):
     class Probe(BattleWait):
+        def appear(self, target):
+            return False
+
         def screenshot(self):
             runtime.hook_enabled_update(enable=('completion',), disable=())
         def _bw_setup_probe(self, pub, pri):

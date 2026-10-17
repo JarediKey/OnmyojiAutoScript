@@ -19,16 +19,26 @@ records `BattleResult.FAILURE` before enabling completion.
 
 ## Post-battle statistics exclusions
 
-The shared post-battle random click generator always excludes both statistics
-entries: the top-left reward-page button `(44,32,72,72)` and the victory-page
-button `(383,559,52,49)`. Rectangles use `(x,y,width,height)` with the origin at
-the upper left. The second region reuses `C_END_SOUL_DETAILS`.
+The shared post-battle random click generator always excludes three statistics
+entries: the top-left reward-page button `(44,32,72,72)`, the victory-page
+button `(383,559,52,49)`, and the bottom-left entry `(20,610,120,100)` including
+its surrounding click margin. Rectangles use `(x,y,width,height)` with the origin
+at the upper left. The second region reuses `C_END_SOUL_DETAILS`.
 
 These exclusions apply to the first victory click, later reward clicks and
 completion fallback clicks, including empty or task-specific exclusion lists.
 They do not change the initial click on the recognized victory banner.
 
-Regression checks: `python -m pytest tests/tasks/Component/GeneralBattle`.
+The shared wait loop and its blocking reward loops recognize the statistics-page
+title before interpreting the screen as an empty reward page. They click the
+footer continue area `(560,692,160,24)` at most three times, allowing two seconds
+to observe each attempt. The title must disappear before normal processing
+resumes. An unresponsive overlay raises `GameStuckError` through the existing
+recovery flow. Closing it alone never records a victory or changes battle counts.
+Solo awakening also checks this overlay while waiting for the next challenge
+button, covering a late overlay after the previous battle handler returns.
+
+Regression checks: `python -m pytest tests/test_battle_statistics_exclusion.py tests/test_battle_statistics_recovery.py tests/tasks/Component/GeneralBattle`.
 These are offline checks, not game validation.
 
 ## Legacy battle preparation confirmation
