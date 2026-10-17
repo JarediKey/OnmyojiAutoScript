@@ -192,10 +192,10 @@
     "itemName": "start_challenge",
     "imageName": "as_start_challenge.png",
     "roiFront": "685,407,142,47",
-    "roiBack": "685,407,142,47",
+    "roiBack": "640,345,235,200",
     "method": "Template matching",
     "threshold": 0.8,
-    "description": "周一点击确认开始挑战"
+    "description": "确认开始挑战"
   },
   {
     "itemName": "check_hero2",

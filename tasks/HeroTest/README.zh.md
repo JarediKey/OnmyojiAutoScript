@@ -6,8 +6,13 @@
 使用当前任务的页面副本；动态模式连接不会修改全局页面或其他实例选择的模式。
 
 御魂预设、阵容锁定、门票、技能选择、战斗限制和调度沿用现有行为。
-导航检查不使用设备或游戏：
+独立的“开始挑战”文字在 `(640,345,235,200)` 内搜索，避免弹窗小幅位移造成漏识别。
+入口先处理“开始挑战”和“确认重置”，再判断重试次数；每次点击后留出 2 秒过场时间，
+总等待上限 30 秒，仍最多点击挑战 3 或 4 次。真实入口失败抛出 `GameStuckError`，
+交由现有恢复流程重试，不将任务直接排到下周；门票不足仍正常跳过。
+
+导航与入口检查不使用设备或游戏：
 
 ```sh
-python -m pytest tests/test_hero_test_navigation.py tests/test_hero_test_skill_fallback.py
+python -m pytest tests/test_hero_test_navigation.py tests/test_hero_test_skill_fallback.py tests/test_hero_test_entry.py
 ```

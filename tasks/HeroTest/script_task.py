@@ -7,7 +7,7 @@ from typing import Callable
 from module.atom.click import RuleClick
 
 from module.logger import logger
-from module.exception import TaskEnd
+from module.exception import TaskEnd, GameStuckError
 from module.base.timer import Timer
 
 import tasks.GameUi.page as pages
@@ -61,31 +61,37 @@ class ScriptTask(GameUi, GeneralBattle, HeroTestAssets, SwitchSoul):
         raise TaskEnd
 
     def enter_battle(self) -> bool:
-        """进入战斗
-        :return: True:进入成功 False:进入失败
-        """
+        """Handle expected dialogs and allow transitions before spending a retry."""
         logger.info("Click battle")
         click_cnt, max_click = 0, random.randint(3, 4)
+        deadline = Timer(30).start()
+        settling = Timer(2)
         while True:
             self.screenshot()
             if self.is_in_battle(False):
-                return True  # 成功进入战斗
-            if click_cnt >= max_click:  # 异常情况,怎么都无法进入
+                return True
+            if deadline.reached():
                 break
-            if self.appear_then_click(self.I_START_CHALLENGE, interval=1):  # 兵藏秘境确认挑战
+            if self.appear_then_click(self.I_START_CHALLENGE, interval=1):
+                settling.reset()
                 continue
-            if self.appear_then_click(self.I_BCMJ_RESET_CONFIRM, interval=1):  # 兵藏秘境确认重置
+            if self.appear_then_click(self.I_BCMJ_RESET_CONFIRM, interval=1):
+                settling.reset()
                 continue
             if self.appear(self.I_REAL_MONEY, interval=1):  # 这里因为门票不够而不是其他异常所以success默认还是true
                 logger.warning('Ticket is not enough')
                 return False
-            if self.appear_then_click(self.O_FIRE, interval=1.2):  # 挑战按钮
+            if settling.started() and not settling.reached():
+                continue
+            if click_cnt >= max_click:
+                break
+            if self.appear_then_click(self.O_FIRE, interval=1.2):
                 self.device.stuck_record_clear()
                 click_cnt += 1
+                settling.reset()
                 continue
-        logger.error('Battle cannot enter, maybe recognize failed')
-        self.success = False  # 进入失败且不知道发生了什么情况
-        return False
+        raise GameStuckError(
+            f'HeroTest did not reach preparation or battle after {click_cnt} challenge clicks')
 
     def battle_wait(self, random_click_swipt_enable: bool) -> bool:
         self.device.stuck_record_add("BATTLE_STATUS_S")
