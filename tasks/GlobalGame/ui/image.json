@@ -160,5 +160,14 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "蓝色矩形确定"
+  },
+  {
+    "itemName": "ui_confirm_wide",
+    "imageName": "ui_ui_confirm_wide.png",
+    "roiFront": "694,380,163,49",
+    "roiBack": "350,300,600,400",
+    "method": "Template matching",
+    "threshold": 0.8,
+    "description": "探索宽版确认"
   }
 ]

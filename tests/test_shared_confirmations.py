@@ -27,6 +27,7 @@ class SharedConfirmationTests(unittest.TestCase):
             (GlobalGameAssets.I_UI_CONFIRM_SMALL, (672, 513)),
             (GlobalGameAssets.I_UI_CONFIRM_PLAIN, (419, 617)),
             (GlobalGameAssets.I_UI_CONFIRM_BLUE, (377, 630)),
+            (GlobalGameAssets.I_UI_CONFIRM_WIDE, (694, 380)),
         ):
             with self.subTest(button=source.name):
                 image = np.zeros((720, 1280, 3), dtype=np.uint8)
@@ -37,6 +38,39 @@ class SharedConfirmationTests(unittest.TestCase):
                 self.assertTrue(rule.match(image))
                 px, py = rule.coord()
                 self.assertTrue(x <= px < x+w and y <= py < y+h)
+
+    def exploration_exit_frame(self):
+        crop = cv2.imread(str(ROOT/'tests/fixtures/confirmations/exploration_exit.png'))
+        image = np.zeros((720, 1280, 3), dtype=np.uint8)
+        image[260:470, 340:940] = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+        return image
+
+    def test_real_exploration_dialog_selects_confirm_instead_of_cancel(self):
+        rule = DialogConfirmation()
+        self.assertTrue(rule.match(self.exploration_exit_frame()))
+        x, y = rule.coord()
+        self.assertTrue(694 <= x < 857 and 380 <= y < 429)
+
+    def test_exploration_exit_confirms_pending_dialog_before_another_back_click(self):
+        from tasks.Exploration.base import BaseExploration
+        task = object.__new__(BaseExploration)
+        task.device = Mock(image=self.exploration_exit_frame())
+        task.screenshot = Mock()
+        task.click = Mock(side_effect=AssertionError('Unexpected back click'))
+        phase = ['dialog']
+
+        def appear(target, **kwargs):
+            if phase[0] == 'world':
+                return target is task.I_CHECK_EXPLORATION
+            return isinstance(target, DialogConfirmation) and target.match(task.device.image)
+
+        task.appear = appear
+        task.device.click.side_effect = lambda *args, **kwargs: phase.__setitem__(0, 'world')
+        task.quit_explore()
+        task.device.click.assert_called_once()
+        x, y = task.device.click.call_args.args
+        self.assertTrue(694 <= x < 857 and 380 <= y < 429)
+        task.click.assert_not_called()
 
     def test_reset_and_empty_frames_are_not_plain_confirmations(self):
         image = np.zeros((720, 1280, 3), dtype=np.uint8)

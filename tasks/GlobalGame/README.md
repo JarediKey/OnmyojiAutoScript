@@ -3,11 +3,16 @@
 [简体中文](README.zh.md)
 
 Tasks use `BaseTask.I_UI_CONFIRM_DIALOG` for an expected plain “确定” or “确认”
-dialog. The matcher reuses complete long, compact, plain and blue button images
+dialog. The matcher reuses complete long, compact, plain, blue and wide-confirm button images
 from GlobalGame, searches `(350,300,600,400)` on the 1280×720 screen, and clicks
 inside the button that actually matched. All variants share one cooldown identity.
 Task-owned duplicates are removed; task-specific actions and completion checks stay
 with their callers. The broader matcher is not an unknown-page closer.
+
+The wide “确认” variant covers the exploration exit dialog. A cropped dialog
+fixture checks the actual confirmation location and verifies that exploration
+exit handles this dialog before another back click. It contains no account or
+background game information.
 
 Buttons with other meanings or text, including Create, Invite, Start, Confirm Reset,
 and skill-selection page markers, retain their own recognition. HeroTest's Confirm

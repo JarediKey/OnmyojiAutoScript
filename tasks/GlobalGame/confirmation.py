@@ -14,6 +14,7 @@ class DialogConfirmation(RuleImage):
             GlobalGameAssets.I_UI_CONFIRM_SMALL,
             GlobalGameAssets.I_UI_CONFIRM_PLAIN,
             GlobalGameAssets.I_UI_CONFIRM_BLUE,
+            GlobalGameAssets.I_UI_CONFIRM_WIDE,
         )
         super().__init__(sources[0].roi_front, (350, 300, 600, 400),
                          'Template matching', 0.8, sources[0].file)

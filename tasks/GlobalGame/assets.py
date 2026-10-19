@@ -52,6 +52,8 @@ class GlobalGameAssets:
 	I_UI_CONFIRM_PLAIN = RuleImage(roi_front=(419,617,174,61), roi_back=(350,300,600,400), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_plain.png")
 	# 蓝色矩形确定
 	I_UI_CONFIRM_BLUE = RuleImage(roi_front=(377,630,206,62), roi_back=(350,300,600,400), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_blue.png")
+	# 探索宽版确认
+	I_UI_CONFIRM_WIDE = RuleImage(roi_front=(694,380,163,49), roi_back=(350,300,600,400), threshold=0.8, method="Template matching", file="./tasks/GlobalGame/ui/ui_ui_confirm_wide.png")
 
 
 	# Image Rule Assets
