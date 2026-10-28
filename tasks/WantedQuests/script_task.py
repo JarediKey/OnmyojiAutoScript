@@ -78,12 +78,12 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
             if self.current_count >= 30:
                 logger.error(f'current count {self.current_count} >= 20, exit')
                 raise Exception('current count >= 20, exit')
-            cu, re, total, area = self.find_wq(self.device.image)
-            logger.info(f"find_wq result: current {cu} remain {re} total {total} area {area}")
-            if re == -2:
+            cu, remaining, total, area = self.find_wq(self.device.image)
+            logger.info(f"find_wq result: current {cu} remain {remaining} total {total} area {area}")
+            if remaining == -2:
                 logger.info("only completed wanted quests remained")
                 break
-            if re == -1:
+            if remaining == -1:
                 error_count += 1
                 # 没找到任务 尝试上滑
                 self.swipe(self.S_WQ_LIST_UP, interval=1)

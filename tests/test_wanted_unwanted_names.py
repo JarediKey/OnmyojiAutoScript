@@ -27,6 +27,7 @@ def test_unwanted_names_are_reset_and_empty_entries_never_match_every_monster(te
 def test_configured_monster_is_excluded_even_with_an_action_prefix():
     task = object.__new__(ScriptTask)
     task.unwanted_boss_name_list = ['荒川之主']
+    task.device = SimpleNamespace(image=None)
     task.screenshot = Mock()
     task.appear = Mock(return_value=True)
     task.O_WQ_MONSTER_TYPE = Mock()
