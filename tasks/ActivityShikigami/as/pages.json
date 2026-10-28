@@ -47,8 +47,8 @@
   {
     "itemName": "to_battle_boss",
     "imageName": "as_to_battle_boss.png",
-    "roiFront": "1111,248,37,136",
-    "roiBack": "979,142,234,327",
+    "roiFront": "1071,302,80,30",
+    "roiBack": "1000,250,200,120",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "点击进入boss战斗页面"
@@ -65,8 +65,8 @@
   {
     "itemName": "check_battle_boss",
     "imageName": "as_check_battle_boss.png",
-    "roiFront": "978,636,43,31",
-    "roiBack": "899,537,167,154",
+    "roiFront": "402,142,20,90",
+    "roiBack": "370,120,70,154",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "description"

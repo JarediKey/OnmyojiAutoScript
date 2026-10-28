@@ -13,6 +13,9 @@ class AppControl(AndroidUserApp, Adb, Uiautomator2):
     _app_u2_family = ['uiautomator2', 'minitouch', 'scrcpy']
 
     def app_is_running(self) -> bool:
+        # 桌面模式：窗口存在 且 已完成登录（自动启动的客户端停在登录页，需先走登录流程）
+        if self.is_desktop:
+            return self.desktop_window_exists() and getattr(self, '_desktop_login_done', True)
         if self.config.script.device.user_id >= 0:
             return self.app_current_user() == (self.config.script.device.user_id, self.package)
         method = self.config.script.device.control_method
