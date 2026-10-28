@@ -196,5 +196,14 @@
     "method": "Masked template matching",
     "threshold": 0.8,
     "description": "斗技胜利MVP分享页右下分享按钮"
+  },
+  {
+    "itemName": "ban_already",
+    "imageName": "duel_ban_already.png",
+    "roiFront": "1122,582,35,40",
+    "roiBack": "1110,570,59,64",
+    "method": "Template matching",
+    "threshold": 0.8,
+    "description": "Already banned indicator"
   }
 ]

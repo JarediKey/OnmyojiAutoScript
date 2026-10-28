@@ -10,5 +10,11 @@
     "roiFront": "105,23,52,47",
     "roiBack": "105,23,52,47",
     "description": "点击第五手上式神位置，获得式神名称"
+  },
+  {
+    "itemName": "duel_confirm",
+    "roiFront": "1120,560,120,85",
+    "roiBack": "1120,560,120,85",
+    "description": "Confirm high-rank lineup"
   }
 ]
