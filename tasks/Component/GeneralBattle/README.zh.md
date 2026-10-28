@@ -4,6 +4,8 @@
 
 普通御魂差异确认使用[通用弹窗规则](../../GlobalGame/README.zh.md)。两套结算流程均在
 继续点击奖励前，使用通用“知道了”处理御魂满仓提示。
+新版 success 钩子在当前结算内关闭该提示并继续收取，不再退出 success 转交
+独立 interrupt 处理器。
 
 战斗等待使用源头的类型化运行状态：`battle_wait_strategy` 选择处理函数，
 `battle_wait_options` 提供各事件的选项数据类。选项依次叠加类型默认值、装饰器

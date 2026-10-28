@@ -2,6 +2,13 @@
 
 [简体中文](README.zh.md)
 
+The current-interface update from upstream PR #1973 refreshes task tracing,
+destination buttons, invitation markers and OCR regions. Single-task tracking
+closes with the standard red back control. Configured unwanted names match
+within OCR strings that include action prefixes; blank comma-separated entries
+are ignored. The PR's unrelated automatic full-quantity Scales Sea purchase
+change is not enabled; configured purchase behavior is retained.
+
 After each secret-zone battle, recognized story dialogue is advanced before returning to navigation. The existing story landmark and a Shantu nameplate template trigger clicks at a 1.5-second interval. A visible story takes precedence over destination markers. Completion requires the challenge button or secret-zone list to remain visible for at least one second across multiple screenshots. A missing story match alone never means completion.
 
 Unknown frames are not clicked and reset destination confirmation. The handler has a 30-second deadline; failure to confirm a destination raises `GameStuckError` for the existing recovery flow. Waiting for the next challenge is bounded to 10 seconds, and returning to the secret-zone list after the battles is bounded to 20 seconds. These checks do not mark an incomplete task as successful.

@@ -56,7 +56,8 @@ class FakeAndroid:
 def device(user_id=12, method='uiautomator2'):
     obj = object.__new__(AppControl)
     obj.config = SimpleNamespace(script=SimpleNamespace(device=SimpleNamespace(
-        user_id=user_id, screenshot_method=method, control_method=method)))
+        user_id=user_id, screenshot_method=method, control_method=method),
+        desktop=SimpleNamespace(enable=False)))
     obj.serial = '127.0.0.1:16512'
     obj.package = PACKAGE
     android = FakeAndroid(user_id)

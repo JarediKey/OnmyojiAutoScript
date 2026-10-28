@@ -5,6 +5,8 @@
 Plain soul-difference confirmations use
 [shared dialog rules](../../GlobalGame/README.md). Both settlement implementations
 acknowledge soul-capacity notices with the shared Got It button before reward clicks.
+The typed success hook dismisses these notices inline and continues collecting
+the same settlement; it does not leave success for a separate interrupt handler.
 
 Battle wait uses the upstream typed runtime: `battle_wait_strategy` selects hooks,
 and `battle_wait_options` supplies event option dataclasses. Options combine typed

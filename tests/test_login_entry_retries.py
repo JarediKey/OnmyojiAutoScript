@@ -46,6 +46,7 @@ class LoginEntryRetriesTests(unittest.TestCase):
         assets.start()
         self.addCleanup(assets.stop)
         self.task = Mock()
+        self.task.device.is_desktop = False
         self.task.O_LOGIN_ENTER_GAME_ORIGIN = SimpleNamespace(
             name='LOGIN_ENTER_GAME_ORIGIN', coord=lambda: (640, 600))
         self.task.O_LOGIN_ENTER_GAME = SimpleNamespace(
