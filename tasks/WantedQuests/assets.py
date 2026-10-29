@@ -44,7 +44,7 @@ class WantedQuestsAssets:
 	# Ocr-description
 	O_WQ_INFO_4 = RuleOcr(roi=(711,506,315,44), area=(711,507,315,44), mode="Single", method="Default", keyword="", name="wq_info_4")
 	# 怪物名称,如酒吞，阎魔等
-	O_WQ_MONSTER_TYPE = RuleOcr(roi=(768,154,349,50), area=(768,154,349,50), mode="Full", method="Default", keyword="", name="wq_monster_type")
+	O_WQ_MONSTER_TYPE = RuleOcr(roi=(634,154,483,52), area=(634,154,483,52), mode="Full", method="Default", keyword="", name="wq_monster_type")
 	#
 	O_WQ_TEXT_ALL = RuleOcr(roi=(12,119,88,393), area=(12,119,88,393), mode="Full", method="Default", keyword="", name="wq_text_all")
 
@@ -98,9 +98,9 @@ class WantedQuestsAssets:
 	# 庭院悬赏任务界面 单个任务点开后 左上角是否追踪
 	I_WQ_TRACE_ONE_DISABLE = RuleImage(roi_front=(1156,570,77,67), roi_back=(1055,488,225,232), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/wq/wq_trace_one_disable.png")
 	# 庭院悬赏任务界面 单个任务点开后的界面 是否打开的 标志
-	I_WQ_TRACE_ONE_CHECK_OPENED = RuleImage(roi_front=(634,163,116,34), roi_back=(582,147,210,60), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/wq/wq_trace_one_check_opened.png")
+	I_WQ_TRACE_ONE_CHECK_OPENED = RuleImage(roi_front=(778,166,52,29), roi_back=(582,147,431,110), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/wq/wq_trace_one_check_opened.png")
 	# 庭院悬赏任务界面 单个任务点开后的界面 是否为现世任务标志
-	I_WQ_TRACE_ONE_REALWORLD = RuleImage(roi_front=(837,457,180,180), roi_back=(604,295,514,417), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/wq/wq_trace_one_realworld.png")
+	I_WQ_TRACE_ONE_REALWORLD = RuleImage(roi_front=(1173,579,51,54), roi_back=(1037,517,243,203), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/wq/wq_trace_one_realworld.png")
 
 
 	# Ocr Rule Assets
@@ -112,11 +112,11 @@ class WantedQuestsAssets:
 
 	# Image Rule Assets
 	# description
-	I_WQ_INVITE_1 = RuleImage(roi_front=(103,397,37,38), roi_back=(79,366,100,100), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_invite_1.png")
+	I_WQ_INVITE_1 = RuleImage(roi_front=(103,397,37,38), roi_back=(79,366,146,104), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_invite_1.png")
 	# description
-	I_WQ_INVITE_2 = RuleImage(roi_front=(386,399,31,35), roi_back=(355,368,100,100), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_invite_2.png")
+	I_WQ_INVITE_2 = RuleImage(roi_front=(386,399,31,35), roi_back=(355,368,157,108), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_invite_2.png")
 	# description
-	I_WQ_INVITE_3 = RuleImage(roi_front=(671,402,37,37), roi_back=(640,368,100,100), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_invite_3.png")
+	I_WQ_INVITE_3 = RuleImage(roi_front=(671,402,37,37), roi_back=(640,368,176,105), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_invite_3.png")
 	# description
 	I_WQ_FRIEND_1 = RuleImage(roi_front=(240,185,180,80), roi_back=(240,185,180,80), threshold=0.8, method="Template matching", file="./tasks/WantedQuests/invite/invite_wq_friend_1.png")
 	# description

@@ -126,12 +126,10 @@ class CostumeBase:
         asset_before_object.threshold = asset_after.threshold
         asset_before_object.file = asset_after.file
         asset_before_object.method = asset_after.method
-        # Keep the shared rule identity, but reload pixels/features for the new skin.
-        asset_before_object._image = None
-        asset_before_object._kp = None
-        asset_before_object._des = None
-        asset_before_object._match_init = False
-        for key in ('name', 'kp', 'des', 'is_template_match', 'is_sift_flann'):
+        # Keep shared rule references while reloading pixels, features, and masks.
+        asset_before_object.refresh()
+        for key in ('is_template_match', 'is_masked_template_match',
+                    'is_multi_scale_template_match', 'is_sift_flann'):
             asset_before_object.__dict__.pop(key, None)
 
     def check_costume_main(self, main_type: MainType):

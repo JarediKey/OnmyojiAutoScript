@@ -3,7 +3,7 @@
     "itemName": "wq_invite_1",
     "imageName": "invite_wq_invite_1.png",
     "roiFront": "103,397,37,38",
-    "roiBack": "79,366,100,100",
+    "roiBack": "79,366,146,104",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "description"
@@ -12,7 +12,7 @@
     "itemName": "wq_invite_2",
     "imageName": "invite_wq_invite_2.png",
     "roiFront": "386,399,31,35",
-    "roiBack": "355,368,100,100",
+    "roiBack": "355,368,157,108",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "description"
@@ -21,7 +21,7 @@
     "itemName": "wq_invite_3",
     "imageName": "invite_wq_invite_3.png",
     "roiFront": "671,402,37,37",
-    "roiBack": "640,368,100,100",
+    "roiBack": "640,368,176,105",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "description"

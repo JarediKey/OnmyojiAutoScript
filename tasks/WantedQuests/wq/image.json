@@ -119,8 +119,8 @@
   {
     "itemName": "wq_trace_one_check_opened",
     "imageName": "wq_trace_one_check_opened.png",
-    "roiFront": "634,163,116,34",
-    "roiBack": "582,147,210,60",
+    "roiFront": "778,166,52,29",
+    "roiBack": "582,147,431,110",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "庭院悬赏任务界面 单个任务点开后的界面 是否打开的 标志"
@@ -128,8 +128,8 @@
   {
     "itemName": "wq_trace_one_realworld",
     "imageName": "wq_trace_one_realworld.png",
-    "roiFront": "837,457,180,180",
-    "roiBack": "604,295,514,417",
+    "roiFront": "1173,579,51,54",
+    "roiBack": "1037,517,243,203",
     "method": "Template matching",
     "threshold": 0.8,
     "description": "庭院悬赏任务界面 单个任务点开后的界面 是否为现世任务标志"
