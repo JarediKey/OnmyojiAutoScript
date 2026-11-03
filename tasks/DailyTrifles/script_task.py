@@ -213,6 +213,7 @@ class ScriptTask(GameUi, Summon, DailyTriflesAssets):
         if self.config.daily_trifles.trifles_config.buy_sushi_count > 0:
             self.run_buy_sushi()
 
+        self.goto_page(page_mall, skip_first_screenshot=False, timeout=8)
         self.goto_page(page_main)
 
     def run_store_sign(self):
