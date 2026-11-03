@@ -137,3 +137,45 @@ class PrivateConfigPathTests(unittest.TestCase):
             new = module.git(root, 'rev-parse', 'HEAD')
             with self.assertRaisesRegex(RuntimeError, 'configuration change'):
                 module.prepare({'root': str(root), 'backup_root': str(Path(folder) / 'backups')}, old, new)
+
+
+class DeploymentRetryLockTests(unittest.TestCase):
+    def test_wait_releases_mutex_for_recovery_then_reacquires_for_activation(self):
+        import json
+        from filelock import FileLock, Timeout
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            settings = root / 'deploy.json'
+            settings.write_text(json.dumps({'root': str(root), 'backup_root': str(root)}))
+            lock_path = str(root / 'auto-deploy.lock')
+            attempts = []
+
+            def activate(*args):
+                with self.assertRaises(Timeout):
+                    with FileLock(lock_path, timeout=0):
+                        pass
+                attempts.append(True)
+                if len(attempts) == 1:
+                    raise DeploymentBusy('Recovery holds an account lease')
+
+            def wait(seconds):
+                self.assertEqual(seconds, 30)
+                # Model recovery needing the deployment mutex before releasing its leases.
+                with FileLock(lock_path, timeout=0):
+                    pass
+
+            def git(root, *args):
+                if args == ('rev-parse', 'HEAD'):
+                    return 'old'
+                if args == ('rev-parse', 'origin/prod'):
+                    return 'new'
+                return ''
+
+            with patch.object(module.sys, 'argv', ['safe_update', '--settings', str(settings), '--wait']), \
+                    patch.object(module, 'git', side_effect=git), \
+                    patch.object(module, 'prepare'), patch.object(module, 'report'), \
+                    patch.object(module, 'in_window', return_value=True), \
+                    patch.object(module, 'activate', side_effect=activate), \
+                    patch.object(module.time, 'sleep', side_effect=wait):
+                module.main()
+            self.assertEqual(len(attempts), 2)

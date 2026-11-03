@@ -21,6 +21,9 @@ The external recovery controller is maintained and deployed separately in
 OASRecovery. This checkout supplies its worker-lease/API integration; an OAS
 source update does not replace the independently installed recovery services.
 A busy worker makes the update defer immediately; its task is not terminated.
+The deployment mutex is released between retries so recovery can finish its
+schedule updates and release account leases. Each activation attempt reacquires
+the mutex and all required idle leases.
 
 The deployment window is 08:10 inclusive to 08:50 exclusive in Asia/Shanghai.
 `--wait` retries busy admission every 30 seconds within that window. If GitHub

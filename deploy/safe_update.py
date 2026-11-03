@@ -258,16 +258,18 @@ def main():
         backup = prepare(settings, old, revision)
         if args.prepare_only:
             return
-        while in_window():
-            try:
+    while in_window():
+        try:
+            with FileLock(str(state / 'auto-deploy.lock'), timeout=0):
                 activate(settings, old, revision, backup)
                 return
-            except DeploymentBusy as exc:
-                report('deferred', reason=str(exc))
-                if not args.wait:
-                    return
-                time.sleep(30)
-        report('deferred', reason='No safe idle opportunity before 08:50 Asia/Shanghai')
+        except (DeploymentBusy, Timeout) as exc:
+            report('deferred', reason=str(exc))
+            if not args.wait:
+                return
+            # Recovery may hold account leases while waiting for this mutex.
+            time.sleep(30)
+    report('deferred', reason='No safe idle opportunity before 08:50 Asia/Shanghai')
 
 
 if __name__ == '__main__':
