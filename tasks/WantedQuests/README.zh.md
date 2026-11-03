@@ -14,3 +14,7 @@
 新模板已用三次山兔剧情故障画面及一张庭院负样本验证。回归素材仅保留裁剪后的界面区域。其他仍无法识别的剧情页需要额外证据或模板，尚未进行游戏实机回放。
 
 恢复逻辑检查：`python -m unittest discover -s tests -p test_login_and_secret_recovery.py -v`。模板检查：`python -m unittest discover -s tests -p test_wanted_story_assets.py -v`（需要 OpenCV）。离线检查不能代替游戏实测。
+
+探索战斗返回稳定的大地图后，即使本地章节计数尚未达到计划次数，也返回悬赏主循环，
+重新读取界面上的真实任务进度。本地章节计数不能证明悬赏怪物数量是否已完成。
+瞬时的大地图画面仍须通过原有的新截图稳定检查；不会因此继续滑动或直接判定任务完成。

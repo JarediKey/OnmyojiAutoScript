@@ -62,8 +62,11 @@ class WQExplore(BaseExploration, HighLight):
                     timeout=Timer(2, count=10)
                 )
                 curr_scene = self.get_current_scene(reuse_screenshot=False)
-                if curr_scene == Scene.WORLD and _cnt_exploration >= num:
-                    logger.info('All Done')
+                if curr_scene == Scene.WORLD:
+                    if _cnt_exploration >= num:
+                        logger.info('All Done')
+                    else:
+                        logger.info('Returned to exploration world; reread wanted quest progress')
                     break
                 continue
             # 探索里面

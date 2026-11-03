@@ -16,3 +16,9 @@ Unknown frames are not clicked and reset destination confirmation. The handler h
 The new template was checked against three captured Shantu incident frames and a courtyard negative sample. Regression fixtures contain only cropped UI regions. Other unrecognized dialogue pages still require additional evidence/templates; live game replay has not been performed.
 
 Recovery checks: `python -m unittest discover -s tests -p test_login_and_secret_recovery.py -v`. Template checks: `python -m unittest discover -s tests -p test_wanted_story_assets.py -v` (requires OpenCV). Offline checks do not replace live game validation.
+
+When an exploration run returns to a stable world map, return to the WantedQuests
+loop and reread the displayed quest progress, even if the local chapter counter
+is below its planned quota. That counter does not prove whether the wanted
+monster quota was met. A transient world frame must pass the existing fresh-frame
+stability check; it does not trigger extra swipes or mark the task complete.
