@@ -11,11 +11,11 @@
   {
     "itemName": "main_goto_exploration_9",
     "imageName": "main9_main_goto_exploration_9.png",
-    "roiFront": "553,107,31,30",
-    "roiBack": "234,98,904,68",
+    "roiFront": "546,105,48,65",
+    "roiBack": "234,95,904,100",
     "method": "Template matching",
-    "threshold": 0.3,
-    "description": "description"
+    "threshold": 0.8,
+    "description": "Recognize both Exploration glyphs before clicking"
   },
   {
     "itemName": "main_goto_summon_9",

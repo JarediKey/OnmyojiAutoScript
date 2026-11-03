@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from module.exception import GamePageUnknownError
+from module.exception import GamePageUnknownError, GameStuckError
 from tasks.DailyTrifles.assets import DailyTriflesAssets
 from tasks.DailyTrifles.page import page_store_gift_room
 from tasks.DailyTrifles.script_task import ScriptTask
@@ -135,13 +135,16 @@ class MallAppearanceTests(unittest.TestCase):
                 self.assertEqual(task.clicks, [task.I_UI_BACK_YELLOW])
 
     def test_unrecognized_return_page_raises_instead_of_finishing(self):
-        for caller in (ScriptTask.run_store, MallNavbar.back_mall):
+        for caller, timer_path, error in (
+            (ScriptTask.run_store, "tasks.GameUi.navigator.Timer", GamePageUnknownError),
+            (MallNavbar.back_mall, "tasks.RichMan.mall.navbar.Timer", GameStuckError),
+        ):
             with self.subTest(caller=caller.__qualname__):
                 task = OfflineMallUi(self.variants[1], state="mall" if caller is ScriptTask.run_store else "blank")
                 task.after_sign = "blank"
-                with patch("tasks.GameUi.navigator.Timer") as timer:
+                with patch(timer_path) as timer:
                     timer.return_value.start.return_value.reached.return_value = True
-                    with self.assertRaises(GamePageUnknownError):
+                    with self.assertRaises(error):
                         caller(task)
                 self.assertEqual(task.clicks, [])
 
