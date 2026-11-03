@@ -74,10 +74,10 @@ jobs:
           git remote set-url --push origin git@github.com:JarediKey/OnmyojiAutoScript.git
           git config user.name "$GIT_AUTHOR_NAME"
           git config user.email "$GIT_AUTHOR_EMAIL"
-          git remote add upstream "https://github.com/${UPSTREAM_REPOSITORY}.git"
-          git fetch upstream master
-          if git merge-base --is-ancestor upstream/master HEAD; then exit 0; fi
-          git merge --no-edit upstream/master
+          git fetch "https://github.com/${UPSTREAM_REPOSITORY}.git" refs/heads/master
+          upstream=$(git rev-parse FETCH_HEAD)
+          if git merge-base --is-ancestor "$upstream" HEAD; then exit 0; fi
+          git merge --no-edit "$upstream"
           test "$(git show -s --format='%an <%ae>|%cn <%ce>')" = 'JarediKey <JarediKey@users.noreply.github.com>|JarediKey <JarediKey@users.noreply.github.com>'
           git push origin HEAD:master
 
