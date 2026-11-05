@@ -29,3 +29,12 @@ the instance before changing its user selection.
 
 Validation consists of offline command/state tests and read-only MuMu capability
 checks. Actual clone stopping, launching, and game login have not been live-tested.
+
+## Native touch handoff
+
+Native ADB minitouch connections are closed and their cached command builders
+discarded before an app launch/relaunch and during scheduler idle cleanup. The
+next touch establishes a fresh connection. This releases each worker's own socket;
+shared ADB forwards, the ADB server and other workers are retained. HTTP minitouch
+uses its existing lifecycle. Socket-level and lifecycle regression checks are in
+`tests/test_minitouch_handoff.py`; they do not establish every game-login cause.

@@ -29,11 +29,11 @@
   {
     "itemName": "main_goto_town_16",
     "imageName": "main16_main_goto_town_16.png",
-    "roiFront": "1014,346,14,34",
-    "roiBack": "960,300,100,120",
+    "roiFront": "1008,338,28,51",
+    "roiBack": "950,295,125,125",
     "method": "Template matching",
     "threshold": 0.8,
-    "description": "町中"
+    "description": "Town label at current courtyard rendering size"
   },
   {
     "itemName": "pet_house_16",

@@ -497,6 +497,22 @@ class Minitouch(Connection):
             )
         )
 
+    def minitouch_release(self):
+        """Release this worker's native touch socket before yielding the device."""
+        if self.config.DEVICE_OVER_HTTP:
+            return
+        client = self.__dict__.pop('_minitouch_client', None)
+        del_cached_property(self, 'minitouch_builder')
+        self._minitouch_port = 0
+        if client is None:
+            return
+        try:
+            client.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        client.close()
+        logger.info('Released native minitouch connection')
+
     @Config.when(DEVICE_OVER_HTTP=False)
     def minitouch_send(self):
         content = self.minitouch_builder.to_minitouch()

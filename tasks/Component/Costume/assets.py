@@ -108,8 +108,8 @@ class CostumeAssets:
 	I_MAIN_GOTO_EXPLORATION_16 = RuleImage(roi_front=(729,231,28,52), roi_back=(680,180,130,150), threshold=0.55, method="Template matching", file="./tasks/Component/Costume/main16/main16_main_goto_exploration_16.png")
 	# 召唤屋
 	I_MAIN_GOTO_SUMMON_16 = RuleImage(roi_front=(981,218,28,24), roi_back=(930,170,130,150), threshold=0.55, method="Template matching", file="./tasks/Component/Costume/main16/main16_main_goto_summon_16.png")
-	# 町中
-	I_MAIN_GOTO_TOWN_16 = RuleImage(roi_front=(1014,346,14,34), roi_back=(960,300,100,120), threshold=0.8, method="Template matching", file="./tasks/Component/Costume/main16/main16_main_goto_town_16.png")
+	# Town label at current courtyard rendering size
+	I_MAIN_GOTO_TOWN_16 = RuleImage(roi_front=(1008,338,28,51), roi_back=(950,295,125,125), threshold=0.8, method="Template matching", file="./tasks/Component/Costume/main16/main16_main_goto_town_16.png")
 	# 宠物屋
 	I_PET_HOUSE_16 = RuleImage(roi_front=(1256,402,20,58), roi_back=(1210,340,70,140), threshold=0.8, method="Template matching", file="./tasks/Component/Costume/main16/main16_pet_house_16.png")
 

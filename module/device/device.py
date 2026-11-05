@@ -138,6 +138,7 @@ class Device(DesktopDevice, Platform, Screenshot, Control, AppControl):
         return self.image
 
     def release_during_wait(self):
+        self.minitouch_release()
         # Scrcpy server is still sending video stream,
         # stop it during wait
         # self.config.script.device.screenshot_method = 'scrcpy'
@@ -265,6 +266,7 @@ class Device(DesktopDevice, Platform, Screenshot, Control, AppControl):
             logger.critical('No app stop/start, because HandleError disabled')
             logger.critical('Please enable Alas.Error.HandleError or manually login to AzurLane')
             raise RequestHumanTakeover
+        self.minitouch_release()
         super().app_start()
         self.stuck_record_clear()
         self.click_record_clear()
