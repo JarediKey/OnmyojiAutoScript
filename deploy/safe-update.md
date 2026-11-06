@@ -81,3 +81,9 @@ private configuration and any approved local source patches during initializatio
 outside the window. The controller reports `up_to_date`, `prepared`, `deferred`,
 `deployed` or `failed` as JSON. Inspect the report, not just the process exit code:
 deferral is a normal successful outcome, not proof that a revision was deployed.
+
+Android-user profiles also hold a serial-scoped emulator lock throughout active
+work and release it at the same scheduler-wait boundary. Acquiring this lock
+never holds global admission, so a queued shared profile does not block an
+unrelated emulator. Deployment/recovery still reserve profile locks and require
+normal idle acknowledgments.

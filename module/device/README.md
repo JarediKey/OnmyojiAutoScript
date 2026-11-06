@@ -24,7 +24,7 @@ fall back to another user. Existing automatic app-control permission
 Normal stop/restart operations also target the configured user. The setting does
 not modify game account data or switch the desktop's OS user. It does not provide
 parallel control of multiple clones, continuous monitoring of other clones, or
-per-display screenshots/touch. Use one OAS controller for that emulator and stop
+per-display screenshots/touch. Shared profiles must serialize access as described below. Stop
 the instance before changing its user selection.
 
 Validation consists of offline command/state tests and read-only MuMu capability
@@ -38,3 +38,14 @@ next touch establishes a fresh connection. This releases each worker's own socke
 shared ADB forwards, the ADB server and other workers are retained. HTTP minitouch
 uses its existing lifecycle. Socket-level and lifecycle regression checks are in
 `tests/test_minitouch_handoff.py`; they do not establish every game-login cause.
+
+## Shared-emulator ownership
+
+Android-user profiles with the same configured ADB serial serialize game work
+through an OS file lock. Ownership covers the active scheduler batch, including
+login, retries and idle cleanup; scheduler waits release it. On reacquisition,
+the cached selected user is cleared so the next task verifies/launches its own
+copy. Profiles on different serials and user ID -1 retain their existing execution.
+All profiles sharing an emulator must use the same serial spelling. Stop a profile
+before changing its serial or Android user ID. Recovery's 30-minute scheduling
+remains separate from this execution guard.

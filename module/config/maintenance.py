@@ -30,7 +30,7 @@ def state_dir(root):
 
 
 class WorkerLease:
-    def __init__(self, root, name):
+    def __init__(self, root, name, shared_serial=None):
         self.root = Path(root)
         self.name = name
         folder = state_dir(self.root)
@@ -38,6 +38,10 @@ class WorkerLease:
         self.lock = FileLock(str(folder / (key + '.lock')))
         self.state_path = folder / (key + '.json')
         self.admission = FileLock(str(folder / 'admission.lock'))
+        self.emulator_lock = (
+            FileLock(str(folder / (account_key('emulator:' + shared_serial) + '.device.lock')))
+            if shared_serial is not None else None
+        )
 
     def write(self, state, wake=0):
         data = {'version': 1, 'name': self.name, 'pid': os.getpid(),
@@ -52,29 +56,40 @@ class WorkerLease:
         # not block unrelated workers. Deployment takes all locks nonblocking.
         self.lock.acquire()
         try:
+            if self.emulator_lock is not None:
+                self.emulator_lock.acquire()
             with self.admission:
                 self.write('active')
             yield self
         finally:
             self.state_path.unlink(missing_ok=True)
+            if self.emulator_lock is not None:
+                self.emulator_lock.release()
             self.lock.release()
 
     @contextmanager
     def idle(self, future):
         wake = time.time() + (future - datetime.now()).total_seconds()
         self.write('idle', wake)
+        if self.emulator_lock is not None:
+            self.emulator_lock.release()
         self.lock.release()
         try:
             yield
         finally:
             self.lock.acquire()
+            if self.emulator_lock is not None:
+                self.emulator_lock.acquire()
             self.write('active')
 
 
 def maintenance_worker(func):
     @wraps(func)
     def wrapped(self, *args, **kwargs):
-        with WorkerLease(Path.cwd(), self.config_name).active() as lease:
+        script = self.config.script
+        serial = (script.device.serial
+                  if script.device.user_id >= 0 and not script.desktop.enable else None)
+        with WorkerLease(Path.cwd(), self.config_name, shared_serial=serial).active() as lease:
             self._maintenance_lease = lease
             return func(self, *args, **kwargs)
     return wrapped
@@ -87,7 +102,12 @@ def maintenance_idle(func):
         if lease is None:
             return func(self, future)
         with lease.idle(future):
-            return func(self, future)
+            result = func(self, future)
+        # Another profile may have owned the display while this worker waited.
+        device = self.__dict__.get('device')
+        if lease.emulator_lock is not None and device is not None:
+            device._started_app_user = None
+        return result
     return wrapped
 
 
