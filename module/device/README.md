@@ -27,8 +27,9 @@ parallel control of multiple clones, continuous monitoring of other clones, or
 per-display screenshots/touch. Shared profiles must serialize access as described below. Stop
 the instance before changing its user selection.
 
-Validation consists of offline command/state tests and read-only MuMu capability
-checks. Actual clone stopping, launching, and game login have not been live-tested.
+Validation includes offline command/state tests and MuMu capability checks.
+Clone launch and M5 login have been observed live. Shared ownership has concurrency
+regression coverage; these checks do not prove all game-login states.
 
 ## Native touch handoff
 
