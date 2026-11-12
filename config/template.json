@@ -847,7 +847,8 @@
     },
     "meta_demon_config": {
       "auto_tea": false,
-      "extreme_notify": false
+      "extreme_notify": false,
+      "auto_shared_boss": true
     },
     "switch_soul": {
       "enable": false,

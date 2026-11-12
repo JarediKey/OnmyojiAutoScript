@@ -148,11 +148,5 @@
     "roiFront": "560,692,160,24",
     "roiBack": "560,692,160,24",
     "description": "Continue below the battle statistics table"
-  },
-  {
-    "itemName": "overflow_ghost",
-    "roiFront": "456,381,160,82",
-    "roiBack": "456,381,160,82",
-    "description": "Existing soul overflow cleanup action"
   }
 ]

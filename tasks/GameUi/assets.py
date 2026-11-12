@@ -31,7 +31,7 @@ class GameUiAssets:
 
 	# Image Rule Assets
 	# 探索界面标识
-	I_CHECK_EXPLORATION = RuleImage(roi_front=(1152,148,21,22), roi_back=(1152,148,21,22), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_exploration.png")
+	I_CHECK_EXPLORATION = RuleImage(roi_front=(1152,148,21,22), roi_back=(1138,134,56,50), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_exploration.png")
 	# 探索前往觉醒
 	I_EXPLORATION_GOTO_AWAKE_ZONE = RuleImage(roi_front=(161,633,47,44), roi_back=(33,619,1150,99), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_exploration_goto_awake_zone.png")
 	# 探索前往御魂
@@ -126,7 +126,7 @@ class GameUiAssets:
 	# 庭院前往商店
 	I_MAIN_GOTO_MALL = RuleImage(roi_front=(664,661,40,18), roi_back=(601,613,163,78), threshold=0.7, method="Template matching", file="./tasks/GameUi/page/page_main_goto_mall.png")
 	# 庭院前往阴阳寮
-	I_MAIN_GOTO_GUILD = RuleImage(roi_front=(495,590,50,22), roi_back=(495,590,120,100), threshold=0.7, method="Template matching", file="./tasks/GameUi/page/page_main_goto_guild.png")
+	I_MAIN_GOTO_GUILD = RuleImage(roi_front=(495,590,50,22), roi_back=(495,590,120,100), threshold=0.7, method="Masked template matching", file="./tasks/GameUi/page/page_main_goto_guild.png")
 	# 庭院前往组队
 	I_MAIN_GOTO_TEAM = RuleImage(roi_front=(395,590,38,48), roi_back=(395,590,120,100), threshold=0.7, method="Template matching", file="./tasks/GameUi/page/page_main_goto_team.png")
 	# 庭院前往图鉴
@@ -144,7 +144,7 @@ class GameUiAssets:
 	# 花合战页面标志
 	I_CHECK_DAILY = RuleImage(roi_front=(28,515,58,62), roi_back=(1,487,154,145), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_daily.png")
 	# 商店页面标志
-	I_CHECK_MALL = RuleImage(roi_front=(231,455,131,78), roi_back=(201,432,185,121), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_mall.png")
+	I_CHECK_MALL = RuleImage(roi_front=(1087,413,47,114), roi_back=(1043,397,116,155), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_mall.png")
 	# 商店页面标志（紫色招牌）
 	I_CHECK_MALL_PURPLE = RuleImage(roi_front=(231,455,131,78), roi_back=(201,432,185,121), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_mall_purple.png")
 	# 商店推荐页面标志

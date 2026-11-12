@@ -59,6 +59,8 @@ class GeneralBattleAssets:
 	C_END_FRIENDS_32 = RuleClick(roi_front=(0,0,100,100), roi_back=(0,0,100,100), name="end_friends_32")
 	# description
 	C_END_FRIENDS_23 = RuleClick(roi_front=(0,0,100,100), roi_back=(0,0,100,100), name="end_friends_23")
+	# 御魂过多的【去清理】按钮
+	C_OVERFLOW_GHOST = RuleClick(roi_front=(456,381,160,82), roi_back=(456,381,160,82), name="overflow_ghost")
 
 
 	# Click Rule Assets
@@ -126,13 +128,6 @@ class GeneralBattleAssets:
 	O_GREEN_MARK_AREA = RuleOcr(roi=(84,256,1116,308), area=(84,256,1116,308), mode="Full", method="Default", keyword="", name="green_mark_area")
 
 
-	# Swipe Rule Assets
-	# description
-	S_BATTLE_RANDOM_LEFT = RuleSwipe(roi_front=(122,155,480,426), roi_back=(667,147,461,427), mode="default", name="battle_random_left")
-	# description
-	S_BATTLE_RANDOM_RIGHT = RuleSwipe(roi_front=(719,138,417,392), roi_back=(237,163,387,394), mode="default", name="battle_random_right")
-
-
 	# Click Rule Assets
 	# 预设队伍1
 	C_PRESET_TEAM_1 = RuleClick(roi_front=(195,235,465,110), roi_back=(195,235,465,110), name="preset_team_1")
@@ -184,8 +179,13 @@ class GeneralBattleAssets:
 	C_END_STATISTICS_BOTTOM_LEFT = RuleClick(roi_front=(20,610,120,100), roi_back=(20,610,120,100), name="end_statistics_bottom_left")
 	# Continue below the battle statistics table
 	C_STATISTICS_CLOSE = RuleClick(roi_front=(560,692,160,24), roi_back=(560,692,160,24), name="statistics_close")
-	# Existing soul overflow cleanup action
-	C_OVERFLOW_GHOST = RuleClick(roi_front=(456,381,160,82), roi_back=(456,381,160,82), name="overflow_ghost")
+
+
+	# Swipe Rule Assets
+	# description
+	S_BATTLE_RANDOM_LEFT = RuleSwipe(roi_front=(122,155,480,426), roi_back=(667,147,461,427), mode="default", name="battle_random_left")
+	# description
+	S_BATTLE_RANDOM_RIGHT = RuleSwipe(roi_front=(719,138,417,392), roi_back=(237,163,387,394), mode="default", name="battle_random_right")
 
 
 	# Image Rule Assets
@@ -268,3 +268,10 @@ class GeneralBattleAssets:
 	I_DISABLE_7DAYS_DIFF_SOUL = RuleImage(roi_front=(547,342,27,36), roi_back=(524,325,70,71), threshold=0.8, method="Template matching", file="./tasks/Component/GeneralBattle/gb/gb_disable_7days_diff_soul.png")
 	# Battle statistics page title
 	I_BATTLE_STATISTICS_PAGE = RuleImage(roi_front=(515,43,255,50), roi_back=(470,20,355,95), threshold=0.85, method="Template matching", file="./tasks/Component/GeneralBattle/gb/gb_battle_statistics_page.png")
+
+
+	# Image Rule Assets
+	# 显示是锁队伍的图标
+	I_TEAM_LOCK = RuleImage(roi_front=(1135,379,26,31), roi_back=(728,354,470,341), threshold=0.8, method="Template matching", file="./tasks/Component/GeneralBattle/lock/lock_team_lock.png")
+	# 显示是没有锁队伍的图标
+	I_TEAM_UNLOCK = RuleImage(roi_front=(1136,379,25,27), roi_back=(724,346,472,342), threshold=0.8, method="Template matching", file="./tasks/Component/GeneralBattle/lock/lock_team_unlock.png")

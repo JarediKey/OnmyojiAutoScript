@@ -23,13 +23,26 @@
 一键托管
 
 
-### [文档](https://runhey.github.io/OnmyojiAutoScript-website/)
+### [文档](https://www.onmyojiautoscript.cn/)
 
 #### 主仓库: [https://github.com/runhey/OnmyojiAutoScript](https://github.com/runhey/OnmyojiAutoScript)
 
 </div>
 
 阴阳师，作为一个手游，已经进入了生命周期的晚期。从现在到关服的这段时间里，请减少花费在阴阳师上的时间，把一切都交给 OAS。
+
+
+## 临时仓库
+
+2026.11.08 runhey 账号被 github 禁掉了。不知名原因、没有邮件通知，在申诉成功之前暂时使用当前备份仓库：
+
+https://github.com/nearaura/OnmyojiAutoScript
+
+国内镜像仓库，一直都挺稳定的：
+
+https://gitcode.com/OnmyojiAutoScript/OnmyojiAutoScript
+
+https://gitee.com/runheng/OnmyojiAutoScript
 
 ## 功能 Features
 
@@ -44,7 +57,7 @@
 - **全部任务**: 你能想到的没有想到的都有，一条龙给你解放双手（该画饼画饼，该挖坑挖坑）
 - **无缝衔接**: 时间管理大师，优异的任务调度系统，无缝寄养，无缝执行任务
 - **装饰可选**: 全部初始皮肤是什么鬼，这里支持你喜欢的庭院、主题等等，[详细说明](https://github.com/runhey/OnmyojiAutoScript/issues/180)
-- **百鬼夜行**: 利用AI来智能撒豆子，模型包含所有式神，[效果展示](https://runhey.github.io/OnmyojiAutoScript-website/docs/user-manual/hyakkiyakou)
+- **百鬼夜行**: 利用AI来智能撒豆子，模型包含所有式神，[效果展示](https://www.onmyojiautoscript.cn/docs/user-manual/hyakkiyakou)
 
 ## 许可证 LICENSE
 
@@ -97,10 +110,10 @@ OAS 在其基础上进行了如下优化：
 
 ## 安装 Installation 
 
-- [学会提问](https://runhey.github.io/OnmyojiAutoScript-website/docs/user-manual/scientific-question): 最基本的要求，**必看必学必会**
-- [用户手册](https://runhey.github.io/OnmyojiAutoScript-website/docs/user-manual/getting-started): 在线手册，不定期更新，包含所有使用说明
-- [安装教程](https://runhey.github.io/OnmyojiAutoScript-website/docs/user-manual/installation): 保姆式安装手册,多翻翻有惊喜
-- [开发文档](https://runhey.github.io/OnmyojiAutoScript-website/docs/development/preamble): 虽然迭代很多、年久失修，但入门开发必读，具体以源码为准
+- [学会提问](https://www.onmyojiautoscript.cn/docs/user-manual/scientific-question): 最基本的要求，**必看必学必会**
+- [用户手册](https://www.onmyojiautoscript.cn/docs/user-manual/getting-started): 在线手册，不定期更新，包含所有使用说明
+- [安装教程](https://www.onmyojiautoscript.cn/docs/user-manual/installation): 保姆式安装手册,多翻翻有惊喜
+- [开发文档](https://www.onmyojiautoscript.cn/docs/development/preamble): 虽然迭代很多、年久失修，但入门开发必读，具体以源码为准
 
 ## 鸣谢 Acknowledgements
 
