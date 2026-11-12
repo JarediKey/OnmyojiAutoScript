@@ -164,11 +164,11 @@
   {
     "itemName": "check_mall",
     "imageName": "page_check_mall.png",
-    "roiFront": "1087,413,47,114",
-    "roiBack": "1043,397,116,155",
+    "roiFront": "862,680,67,31",
+    "roiBack": "840,665,110,55",
     "method": "Template matching",
     "threshold": 0.8,
-    "description": "商店页面标志"
+    "description": "Fixed mall navbar shop label"
   },
   {
     "itemName": "check_mall_purple",

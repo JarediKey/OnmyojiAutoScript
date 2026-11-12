@@ -205,5 +205,14 @@
     "method": "Template matching",
     "threshold": 0.8,
     "description": "Already banned indicator"
+  },
+  {
+    "itemName": "d_entry_reward",
+    "imageName": "../../WeeklyTrifles/touch_fish/touch_fish_wt_happy_get.png",
+    "roiFront": "778,504,119,35",
+    "roiBack": "715,480,255,90",
+    "method": "Template matching",
+    "threshold": 0.8,
+    "description": "Receive the duel entry gift before starting a match"
   }
 ]

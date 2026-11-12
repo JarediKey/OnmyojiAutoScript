@@ -309,14 +309,18 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
         logger.hr('Start wanted quests')
         while 1:
             self.screenshot()
-            if self.appear(self.I_TRACE_TRUE):
+            if self.appear(self.I_TRACE_TRUE) or self.appear(self.I_WQ_TRACE_ONE_CHECK_OPENED):
                 break
             if self.click(ocr, interval=1):
                 continue
         if not self.appear(self.I_GOTO_1):
             # 如果没有出现 '前往'按钮， 那就是这个可能是神秘任务但是没有解锁
             logger.warning('This is a secret mission but not unlock')
-            self.ui_click(self.I_TRACE_TRUE, self.I_TRACE_FALSE)
+            if self.appear(self.I_TRACE_TRUE):
+                self.ui_click(self.I_TRACE_TRUE, self.I_TRACE_FALSE)
+            else:
+                self.ui_click_until_smt_disappear(
+                    self.I_UI_BACK_RED, stop=self.I_WQ_TRACE_ONE_CHECK_OPENED, interval=1.5)
             return False
         # 跳过不想打的
         monster_name = self.O_WQ_MONSTER_TYPE.detect_text(self.device.image)
@@ -690,6 +694,8 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
         reg_XX = re.compile(r'^(\d+)\1$')
         # 过滤掉协或者未知悬赏等其他无用字符
         reg_other = re.compile(r'[?？协边]')
+        unknown_rows = [calc_xywh(res.box)[1] for res in res_list
+                        if re.fullmatch(r'[?？]+', res.ocr_text.strip())]
         completed_only = False
         for index, res in enumerate(res_list):
             if reg_fengyin.match(res.ocr_text):
@@ -701,6 +707,10 @@ class ScriptTask(WQExplore, SecretScriptTask, WantedQuestsAssets):
             if (match := reg_progress.match(res.ocr_text)):
                 spliter_index = match.start(2)
                 xywh = calc_xywh(res.box)
+                # A question mark above this counter belongs to an unrevealed quest.
+                if any(0 < xywh[1] - y < 70 for y in unknown_rows):
+                    logger.info('Skip unrevealed mysterious wanted quest')
+                    continue
                 self.O_WQ_TEXT_ALL.area = xywh
                 cu, re, total = int(res.ocr_text[:spliter_index]), 1, int(res.ocr_text[spliter_index + 1:])
                 logger.info(f'Matched: {res.ocr_text}')

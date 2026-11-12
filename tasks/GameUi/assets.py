@@ -143,8 +143,8 @@ class GameUiAssets:
 	I_CHECK_FRIENDS = RuleImage(roi_front=(27,251,29,47), roi_back=(5,216,86,106), threshold=0.7, method="Template matching", file="./tasks/GameUi/page/page_check_friends.png")
 	# 花合战页面标志
 	I_CHECK_DAILY = RuleImage(roi_front=(28,515,58,62), roi_back=(1,487,154,145), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_daily.png")
-	# 商店页面标志
-	I_CHECK_MALL = RuleImage(roi_front=(1087,413,47,114), roi_back=(1043,397,116,155), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_mall.png")
+	# Fixed mall navbar shop label
+	I_CHECK_MALL = RuleImage(roi_front=(862,680,67,31), roi_back=(840,665,110,55), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_mall.png")
 	# 商店页面标志（紫色招牌）
 	I_CHECK_MALL_PURPLE = RuleImage(roi_front=(231,455,131,78), roi_back=(201,432,185,121), threshold=0.8, method="Template matching", file="./tasks/GameUi/page/page_check_mall_purple.png")
 	# 商店推荐页面标志

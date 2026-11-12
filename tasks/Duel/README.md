@@ -2,6 +2,12 @@
 
 [简体中文](README.zh.md)
 
+The entry gift's “开心收下” button is handled before reading the score or clicking
+the battle button. It reuses WeeklyTrifles' acknowledgement bitmap with a Duel
+search region. Matching takes a fresh screenshot after every click and checks
+the popup again, including while its click cooldown is active. A visible battle
+button behind the popup cannot cause repeated start clicks.
+
 Upstream PR #1971 handles high-rank ban selection and lineup confirmation.
 The ban page recognizes the already-banned stamp and stops clicking when it is
 visible. Each match permits at most five ban clicks. Forty ban-page loops without

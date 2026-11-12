@@ -66,6 +66,8 @@ class DuelAssets:
 	I_D_VICTORY_SHARE = RuleImage(roi_front=(1100,580,90,120), roi_back=(1080,560,130,160), threshold=0.8, method="Masked template matching", file="./tasks/Duel/duel/duel_d_victory_share.png")
 	# Already banned indicator
 	I_BAN_ALREADY = RuleImage(roi_front=(1122,582,35,40), roi_back=(1110,570,59,64), threshold=0.8, method="Template matching", file="./tasks/Duel/duel/duel_ban_already.png")
+	# Receive the duel entry gift before starting a match
+	I_D_ENTRY_REWARD = RuleImage(roi_front=(778,504,119,35), roi_back=(715,480,255,90), threshold=0.8, method="Template matching", file="./tasks/Duel/duel/../../WeeklyTrifles/touch_fish/touch_fish_wt_happy_get.png")
 
 
 	# Ocr Rule Assets

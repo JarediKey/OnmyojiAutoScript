@@ -43,7 +43,8 @@ class ScriptTask(GameUi, GeneralBattle, SwitchSoul, DuelAssets, SwitchOnmyoji):
         self.prepare_duel()
         while True:
             self.screenshot()
-            self.check_and_get_reward()
+            if self.check_and_get_reward():
+                continue
             if not self.duel_main():
                 self.goto_page(page_duel)
                 continue
@@ -113,13 +114,16 @@ class ScriptTask(GameUi, GeneralBattle, SwitchSoul, DuelAssets, SwitchOnmyoji):
     def enter_battle(self):
         """点击开始战斗(一直到出现战斗准备界面)"""
         logger.hr('duel battle matching')
-        while not self.is_in_battle_prepare():
+        while True:
             self.screenshot()
-            # 战斗按钮
-            self.ui_click_until_disappear(self.I_D_BATTLE, interval=1.2)
-            self.ui_click_until_disappear(self.I_D_BATTLE2, interval=1.2)
-            # 战斗带保护的按钮
-            self.ui_click_until_disappear(self.I_D_BATTLE_PROTECT, interval=1.2)
+            if self.check_and_get_reward():
+                continue
+            if self.is_in_battle_prepare() or self.is_in_real_battle() or self.is_battle_end():
+                break
+            # Refresh the frame after each input so overlays take priority.
+            for button in (self.I_D_BATTLE, self.I_D_BATTLE2, self.I_D_BATTLE_PROTECT):
+                if self.appear_then_click(button, interval=1.2):
+                    break
 
     def battle_prepare(self):
         """选式神准备斗技阶段"""
@@ -328,11 +332,16 @@ class ScriptTask(GameUi, GeneralBattle, SwitchSoul, DuelAssets, SwitchOnmyoji):
         logger.info('Souls Switch is complete')
         self.ui_click(self.I_UI_BACK_YELLOW, self.I_D_TEAM)
 
-    def check_and_get_reward(self):
+    def check_and_get_reward(self) -> bool:
         """检查并收获奖励"""
+        if self.appear(self.I_D_ENTRY_REWARD):
+            self.appear_then_click(self.I_D_ENTRY_REWARD, interval=1)
+            return True
         if self.appear(self.I_REWARD, interval=0.6) or self.appear(self.I_UI_REWARD, interval=0.6):
             self.click(random_click(ltrb=(True, True, False, True)))
             logger.info('get reward')
+            return True
+        return False
 
     def is_in_battle_prepare(self, skip_screenshot=True) -> bool:
         """是否在战斗准备界面"""

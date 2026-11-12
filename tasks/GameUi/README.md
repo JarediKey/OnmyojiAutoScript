@@ -2,6 +2,11 @@
 
 [简体中文](README.zh.md)
 
+The mall overview is recognized by the fixed bottom navigation's shop label,
+avoiding the animated shop sign in the scenery. Its threshold remains 0.8.
+The purple-sign appearance retains its separate rule. Recommendation and
+individual shop pages are not treated as the overview.
+
 When navigation finds an active battle or preparation page, the battle hook uses
 the current task's `GeneralBattle` implementation if available. A navigation-only
 task such as GotoMain creates `GeneralBattle` with the same configuration and

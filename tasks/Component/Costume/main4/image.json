@@ -11,11 +11,11 @@
   {
     "itemName": "main_goto_exploration_4",
     "imageName": "main4_main_goto_exploration_4.png",
-    "roiFront": "439,234,32,48",
+    "roiFront": "441,243,25,40",
     "roiBack": "150,201,847,100",
     "method": "Template matching",
     "threshold": 0.8,
-    "description": "description"
+    "description": "Current exploration lantern text"
   },
   {
     "itemName": "main_goto_summon_4",
@@ -29,11 +29,11 @@
   {
     "itemName": "main_goto_town_4",
     "imageName": "main4_main_goto_town_4.png",
-    "roiFront": "814,242,47,60",
+    "roiFront": "843,244,18,36",
     "roiBack": "524,228,555,82",
     "method": "Template matching",
     "threshold": 0.8,
-    "description": "description"
+    "description": "Town label without animated background"
   },
   {
     "itemName": "pet_house_4",
