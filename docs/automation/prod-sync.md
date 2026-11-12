@@ -143,3 +143,6 @@ so an already published prod can deploy even when the Mac is offline or GitHub
 starts late. The native timer does not terminate an update at the window boundary;
 the controller itself refuses to begin a late activation. Transport diagnostics remain in its private
 state folder, while Actions receives the sanitized deployment report.
+
+Mac Git jobs use the existing SSH identity for both reads and publication of
+the fork; upstream source reads use its public HTTPS endpoint.
