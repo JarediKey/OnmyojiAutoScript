@@ -14,7 +14,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from module.atom.image import RuleImage, set_roi_match_padding
+from module.atom.image import RuleImage, ROI_BACK_EXPAND
+from module.base.utils import expand_roi
 from tasks.GameUi.assets import GameUiAssets
 from tasks.Component.Costume.config import ThemeType
 from tasks.Component.CostumeTheme.theme import apply_theme
@@ -28,16 +29,16 @@ OTHER_ENTRANCES = ('COLLECTION', 'TRAVEL', 'TEAM', 'MALL', 'DAILY', 'FRIENDS',
 class SharedGuildMaskTests(unittest.TestCase):
     def setUp(self):
         apply_theme(ThemeType.COSTUME_THEME_DEFAULT)
-        set_roi_match_padding(0)
 
     def tearDown(self):
         apply_theme(ThemeType.COSTUME_THEME_DEFAULT)
-        set_roi_match_padding(0)
 
     def rule(self, method='Masked template matching'):
-        source = GameUiAssets.I_MAIN_GOTO_GUILD
-        return RuleImage(tuple(source.roi_front), source.roi_back, method,
-                         source.threshold, source.file)
+        items = json.loads((ROOT / 'tasks/GameUi/page/image_main.json').read_text(encoding='utf-8'))
+        row = next(item for item in items if item['itemName'] == 'main_goto_guild')
+        return RuleImage(tuple(map(int, row['roiFront'].split(','))),
+                         tuple(map(int, row['roiBack'].split(','))), method,
+                         row['threshold'], './tasks/GameUi/page/' + row['imageName'])
 
     def frame(self, state):
         crop = cv2.cvtColor(cv2.imread(str(FIXTURES / ('guild_search_' + state + '.png'))),
@@ -53,7 +54,7 @@ class SharedGuildMaskTests(unittest.TestCase):
         self.assertEqual(item['method'], 'Masked template matching')
         self.assertEqual(GameUiAssets.I_MAIN_GOTO_GUILD.method, item['method'])
         self.assertEqual(rule.threshold, 0.7)
-        self.assertEqual(rule.roi_back, (495, 590, 120, 100))
+        self.assertEqual(rule.roi_back, expand_roi((495, 590, 120, 100), ROI_BACK_EXPAND))
         self.assertEqual(rule.mask.shape, rule.image.shape[:2])
         self.assertEqual(set(np.unique(rule.mask)), {0, 255})
         self.assertGreater(np.count_nonzero(rule.mask), 200)
@@ -62,13 +63,11 @@ class SharedGuildMaskTests(unittest.TestCase):
                          'b7cbc4f76c6eef129e955b9b3d89a376a721b9930e4295011e98363bdd80a5d9')
 
     def test_new_theme_open_hits_at_guild_not_another_icon(self):
-        for pad in (0, 2):
-            with self.subTest(padding=pad):
-                set_roi_match_padding(pad)
-                rule = self.rule()
-                self.assertTrue(rule.match(self.frame('open')))
-                self.assertGreater(rule.last_score, 0.9)
-                self.assertEqual(rule.roi_front[:2], [556, 610])
+        with self.subTest(padding=pad):
+            rule = self.rule()
+            self.assertTrue(rule.match(self.frame('open')))
+            self.assertGreater(rule.last_score, 0.9)
+            self.assertEqual(rule.roi_front[:2], [556, 610])
 
     def test_plain_matching_reproduces_reported_failure(self):
         rule = self.rule('Template matching')
@@ -76,12 +75,10 @@ class SharedGuildMaskTests(unittest.TestCase):
         self.assertAlmostEqual(rule.last_score, 0.52842, places=4)
 
     def test_closed_scroll_is_not_a_guild_entrance(self):
-        for pad in (0, 2):
-            with self.subTest(padding=pad):
-                set_roi_match_padding(pad)
-                rule = self.rule()
-                self.assertFalse(rule.match(self.frame('closed')))
-                self.assertLess(rule.last_score, rule.threshold)
+        with self.subTest(padding=pad):
+            rule = self.rule()
+            self.assertFalse(rule.match(self.frame('closed')))
+            self.assertLess(rule.last_score, rule.threshold)
 
     def test_original_template_synthetic_control(self):
         rule = self.rule()
