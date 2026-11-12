@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 import unittest
 from tasks.DailyTrifles.assets import DailyTriflesAssets
+from module.atom.image import ROI_BACK_EXPAND
+from module.base.utils import expand_roi
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -18,5 +20,5 @@ class RegressionTests(unittest.TestCase):
         self.assertEqual(daily['roiBack'], '1162,77,98,535')
         self.assertEqual(
             tuple(DailyTriflesAssets.I_GIFT_RECOMMEND.roi_back),
-            (1162, 77, 98, 535),
+            expand_roi((1162, 77, 98, 535), ROI_BACK_EXPAND),
         )

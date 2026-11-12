@@ -38,5 +38,6 @@ class SkinTemplateReloadTests(unittest.TestCase):
         original = RuleImage((1, 2, 3, 4), (10, 20, 30, 40), 'Template matching', .8, 'old.png')
         replacement = RuleImage((5, 6, 7, 8), (50, 60, 70, 80), 'Template matching', .9, 'new.png')
         task = SimpleNamespace(I_TEST=original)
+        search_before = original.roi_back
         CostumeBase.replace_img(task, 'I_TEST', replacement, rp_roi_back=False)
-        self.assertEqual(task.I_TEST.roi_back, (10, 20, 30, 40))
+        self.assertEqual(task.I_TEST.roi_back, search_before)

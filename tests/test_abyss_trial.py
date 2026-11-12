@@ -188,6 +188,7 @@ class AbyssTrialTests(unittest.TestCase):
         import cv2
         import numpy as np
         from tasks.AbyssShadows.assets import AbyssShadowsAssets
+        from module.atom.image import ROI_BACK_EXPAND
         rules = (AbyssShadowsAssets.I_DIFFICULTY_EASY,
                  AbyssShadowsAssets.I_DIFFICULTY_NORMAL,
                  AbyssShadowsAssets.I_DIFFICULTY_HARD)
@@ -200,7 +201,7 @@ class AbyssTrialTests(unittest.TestCase):
             for rule in rules:
                 with self.subTest(menu=name, rule=rule.name):
                     self.assertEqual(rule.match(frame), expected)
-                    self.assertLessEqual(rule.roi_back[1] + rule.roi_back[3], 584)
+                    self.assertLessEqual(rule.roi_back[1] + rule.roi_back[3], 584 + ROI_BACK_EXPAND)
 
     def entry_frames(self, frames, locked=True):
         cfg = self.config_type()

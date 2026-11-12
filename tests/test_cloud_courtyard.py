@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 import unittest
 from tasks.Component.Costume.assets import CostumeAssets
+from module.atom.image import ROI_BACK_EXPAND
+from module.base.utils import expand_roi
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -29,4 +31,4 @@ class RegressionTests(unittest.TestCase):
                     expected[name],
                 )
                 generated = getattr(CostumeAssets, f'I_{name.upper()}')
-                self.assertEqual(tuple(generated.roi_back), expected[name])
+                self.assertEqual(tuple(generated.roi_back), expand_roi(expected[name], ROI_BACK_EXPAND))

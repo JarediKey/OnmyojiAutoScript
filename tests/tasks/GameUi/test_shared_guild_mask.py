@@ -63,11 +63,10 @@ class SharedGuildMaskTests(unittest.TestCase):
                          'b7cbc4f76c6eef129e955b9b3d89a376a721b9930e4295011e98363bdd80a5d9')
 
     def test_new_theme_open_hits_at_guild_not_another_icon(self):
-        with self.subTest(padding=pad):
-            rule = self.rule()
-            self.assertTrue(rule.match(self.frame('open')))
-            self.assertGreater(rule.last_score, 0.9)
-            self.assertEqual(rule.roi_front[:2], [556, 610])
+        rule = self.rule()
+        self.assertTrue(rule.match(self.frame('open')))
+        self.assertGreater(rule.last_score, 0.9)
+        self.assertEqual(rule.roi_front[:2], [556, 610])
 
     def test_plain_matching_reproduces_reported_failure(self):
         rule = self.rule('Template matching')
@@ -75,10 +74,9 @@ class SharedGuildMaskTests(unittest.TestCase):
         self.assertAlmostEqual(rule.last_score, 0.52842, places=4)
 
     def test_closed_scroll_is_not_a_guild_entrance(self):
-        with self.subTest(padding=pad):
-            rule = self.rule()
-            self.assertFalse(rule.match(self.frame('closed')))
-            self.assertLess(rule.last_score, rule.threshold)
+        rule = self.rule()
+        self.assertFalse(rule.match(self.frame('closed')))
+        self.assertLess(rule.last_score, rule.threshold)
 
     def test_original_template_synthetic_control(self):
         rule = self.rule()
