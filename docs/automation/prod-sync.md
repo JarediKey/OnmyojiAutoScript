@@ -2,6 +2,13 @@
 
 [简体中文](prod-sync.zh.md)
 
+The `runhey` remote currently points to the project-announced temporary source,
+`https://github.com/nearaura/OnmyojiAutoScript.git`. The official domestic mirror
+announces this address while the original runhey account is unavailable:
+https://gitee.com/runheng/OnmyojiAutoScript. The mirror and temporary source were
+verified at the same dev commit before changing the workflow source. The dev
+mirror remains exact; private production changes belong only on prod.
+
 `Sync Upstream Branches` lives on the default `master` branch. The Mac's daily
 dispatcher requests it at 00:10 UTC (08:10 Asia/Shanghai). GitHub's daily cron is
 retained as a fallback because its start can be delayed. Manual dispatch is also

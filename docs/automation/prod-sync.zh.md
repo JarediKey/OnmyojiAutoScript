@@ -2,6 +2,12 @@
 
 [English](prod-sync.md)
 
+`runhey` 远程目前指向项目公告指定的临时源：
+`https://github.com/nearaura/OnmyojiAutoScript.git`。原 runhey 账号不可用期间，
+官方国内镜像公告采用该地址：https://gitee.com/runheng/OnmyojiAutoScript。
+修改工作流源之前，已核对镜像与临时源的 dev 提交一致。dev 继续精确镜像，
+个人生产修改仅保留在 prod。
+
 `Sync Upstream Branches` 位于默认分支 `master`，由 Mac 每日派发程序在
 00:10 UTC（北京时间 08:10）请求运行。GitHub 自带每日定时保留为备用，因为它可能
 延迟实际开始时间。也支持手动触发。

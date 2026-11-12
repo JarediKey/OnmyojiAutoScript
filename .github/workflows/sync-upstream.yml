@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  UPSTREAM_REPOSITORY: runhey/OnmyojiAutoScript
+  UPSTREAM_REPOSITORY: nearaura/OnmyojiAutoScript
   PYTHONUTF8: "1"
   GIT_AUTHOR_NAME: JarediKey
   GIT_AUTHOR_EMAIL: JarediKey@users.noreply.github.com

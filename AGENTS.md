@@ -3,7 +3,8 @@
 ## Branch ownership
 
 - `origin` is `https://github.com/JarediKey/OnmyojiAutoScript.git`;
-  `runhey` is `https://github.com/runhey/OnmyojiAutoScript.git`.
+  `runhey` is `https://github.com/nearaura/OnmyojiAutoScript.git`, the temporary
+  upstream announced by the project and its domestic mirror after runhey was suspended.
 - Fetch both remotes before comparisons or work requiring current upstream.
 - `dev` mirrors `runhey/dev`. Do not put personal commits there; the daily
   synchronization workflow force-aligns the remote branch.
